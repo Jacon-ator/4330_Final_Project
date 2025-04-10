@@ -12,7 +12,7 @@ void main() {
   Flame.device.fullScreen();
 
   // Depending on what we decide, uncomment orientation
-  //Flame.device.setPortrait();
+  Flame.device.setPortrait();
   //Flame.device.setLandscape();
 
   // funky set up to allow for hotreloading while in debug mode
