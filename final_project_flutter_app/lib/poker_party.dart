@@ -14,7 +14,7 @@ class PokerParty extends FlameGame {
     super.onLoad();
 
     // Loads background image
-    final bgSprite = await loadSprite('art/Poker Table Mock Up.png');
+    final bgSprite = await loadSprite('art/Poker Party Gameplay Mock Up.png');
 
     // Create a SpriteComponent to display the background
     background = SpriteComponent()
