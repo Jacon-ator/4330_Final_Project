@@ -1,4 +1,4 @@
-import 'package:final_project_flutter_app/gamblers_paradise.dart';
+import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
@@ -11,16 +11,13 @@ void main() {
   // sets the app to fullscreen
   Flame.device.fullScreen();
 
-  // Depending on what we decide, uncomment orientation
-  Flame.device.setPortrait();
-  //Flame.device.setLandscape();
+  // sets the phone orentation to landscape mode
+  Flame.device.setLandscape();
 
   // funky set up to allow for hotreloading while in debug mode
-  // and not wile in release mode
-  if (kDebugMode) {
-    runApp(GameWidget(game: GamblersParadise()));
-  } else {
-    final game = GamblersParadise();
-    runApp(GameWidget(game: game));
-  }
+  // and not while in release mode
+  PokerParty game = PokerParty();
+  runApp(
+    GameWidget(game: kDebugMode ? PokerParty() : game),
+  );
 }
