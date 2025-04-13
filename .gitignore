@@ -24,4 +24,4 @@ doc/api/
 *.js.map
 
 .flutter-plugins
-.flutter-plugins-dependencies
+*configure_fingerprint.bin
