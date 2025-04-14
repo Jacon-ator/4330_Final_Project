@@ -6,6 +6,8 @@ import 'package:flutter/foundation.dart';
 
 //This is Jared's first commit comment
 
+//hi this is minseo
+
 void main() {
   // waits for flutter to be initialized before running things below
   WidgetsFlutterBinding.ensureInitialized();
