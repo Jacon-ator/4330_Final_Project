@@ -4,6 +4,10 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
+//This is Jared's first commit comment
+
+//hi this is minseo
+
 void main() {
   // waits for flutter to be initialized before running things below
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,3 +25,4 @@ void main() {
     GameWidget(game: kDebugMode ? PokerParty() : game),
   );
 }
+//austin was here

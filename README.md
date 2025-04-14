@@ -7,9 +7,9 @@
 <!--  If we do multiple games list of each game and what each game does (rules, goals, end condition) -->
 
 ### Contributors: 
-| Name         | Work Done                        |
+| Name         | Role(s)                          |
 |--------------|----------------------------------|
-| Alice Smith  | Designed the user interface      |
-| Bob Johnson  | Implemented backend logic        |
+| Aidan Eiler  | Designed the user interface      |
+| Matthew Nguyen  | Implemented backend logic        |
 | Carol White  | Wrote unit tests and documentation |
 | Dave Brown   | Managed deployment and DevOps    |
