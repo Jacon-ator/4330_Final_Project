@@ -4,6 +4,8 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
+//This is Jared's first commit comment
+
 void main() {
   // waits for flutter to be initialized before running things below
   WidgetsFlutterBinding.ensureInitialized();
