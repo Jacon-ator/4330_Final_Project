@@ -12,4 +12,4 @@
 | Alice Smith  | Designed the user interface      |
 | Bob Johnson  | Implemented backend logic        |
 | Carol White  | Wrote unit tests and documentation |
-| Dave Brown   | Managed deployment and DevOps    |
+| Jacob Kinchen| Art    |
