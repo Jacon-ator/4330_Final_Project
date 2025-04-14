@@ -27,6 +27,7 @@ jobs:
           cd final_project_flutter_app
           flutter build apk --release --split-per-abi
       - run: |
+          cd final_project_flutter_app
           flutter build ios --no-codesign
           cd build/ios/iphoneos
           mkdir Payload
