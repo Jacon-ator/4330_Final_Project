@@ -10,6 +10,6 @@
 | Name         | Role(s)                          |
 |--------------|----------------------------------|
 | Aidan Eiler  | Designed the user interface      |
-| Bob Johnson  | Implemented backend logic        |
+| Matthew Nguyen  | Implemented backend logic        |
 | Carol White  | Wrote unit tests and documentation |
 | Dave Brown   | Managed deployment and DevOps    |
