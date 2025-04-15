@@ -10,6 +10,11 @@ name: "Flutter CI"
 
 jobs:
   build:
+  
+    defaults:
+      run:
+        working-directory: ./final_project_flutter_app
+        
     name: Build and Release
     runs-on: macos-latest
     steps:
@@ -24,10 +29,8 @@ jobs:
           architecture: "x64"
 
       - run: |
-          cd final_project_flutter_app
           flutter build apk --release --split-per-abi
       - run: |
-          cd final_project_flutter_app
           flutter build ios --no-codesign
           cd build/ios/iphoneos
           mkdir Payload
