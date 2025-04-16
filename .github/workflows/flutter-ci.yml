@@ -10,6 +10,11 @@ name: "Flutter CI"
 
 jobs:
   build:
+
+    defaults:
+      run:
+        working-directory: ./final_project_flutter_app
+        
     name: Build and Release
     runs-on: macos-latest
     steps:
