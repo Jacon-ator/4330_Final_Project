@@ -1,6 +1,9 @@
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 
+import 'src/components/components.dart';
+import 'src/config.dart';
+
 class PokerParty extends FlameGame {
   late SpriteComponent background;
 
@@ -23,5 +26,8 @@ class PokerParty extends FlameGame {
 
     // Add it to the game
     add(background);
+
+    //Adds button to screen
+    add(MainMenuButton());
   }
 }
