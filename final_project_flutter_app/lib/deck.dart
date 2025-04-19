@@ -27,15 +27,12 @@ class Deck {
       13,
       14,
     ]; // 11 = Jack, 12 = Queen, 13 = King, 14 = Ace
-    for (int suitIndex = 0; suitIndex < suits.length; suitIndex++) {
-      String suit = suits[suitIndex];
-      for (int rankIndex = 0; rankIndex < ranks.length; rankIndex++) {
-        int rank = ranks[rankIndex];
-
-        // Calculate position in spritesheet grid
-        int x = rankIndex * 13; // Each card is 13px wide
-        int y = suitIndex * 21; // Each card is 21px tall
-
+    int x = -13;
+    int y = -13;
+    for (String suit in suits) {
+      x += 13;
+      for (int rank in ranks) {
+        y += 21;
         cards.add(Card(
           suit: suit,
           rank: rank,

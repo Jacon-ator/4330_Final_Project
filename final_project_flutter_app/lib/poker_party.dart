@@ -1,10 +1,11 @@
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
-
+import 'screens/main_menu_screen.dart';
+import 'screens/rules_screen.dart';
 import 'src/components/components.dart';
-import 'src/config.dart';
 
 class PokerParty extends FlameGame {
+  late final RouterComponent router;
   late SpriteComponent background;
 
   /* This implementation will probably be changed or deleted, just messing around
@@ -16,18 +17,23 @@ class PokerParty extends FlameGame {
   Future<void> onLoad() async {
     super.onLoad();
 
-    // Loads background image
-    final bgSprite = await loadSprite('art/Poker Party Gameplay Mock Up.png');
+    router = RouterComponent(
+      initialRoute: 'menu',
+      routes: {
+        'menu': Route(MainMenuScreen.new),
 
-    // Create a SpriteComponent to display the background
-    background = SpriteComponent()
-      ..sprite = bgSprite
-      ..size = size; // Makes it fill the screen
+        'rules': Route(RulesScreen.new),
+        // 'profile': Route(() => ProfilePage()),
+      },
+    );
 
-    // Add it to the game
-    add(background);
+    add(router);
 
-    //Adds button to screen
+    // Adds button to screen
     add(MainMenuButton());
+
+    void goTo(String route) {
+      router.pushNamed(route);
+    }
   }
 }

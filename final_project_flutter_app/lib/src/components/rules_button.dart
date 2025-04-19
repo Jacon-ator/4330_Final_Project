@@ -1,10 +1,9 @@
-//button class that will be used in the main menu
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
 
-class MainMenuButton extends PositionComponent
+class RulesButton extends PositionComponent
     with TapCallbacks, HasGameRef<PokerParty> {
   @override
   void render(Canvas canvas) {
@@ -14,7 +13,7 @@ class MainMenuButton extends PositionComponent
 
     final textPainter = TextPainter(
       text: TextSpan(
-        text: 'Main Menu',
+        text: 'Texas Hold\'em Rules',
         style: TextStyle(color: Colors.white, fontSize: 24),
       ),
       textDirection: TextDirection.ltr,
@@ -29,7 +28,6 @@ class MainMenuButton extends PositionComponent
   @override
   void onTapDown(TapDownEvent event) {
     super.onTapDown(event);
-    // Navigate to the main menu screen when the button is tapped
-    gameRef.router.pushNamed('menu');
+    gameRef.router.pushNamed('rules');
   }
 }
