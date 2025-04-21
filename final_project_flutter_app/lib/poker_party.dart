@@ -5,6 +5,7 @@ import 'package:flame/game.dart';
 import 'screens/main_menu_screen.dart';
 import 'screens/rules_screen.dart';
 import 'src/components/components.dart';
+import 'screens/support_screen.dart';
 
 class PokerParty extends FlameGame {
   late final RouterComponent router;
@@ -32,6 +33,7 @@ class PokerParty extends FlameGame {
         'menu': Route(MainMenuScreen.new),
         'rules': Route(RulesScreen.new),
         'game': Route(GameScreen.new),
+        'support': Route(SupportScreen.new),
       },
     );
 
