@@ -20,4 +20,8 @@ class PlayingCard {
       return -1; // Card b is greater
     }
   }
+
+  String toString() {
+    return 'PlayingCard{suit: $suit, rank: $rank, position: $position}';
+  }
 }

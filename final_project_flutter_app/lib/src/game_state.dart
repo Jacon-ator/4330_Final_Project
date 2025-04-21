@@ -22,16 +22,24 @@ class GameState {
   int smallBlind = 25; // Small blind amount
 
   GameState();
+  void initializePlayers(List<String> playerNames) {
+    // Initialize players with given names and default balances
+    players = playerNames
+        .map((name) =>
+            Player(name, 1000)) // Default balance of 1000 for each player
+        .toList();
+  }
 
   void resetGame() {
     // Initialize the game state with default values
-    players = [
-      Player("Player 1", 1000),
-      Player("Player 2", 1000),
-      Player("Player 3", 1000),
-      Player("Player 4", 1000),
-    ];
-    communityCards = []; // Start with no community cards
+    initializePlayers([
+      "Player 1",
+      "Player 2",
+      "Player 3",
+      "Player 4"
+    ]); // Example player names
+    communityCards = [];
+    deck.resetDeck(); // Start with no community cards
     deck.cards = deck.generateDeck(); // Generate the deck of cards
     deck.shuffleDeck(); // Shuffle the deck
     currentPlayerIndex = 0;

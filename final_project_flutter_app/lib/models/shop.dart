@@ -12,7 +12,7 @@ class ShopOverlay extends PositionComponent with HasGameRef {
   Future<void> onLoad() async {
     super.onLoad();
 
-    // Title 
+    // Title
     title = TextComponent(
       text: 'Shop',
       textRenderer: TextPaint(
@@ -48,10 +48,10 @@ class ShopOverlay extends PositionComponent with HasGameRef {
       ),
     )
       ..anchor = Anchor.bottomLeft
-      ..position = Vector2(20, gameRef.size.y - 20)
-      // ..onTap = () { 
-      //    add route here
-      // };
+      ..position = Vector2(20, gameRef.size.y - 20);
+    // ..onTap = () {
+    //    add route here
+    // };
     add(backButton);
   }
 }
