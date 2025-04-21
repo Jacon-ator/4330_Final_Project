@@ -39,5 +39,19 @@ class ShopOverlay extends PositionComponent with HasGameRef {
       ..x = gameRef.size.x / 2
       ..y = 120;
     add(cosmeticCard);
+
+    // back button to return to game screen
+    final backButton = TextComponent(
+      text: 'Back',
+      textRenderer: TextPaint(
+        style: TextStyle(color: Colors.blue, fontSize: 28),
+      ),
+    )
+      ..anchor = Anchor.bottomLeft
+      ..position = Vector2(20, gameRef.size.y - 20)
+      // ..onTap = () { 
+      //    add route here
+      // };
+    add(backButton);
   }
 }
