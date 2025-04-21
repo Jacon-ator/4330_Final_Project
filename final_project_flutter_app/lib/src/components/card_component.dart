@@ -9,13 +9,19 @@ import 'package:flame/events.dart';
 class CardComponent extends PositionComponent with HasGameRef<PokerParty> {
   late final Sprite sprite;
   final PlayingCard card;
+  final String imagePath;
 
   CardComponent({
     required this.card,
-    required String imagePath,
+    required this.imagePath,
     super.position,
   }) : super(size: Vector2(cardWidth, cardHeight), anchor: Anchor.topLeft) {
     // Load the sprite for the card based on its suit and rank
+  }
+
+  @override
+  Future<void> onLoad() async {
+    // Only runs once, when the component is loaded.
     sprite = Sprite(gameRef.images.fromCache(imagePath));
   }
 
