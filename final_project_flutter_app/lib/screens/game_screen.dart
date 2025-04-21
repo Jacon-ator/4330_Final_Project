@@ -60,7 +60,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     add(background);
 
     print("Starting game...");
-    startGame();
+    await startGame();
   }
 
   void updateHandUI(Player player, int index) {
@@ -91,7 +91,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
         imagePath: 'art/cards/A-Hearts.png'));
   }
 
-  void startGame() {
+  Future<void> startGame() async {
     gameRef.gameState.resetGame(); // Reset the game state
     gameRef.gameState.initializePlayers([
       'Player 1', // Human player
@@ -99,21 +99,19 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       'AI Player 2', // AI player
       'AI Player 3' // AI player
     ]);
-    Future.delayed(Duration(seconds: 1), () {
-      dealCards(); // Deal cards to players
-    });
+    await dealCards(); // Deal cards to players
   }
 
-  void dealCards() async {
+  Future<void> dealCards() async {
     // Shuffle the deck before dealing cards
     for (Player player in gameRef.gameState.players) {
       player.receiveCard(
           gameRef.gameState.deck.dealCard()); // Deal one card to each player
       updateHandUI(player, 0);
-      await Future.delayed(Duration(milliseconds: 500)); // Delay for better UX
+      // await Future.delayed(Duration(milliseconds: 500)); // Delay for better UX
       player.receiveCard(gameRef.gameState.deck.dealCard());
       updateHandUI(player, 1); // Deal one card to each player
-      await Future.delayed(Duration(milliseconds: 500)); // Delay for better UX
+      // await Future.delayed(Duration(milliseconds: 500)); // Delay for better UX
       print(
           'Player ${player.name} received cards: ${player.hand[0].toString()} and ${player.hand[1].toString()}');
     }
