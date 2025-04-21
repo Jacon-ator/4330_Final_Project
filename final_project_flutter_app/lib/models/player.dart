@@ -4,7 +4,7 @@ class Player {
   final String name;
   int balance;
   int bet = 0;
-  List<Card> hand = [];
+  List<PlayingCard> hand = [];
   bool isAI = false; // Flag to indicate if the player is an AI
   bool isCurrentTurn = false; // Flag to indicate if it's the player's turn
   bool isFolded = false; // Flag to indicate if the player has folded
@@ -27,7 +27,7 @@ class Player {
     isCurrentTurn = false; // End the player's turn after placing a bet
   }
 
-  void receiveCard(Card card) {
+  void receiveCard(PlayingCard card) {
     hand.add(card);
   }
 

@@ -1,17 +1,17 @@
 import 'package:flame/game.dart';
 
-class Card {
+class PlayingCard {
   final String suit;
   final int rank;
   final Vector2 position;
 
-  Card({
+  PlayingCard({
     required this.suit,
     required this.rank,
     required this.position,
   });
 
-  static compareCard(Card a, Card b) {
+  static compareCard(PlayingCard a, PlayingCard b) {
     if (a.rank == b.rank) {
       return 0;
     } else if (a.rank > b.rank) {

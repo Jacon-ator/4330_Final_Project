@@ -5,7 +5,7 @@ import 'package:final_project_flutter_app/models/table.dart';
 
 class GameState {
   List<Player> players = [];
-  List<Card> communityCards = [];
+  List<PlayingCard> communityCards = [];
   Deck deck =
       Deck(name: "Standard Deck", cards: []); // Initialize with an empty deck
   Table table = Table(

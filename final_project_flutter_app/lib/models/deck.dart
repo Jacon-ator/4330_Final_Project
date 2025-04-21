@@ -3,14 +3,14 @@ import 'package:flame/game.dart';
 
 class Deck {
   String name;
-  List<Card> cards;
+  List<PlayingCard> cards;
   bool isShuffled = true;
 
   Deck({required this.name, required this.cards});
 
 // pixel size 13x21
-  List<Card> generateDeck() {
-    List<Card> cards = [];
+  List<PlayingCard> generateDeck() {
+    List<PlayingCard> cards = [];
     List<String> suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
     List<int> ranks = [
       2,
@@ -33,7 +33,7 @@ class Deck {
       x += 13;
       for (int rank in ranks) {
         y += 21;
-        cards.add(Card(
+        cards.add(PlayingCard(
           suit: suit,
           rank: rank,
           position: Vector2(x.toDouble(), y.toDouble()),
@@ -48,7 +48,7 @@ class Deck {
     isShuffled = true;
   }
 
-  Card dealCard() {
+  PlayingCard dealCard() {
     if (!isShuffled) {
       shuffleDeck();
     }
