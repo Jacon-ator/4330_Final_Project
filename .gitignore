@@ -26,3 +26,4 @@ doc/api/
 .flutter-plugins
 *configure_fingerprint.bin
 final_project_flutter_app/linux/flutter/
+final_project_flutter_app/macos/Flutter/
