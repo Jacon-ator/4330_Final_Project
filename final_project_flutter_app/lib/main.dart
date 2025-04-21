@@ -6,11 +6,6 @@ import 'package:flutter/foundation.dart';
 import 'widgets/profile_page.dart';
 import 'package:flame_audio/flame_audio.dart';
 
-//This is Jared's first commit comment
-
-//hi this is minseo
-//minseo commit
-
 void main() {
   // waits for flutter to be initialized before running things below
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,4 +23,3 @@ void main() {
     GameWidget(game: kDebugMode ? PokerParty() : game),
   );
 }
-//austin was here
