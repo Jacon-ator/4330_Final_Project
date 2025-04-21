@@ -1,4 +1,4 @@
-import 'package:final_project_flutter_app/card.dart';
+import 'package:final_project_flutter_app/models/card.dart';
 import 'package:flame/game.dart';
 
 class Deck {

@@ -1,10 +1,10 @@
+import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:final_project_flutter_app/src/components/components.dart';
 import 'package:final_project_flutter_app/src/components/rules_button.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
-import 'package:flame/game.dart';
 
-class MainMenuScreen extends Component with HasGameRef {
+class MainMenuScreen extends Component with HasGameRef<PokerParty> {
   late Vector2 size;
   late SpriteComponent background;
   @override
@@ -29,12 +29,16 @@ class MainMenuScreen extends Component with HasGameRef {
       ..size = Vector2(size.x / 3, size.y / 3)
       ..position = Vector2(size.x / 3, size.y / 2 - size.y / 6);
 
+    final StartGameButton startGameButton = StartGameButton()
+      ..size = Vector2(size.x / 3, size.y / 3)
+      ..position = Vector2(size.x / 3 * 2, size.y / 2 - size.y / 6);
+
     background = SpriteComponent()
-      ..sprite =
-          await gameRef.loadSprite('art/Poker Party Gameplay Mock Up.png')
+      ..sprite = await gameRef.loadSprite('art/Temp Title Screen.png')
       ..size = size; // Makes it fill the screen
     add(background);
     add(rulesButton);
+    add(startGameButton);
   }
 
   void render(Canvas canvas) {

@@ -1,3 +1,5 @@
+import 'package:final_project_flutter_app/screens/game_screen.dart';
+import 'package:final_project_flutter_app/src/game_state.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'screens/main_menu_screen.dart';
@@ -8,29 +10,32 @@ class PokerParty extends FlameGame {
   late final RouterComponent router;
   late SpriteComponent background;
 
-  /* This implementation will probably be changed or deleted, just messing around
-     and trying to get an image to be drawn in the window. Just wanted to get basic 
-     drawing of sprites and flame syntax working
-  */
+  final GameState gameState = GameState();
+
+  double _gameTimer = 0.0;
+  double _turnTimer = 0.0;
 
   @override
   Future<void> onLoad() async {
     super.onLoad();
 
+    /*
+      Initializes the router component with an initial route and a map of routes.
+      The initial route is 'menu', which will display the MainMenuScreen.
+      Additional routes can be added as needed, such as 'rules' for the RulesScreen. Make
+      sure that each screen is a Component, but that could be changed to widgets if we'd like
+      later on.
+    */
     router = RouterComponent(
       initialRoute: 'menu',
       routes: {
         'menu': Route(MainMenuScreen.new),
-
         'rules': Route(RulesScreen.new),
-        // 'profile': Route(() => ProfilePage()),
+        'game': Route(GameScreen.new),
       },
     );
 
     add(router);
-
-    // Adds button to screen
-    add(MainMenuButton());
 
     void goTo(String route) {
       router.pushNamed(route);
