@@ -1,15 +1,9 @@
+import 'package:final_project_flutter_app/models/player.dart';
+import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:final_project_flutter_app/src/components/card_component.dart';
+import 'package:final_project_flutter_app/src/components/components.dart';
 import 'package:final_project_flutter_app/src/components/hand_area.dart';
 import 'package:flame/components.dart';
-import 'package:final_project_flutter_app/poker_party.dart';
-import 'package:final_project_flutter_app/src/game_state.dart';
-import 'package:final_project_flutter_app/src/components/components.dart';
-import 'package:flame/game.dart';
-import 'package:flutter/material.dart';
-import 'package:final_project_flutter_app/models/deck.dart';
-import 'package:final_project_flutter_app/models/player.dart';
-import 'package:final_project_flutter_app/models/card.dart';
-import 'package:final_project_flutter_app/models/table.dart';
 
 class GameScreen extends Component with HasGameRef<PokerParty> {
   // This class will handle the game logic and UI for the game screen.
@@ -29,24 +23,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
 
     //load all images
     try {
-      await gameRef.images.loadAll([
-        'art/cards/A-Hearts.png',
-        'art/Poker Party Gameplay Mock Up.png',
-        // 'art/2-Hearts.png',
-        // 'art/3-Hearts.png',
-        // 'art/4-Hearts.png',
-        // 'art/5-Hearts.png',
-        // 'art/6-Hearts.png',
-        // 'art/7-Hearts.png',
-        // 'art/8-Hearts.png',
-        // 'art/9-Hearts.png',
-        // 'art/10-Hearts.png',
-        // 'art/J-Hearts.png',
-        // 'art/Q-Hearts.png',
-        // 'art/K-Hearts.png',
-        // 'art/A-Diamonds.png',
-        // Add other card images as needed
-      ]);
+      await gameRef.images.load('art/cards/Cards Mock Up.png');
     } catch (e) {
       print('Error loading images: $e');
     }
@@ -81,7 +58,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     final cardComponent = CardComponent(
       card: player.hand[index],
       position: Vector2.zero(), // Position will be determined by HandArea
-      imagePath: 'art/cards/A-Hearts.png',
+      imagePath: '',
     );
 
     // Add the card to the HandArea instead of directly to the screen

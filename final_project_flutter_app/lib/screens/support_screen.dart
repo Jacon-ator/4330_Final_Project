@@ -1,10 +1,6 @@
-import 'dart:ui';
-
 import 'package:final_project_flutter_app/src/components/components.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:final_project_flutter_app/poker_party.dart';
 
 class SupportScreen extends Component with HasGameRef {
   late Vector2 size;

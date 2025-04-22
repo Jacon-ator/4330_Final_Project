@@ -63,7 +63,7 @@ flutter:
   assets:
     - assets/images/art/Poker Party Gameplay Mock Up.png
     - assets/images/art/Temp Title Screen.png
-    - assets/images/art/cards/A-Hearts.png
+    - assets/images/art/cards/
     - assets/images/art/buttons/Rules Button.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

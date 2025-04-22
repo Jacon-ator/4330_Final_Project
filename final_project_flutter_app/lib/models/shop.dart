@@ -1,8 +1,5 @@
 import 'package:flame/components.dart';
-import 'package:flame/game.dart';
-import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
-import 'package:flame/input.dart';
 
 class ShopOverlay extends PositionComponent with HasGameRef {
   late TextComponent title;

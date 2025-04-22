@@ -1,10 +1,8 @@
 import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'widgets/profile_page.dart';
-import 'package:flame_audio/flame_audio.dart';
+import 'package:flutter/material.dart';
 
 void main() {
   // waits for flutter to be initialized before running things below

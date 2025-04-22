@@ -1,4 +1,5 @@
 import 'package:final_project_flutter_app/models/card.dart';
+import 'package:final_project_flutter_app/src/config.dart';
 import 'package:flame/game.dart';
 
 class Deck {
@@ -13,26 +14,27 @@ class Deck {
     List<PlayingCard> cards = [];
     List<String> suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
     List<int> ranks = [
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9,
-      10,
-      11,
-      12,
-      13,
       14,
+      13,
+      12,
+      11,
+      10,
+      9,
+      8,
+      7,
+      6,
+      5,
+      4,
+      3,
+      2,
     ]; // 11 = Jack, 12 = Queen, 13 = King, 14 = Ace
-    int x = -13;
-    int y = -13;
+    int x = -cardWidth.toInt();
+    int y = -cardHeight.toInt();
     for (String suit in suits) {
-      x += 13;
+      y += cardHeight.toInt();
+      x = -cardWidth.toInt();
       for (int rank in ranks) {
-        y += 21;
+        x += cardWidth.toInt();
         cards.add(PlayingCard(
           suit: suit,
           rank: rank,

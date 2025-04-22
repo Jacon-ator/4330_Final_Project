@@ -2,9 +2,9 @@ import 'package:final_project_flutter_app/screens/game_screen.dart';
 import 'package:final_project_flutter_app/src/game_state.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
+
 import 'screens/main_menu_screen.dart';
 import 'screens/rules_screen.dart';
-import 'src/components/components.dart';
 import 'screens/support_screen.dart';
 
 class PokerParty extends FlameGame {
@@ -13,8 +13,8 @@ class PokerParty extends FlameGame {
 
   final GameState gameState = GameState();
 
-  double _gameTimer = 0.0;
-  double _turnTimer = 0.0;
+  final double _gameTimer = 0.0;
+  final double _turnTimer = 0.0;
 
   @override
   Future<void> onLoad() async {

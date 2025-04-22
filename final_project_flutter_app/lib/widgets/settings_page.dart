@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class SettingsPage extends StatefulWidget {
   final VoidCallback onClose;
 
-  const SettingsPage({Key? key, required this.onClose}) : super(key: key);
+  const SettingsPage({super.key, required this.onClose});
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();

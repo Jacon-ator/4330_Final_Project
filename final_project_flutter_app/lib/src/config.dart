@@ -1,6 +1,6 @@
 //used for constant values that can be changed
-const cardHeight = 75.0;
-const cardWidth = 50.0;
+const cardHeight = 84.0;
+const cardWidth = 52.0;
 const cardOffset = 20.0; // Offset between cards
 
 const handareawidth = 100.0;
