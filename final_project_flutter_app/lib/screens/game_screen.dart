@@ -4,6 +4,7 @@ import 'package:final_project_flutter_app/src/components/card_component.dart';
 import 'package:final_project_flutter_app/src/components/components.dart';
 import 'package:final_project_flutter_app/src/components/hand_area.dart';
 import 'package:flame/components.dart';
+import 'package:flutter/material.dart';
 
 class GameScreen extends Component with HasGameRef<PokerParty> {
   // This class will handle the game logic and UI for the game screen.
