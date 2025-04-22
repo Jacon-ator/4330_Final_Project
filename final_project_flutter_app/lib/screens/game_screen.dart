@@ -12,9 +12,24 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
 
   List<ActionButton>? actionButtons;
   bool waitingForPlayerInput = false;
+  int playerIndex = 0;
 
   void showPlayerActions() {
     waitingForPlayerInput = true;
+    print('Showing player actions...');
+    print('Current player: ${gameRef.gameState.players[playerIndex].name}');
+
+    add(ActionButton('Call', () {
+      if (gameRef.gameState.players[playerIndex].isCurrentTurn) {
+        gameRef.gameState.players[playerIndex]
+            .call(gameRef.gameState.players[playerIndex].bet); // Call the bet
+        print('Player ${gameRef.gameState.players[playerIndex].name} called.');
+        nextPlayer(); // Move to the next player
+        playerTurn(); // Start the next player's turn
+      } else {
+        print('It is not your turn!');
+      }
+    }, Colors.green));
   }
 
   @override
@@ -90,5 +105,29 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       print(
           'Player ${player.name} received cards: ${player.hand[0].toString()} and ${player.hand[1].toString()}');
     }
+  }
+
+  void nextPlayer() {
+    playerIndex = (playerIndex + 1) %
+        gameRef.gameState.players.length; // Move to the next player
+    gameRef.gameState.players[playerIndex].isCurrentTurn =
+        true; // Set the next player as current turn
+  }
+
+  void playerTurn() {
+    List<Player> playerList = gameRef
+        .gameState.players; // Get the list of players from the game state
+    playerList[playerIndex].isCurrentTurn = true;
+    Player currentPlayer =
+        playerList[playerIndex]; // Set the first player as current turn
+    // This method will be called to start the player's turn.
+    // It will show the action buttons and wait for player input.
+    if (currentPlayer.isAI) {
+      // If it's an AI player's turn, handle AI logic here
+      currentPlayer.makeAIDecision();
+      currentPlayer.isCurrentTurn = false; // End AI turn after decision
+      nextPlayer(); // Move to the next player
+    } else
+      showPlayerActions();
   }
 }
