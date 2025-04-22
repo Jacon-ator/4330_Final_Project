@@ -25,14 +25,9 @@ class HandArea extends PositionComponent with HasGameRef<PokerParty> {
     if (!player.isAI) {
       // Human player cards at bottom
       position = Vector2(20 + (index * 55), 20); // Relative to HandArea
-    } else {
-      // AI player cards
-      int playerIndex = gameRef.gameState.players.indexOf(player);
-      position = Vector2((playerIndex - 1) * 200 + (index * 30), 0);
+      card.position = position;
+      add(card); // Add to HandArea's children
     }
-
-    card.position = position;
-    add(card); // Add to HandArea's children
   }
 
   @override

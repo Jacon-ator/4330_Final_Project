@@ -9,9 +9,9 @@ class Player {
   bool isCurrentTurn = false; // Flag to indicate if it's the player's turn
   bool isFolded = false; // Flag to indicate if the player has folded
 
-  Player(String name, int balance)
+  Player(String name, int balance, {this.isAI = false})
       : name = name.isEmpty ? "Player" : name,
-        balance = balance < 0 ? 0 : balance;
+        balance = balance < 0 ? 0 : balance; // Default to false if not provided
 
   void resetHand() {
     hand.clear();
@@ -34,7 +34,7 @@ class Player {
   void fold() {
     hand.clear(); // Clear the hand when the player folds
     isFolded = true; // Set the folded flag to true
-    isCurrentTurn = false; // End the player's turn
+    // isCurrentTurn = false; // End the player's turn
   }
 
   void call(int amount) {
@@ -52,10 +52,6 @@ class Player {
   void makeAIDecision() {
     // Placeholder for AI decision-making logic
     // This could be expanded with actual AI strategies
-    if (balance > 0 && !isFolded) {
-      // Example AI logic: bet half of the balance if not folded
-      int aiBet = (balance / 2).toInt();
-      placeBet(aiBet);
-    }
+    placeBet(10);
   }
 }

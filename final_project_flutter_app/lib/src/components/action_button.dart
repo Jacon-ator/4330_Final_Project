@@ -6,9 +6,27 @@ class ActionButton extends PositionComponent with TapCallbacks {
   final String action;
   final VoidCallback onPressed;
   final Color color;
+  static const double defaultSpacing = 10.0; // spacing between buttons
 
-  ActionButton(this.action, this.onPressed, this.color) {
+  // Add optional parameters for positioning
+  ActionButton(
+    this.action,
+    this.onPressed,
+    this.color, {
+    ActionButton? previousButton, // Optional previous button to align with
+    double spacing = defaultSpacing,
+    super.position,
+  }) {
     size = Vector2(120, 50);
+
+    // If previousButton is provided, position this button next to it
+    if (previousButton != null) {
+      position = Vector2(
+        previousButton.position.x + previousButton.size.x + spacing,
+        previousButton.position.y,
+      );
+    } else
+      position = Vector2(0, 0);
   }
 
   @override

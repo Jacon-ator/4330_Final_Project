@@ -22,22 +22,16 @@ class GameState {
   int smallBlind = 25; // Small blind amount
 
   GameState();
-  void initializePlayers(List<String> playerNames) {
+  void initializePlayer(String playerName, bool isAI) {
     // Initialize players with given names and default balances
-    players = playerNames
-        .map((name) =>
-            Player(name, 1000)) // Default balance of 1000 for each player
-        .toList();
+    players
+        .add(Player(playerName, 1000, isAI: isAI)); // Default balance of 1000
   }
 
   void resetGame() {
+    print("Resetting game state...");
     // Initialize the game state with default values
-    initializePlayers([
-      "Player 1",
-      "Player 2",
-      "Player 3",
-      "Player 4"
-    ]); // Example player names
+    initializePlayers();
     communityCards = [];
     deck.resetDeck(); // Start with no community cards
     deck.cards = deck.generateDeck(); // Generate the deck of cards
@@ -45,5 +39,23 @@ class GameState {
     currentPlayerIndex = 0;
     pot = 0;
     isGameOver = false;
+  }
+
+  void initializePlayers() {
+    for (int i = 0; i < 4; i++) {
+      bool isAI = false; // Default to false for human players
+      // Initialize players with default names and reset their states. this is just for testing and will be changed later
+      if (i == 0) {
+        isAI = false; // First player is a human player
+      } else {
+        isAI = true; // Other players are AI players
+      }
+      initializePlayer(
+          "player ${i + 1}", isAI); // Initialize players with default names
+    }
+  }
+
+  void rotateBlinds() {
+    players.add(players.removeAt(0)); // Move the first player to the end
   }
 }

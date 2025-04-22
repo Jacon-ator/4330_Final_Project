@@ -1,0 +1,28 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "final_project_flutter_app",
+            "cwd": "$Recycle.Bin\\S-1-5-21-2281296030-230277085-720073100-1001\\$RHRRDVC\\final_project_flutter_app",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "final_project_flutter_app (profile mode)",
+            "cwd": "$Recycle.Bin\\S-1-5-21-2281296030-230277085-720073100-1001\\$RHRRDVC\\final_project_flutter_app",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "final_project_flutter_app (release mode)",
+            "cwd": "$Recycle.Bin\\S-1-5-21-2281296030-230277085-720073100-1001\\$RHRRDVC\\final_project_flutter_app",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}
