@@ -1,4 +1,5 @@
 import 'package:final_project_flutter_app/screens/game_screen.dart';
+import 'package:final_project_flutter_app/screens/shop_screen.dart';
 import 'package:final_project_flutter_app/src/game_state.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
@@ -34,6 +35,7 @@ class PokerParty extends FlameGame {
         'rules': Route(RulesScreen.new),
         'game': Route(GameScreen.new),
         'support': Route(SupportScreen.new),
+        'shop': Route(ShopScreen.new),
       },
     );
 
