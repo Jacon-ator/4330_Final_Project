@@ -1,4 +1,5 @@
 import 'package:final_project_flutter_app/src/components/card_component.dart';
+import 'package:final_project_flutter_app/src/components/hand_area.dart';
 import 'package:flame/components.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:final_project_flutter_app/src/game_state.dart';
@@ -69,26 +70,22 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       return;
     }
 
-    // Calculate position based on player and card index
-    // Adjust for player position around the table
-    Vector2 position;
-
-    // Example: Position cards differently based on which player it is
-    if (player == gameRef.gameState.players[0]) {
-      // Human player
-      position = Vector2(100 + (index * 100), gameRef.size.y - 100);
-    } else {
-      // Calculate AI player positions (example: distribute around top of screen)
-      int playerIndex = gameRef.gameState.players.indexOf(player);
-      double x = 100 + (playerIndex * 200) + (index * 30);
-      double y = 150;
-      position = Vector2(x, y);
+    // Find the HandArea component
+    final handArea = children.whereType<HandArea>().firstOrNull;
+    if (handArea == null) {
+      print('Error: HandArea not found');
+      return;
     }
 
-    add(CardComponent(
-        card: player.hand[index],
-        position: position,
-        imagePath: 'art/cards/A-Hearts.png'));
+    // Create the card component
+    final cardComponent = CardComponent(
+      card: player.hand[index],
+      position: Vector2.zero(), // Position will be determined by HandArea
+      imagePath: 'art/cards/A-Hearts.png',
+    );
+
+    // Add the card to the HandArea instead of directly to the screen
+    handArea.addCard(player, cardComponent, index, gameRef);
   }
 
   Future<void> startGame() async {
@@ -99,6 +96,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       'AI Player 2', // AI player
       'AI Player 3' // AI player
     ]);
+    add(HandArea());
     await dealCards(); // Deal cards to players
   }
 
