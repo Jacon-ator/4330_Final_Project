@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "136301614529",
+    "project_id": "poker-party-80b1a",
+    "storage_bucket": "poker-party-80b1a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:136301614529:android:e8a3444fd77d64df570b40",
+        "android_client_info": {
+          "package_name": "com.example.final_project_flutter_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEI1LMAwr18HR06SRkwF4Bnlqp6q2BnO4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
