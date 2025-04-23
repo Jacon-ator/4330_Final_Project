@@ -24,7 +24,7 @@ class HandArea extends PositionComponent with HasGameRef<PokerParty> {
     Vector2 position;
     if (!player.isAI) {
       // Human player cards at bottom
-      position = Vector2(20 + (index * 55), 20); // Relative to HandArea
+      position = Vector2(20 + (index * 78), 15); // Relative to HandArea
       card.position = position;
       add(card); // Add to HandArea's children
     }
@@ -36,16 +36,16 @@ class HandArea extends PositionComponent with HasGameRef<PokerParty> {
 
     // Set HandArea position and size
     position = Vector2(
-        gameRef.size.x / 2 - 75, gameRef.size.y / 2 + 100); // Bottom of screen
-    size = Vector2(gameRef.size.x / 8 + 40, 150); // Full width, 150px height
+        gameRef.size.x / 2 - 91, gameRef.size.y / 2 + 180); // Bottom of screen
+    size = Vector2(gameRef.size.x - 1082, 155); // Full width, 150px height
 
-    // Draw background if desired
-    final bgPaint = Paint()
-      ..color = const Color.fromARGB(51, 178, 21, 21); // Semi-transparent black
-    add(RectangleComponent(
-      size: size,
-      paint: bgPaint,
-    ));
+    // DEBUG: Draws Window
+    // final bgPaint = Paint()
+    //   ..color = const Color.fromARGB(51, 178, 21, 21); // Semi-transparent black
+    // add(RectangleComponent(
+    //   size: size,
+    //   paint: bgPaint,
+    // ));
   }
 }
 

@@ -16,8 +16,9 @@ class CommunityCardArea extends RectangleComponent with HasGameRef<PokerParty> {
   Future<void> onLoad() async {
     super.onLoad();
     // Set the background color or any other properties if needed
-    paint.color =
-        const Color.fromARGB(51, 178, 21, 21); // Light gray background
+
+    paint.color = const Color.fromARGB(
+        0, 178, 21, 21); // DEBUG: Whant alpha to see window
   }
 
   void addCard(PlayingCard communityCard, int i, PokerParty gameRef) {
@@ -31,6 +32,8 @@ class CommunityCardArea extends RectangleComponent with HasGameRef<PokerParty> {
     add(ccardcomponent);
   }
 
+  /* Debug Window 
+
   @override
   void render(Canvas canvas) {
     super.render(canvas);
@@ -41,4 +44,6 @@ class CommunityCardArea extends RectangleComponent with HasGameRef<PokerParty> {
       ..strokeWidth = 2;
     canvas.drawRect(size.toRect(), borderPaint);
   }
+
+  */
 }
