@@ -43,4 +43,15 @@ class Card {
 
   /// generic constructor for creating cards
   const Card(this.rank, this.suit);
+
+  /// override == operator for proper equality comparison
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Card && other.rank == rank && other.suit == suit;
+  }
+
+  /// override hashCode for proper use in collections
+  @override
+  int get hashCode => rank.hashCode ^ suit.hashCode;
 }
