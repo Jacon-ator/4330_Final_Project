@@ -10,7 +10,13 @@ class RulesButton extends PositionComponent
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    sprite = await Sprite.load("art/buttons/Rules Button.png");
+    final image =
+        await gameRef.images.load("art/buttons/Master Button Sheet.png");
+    sprite = Sprite(
+      image,
+      srcPosition: Vector2(345, 240), // multiplied original coordinates
+      srcSize: Vector2(335, 65), // change width and height as needed
+    );
 
     // Optionally, adjust the size based on your asset's dimensions.
     if (sprite != null) {
