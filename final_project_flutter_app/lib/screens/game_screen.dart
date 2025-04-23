@@ -73,19 +73,56 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
 
   @override
   Future<void> onLoad() async {
-    super.onLoad();
+    await super.onLoad();
 
-    await gameRef.images.load('art/cards/Cards Mock Up.png');
+    await gameRef.images.loadAll([
+      'art/cards/Cards Mock Up.png',
+      'art/Base Poker Table.png',
+      'art/Base Player UI.png',
+      'art/Chat Menu.png'
+    ]);
 
-    // Load game screen components here
-    // For example, you can add a background or text explaining the game rules
-    final bgSprite =
-        await gameRef.loadSprite('art/Poker Party Gameplay Mock Up.png');
-    final background = SpriteComponent()
-      ..sprite = bgSprite
-      ..size = gameRef.size; // Makes it fill the screen
+    // Load sprites
+    final tableSprite = await gameRef.loadSprite('art/Base Poker Table.png');
+    final uiSprite = await gameRef.loadSprite('art/Base Player UI.png');
+    final chatMenuSprite = await gameRef.loadSprite('art/Chat Menu.png');
 
-    add(background);
+    // Define heights based on the screen dimensions
+    var scalarForDiff = 0.755;
+    final tableHeight = gameRef.size.y * scalarForDiff;
+    final uiHeight = gameRef.size.y * (1 - scalarForDiff);
+
+    // Define chat menu width as, e.g., 25% of the total screen width
+    final chatMenuWidth = gameRef.size.x * 0.242;
+    final tableWidth =
+        gameRef.size.x - chatMenuWidth; // remaining width for the poker table
+
+    // Create the poker table component (occupies the left portion)
+    final pokerTable = SpriteComponent()
+      ..sprite = tableSprite
+      ..size = Vector2(tableWidth, tableHeight)
+      ..position = Vector2(0, 0)
+      // Set the same priority as chat to have them on the same layer
+      ..priority = 0;
+
+    // Create the chat menu component (occupies the right portion of the table area)
+    final chatMenu = SpriteComponent()
+      ..sprite = chatMenuSprite
+      ..size = Vector2(chatMenuWidth, tableHeight)
+      ..position = Vector2(tableWidth, 0)
+      ..priority = 0;
+
+    // Create the player UI component (occupies the bottom 30% of the screen)
+    final playerUI = SpriteComponent()
+      ..sprite = uiSprite
+      ..size = Vector2(gameRef.size.x, uiHeight)
+      ..position = Vector2(0, tableHeight)
+      ..priority = 0;
+
+    // Add the components
+    add(pokerTable);
+    add(chatMenu);
+    add(playerUI);
 
     print("Starting game...");
     await startGame();
