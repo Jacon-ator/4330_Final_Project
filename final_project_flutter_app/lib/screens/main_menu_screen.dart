@@ -35,13 +35,13 @@ class MainMenuScreen extends Component with HasGameRef<PokerParty> {
     final SupportButton supportButton = SupportButton()
       ..size = Vector2(size.x / 3, size.y / 3)
       ..position = Vector2(size.x / 6, size.y / 6);
-      
+
     final ShopButton shopButton = ShopButton()
       ..size = Vector2(size.x / 3, size.y / 3)
       ..position = Vector2(size.x / 2 - size.x / 6, size.y * 0.65);
 
     background = SpriteComponent()
-      ..sprite = await gameRef.loadSprite('art/Temp Title Screen.png')
+      ..sprite = await gameRef.loadSprite('art/Title Screen.png')
       ..size = size; // Makes it fill the screen
     add(background);
     add(supportButton);
