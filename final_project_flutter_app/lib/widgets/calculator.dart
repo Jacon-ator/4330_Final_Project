@@ -104,4 +104,48 @@ class Card {
 
     return Card(rank, suit);
   }
+
+  /// returns a string representation of the card in format "RS"
+  /// where R is the rank (2-9, T, J, Q, K, A) and S is the suit (C, D, H, S)
+  @override
+  String toString() {
+    String rankStr;
+    switch (rank) {
+      case Rank.ace:
+        rankStr = 'A';
+        break;
+      case Rank.king:
+        rankStr = 'K';
+        break;
+      case Rank.queen:
+        rankStr = 'Q';
+        break;
+      case Rank.jack:
+        rankStr = 'J';
+        break;
+      case Rank.ten:
+        rankStr = 'T';
+        break;
+      default:
+        rankStr = (rank.index + 2).toString();
+    }
+
+    String suitStr;
+    switch (suit) {
+      case Suit.clubs:
+        suitStr = 'C';
+        break;
+      case Suit.diamonds:
+        suitStr = 'D';
+        break;
+      case Suit.hearts:
+        suitStr = 'H';
+        break;
+      case Suit.spades:
+        suitStr = 'S';
+        break;
+    }
+
+    return '$rankStr$suitStr';
+  }
 }
