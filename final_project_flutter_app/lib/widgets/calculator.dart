@@ -235,3 +235,39 @@ List<Card> _sortCardsByRankDescending(List<Card> cards) {
   sortedCards.sort((a, b) => b.value.compareTo(a.value));
   return sortedCards;
 }
+
+/// evaluates the best possible poker hand from the combined player hand and community cards
+/// returns a HandResult with the type and relevant cards
+/// this is the main entry point for hand evaluation
+HandResult evaluateHand({
+  required List<Card> playerHand,
+  required List<Card> communityCards,
+}) {
+  // combine player hand and community cards to get all available cards
+  final allCards = [...playerHand, ...communityCards];
+  
+  // check for each hand type in descending order (best to worst)
+  // as soon as a match is found, return the corresponding result
+  if (_isRoyalFlush(allCards)) {
+    return _createRoyalFlushResult(allCards);
+  } else if (_isStraightFlush(allCards)) {
+    return _createStraightFlushResult(allCards);
+  } else if (_isFourOfAKind(allCards)) {
+    return _createFourOfAKindResult(allCards);
+  } else if (_isFullHouse(allCards)) {
+    return _createFullHouseResult(allCards);
+  } else if (_isFlush(allCards)) {
+    return _createFlushResult(allCards);
+  } else if (_isStraight(allCards)) {
+    return _createStraightResult(allCards);
+  } else if (_isThreeOfAKind(allCards)) {
+    return _createThreeOfAKindResult(allCards);
+  } else if (_isTwoPair(allCards)) {
+    return _createTwoPairResult(allCards);
+  } else if (_isPair(allCards)) {
+    return _createPairResult(allCards);
+  } else {
+    // if no better hand is found, it's a high card hand
+    return _createHighCardResult(allCards);
+  }
+}
