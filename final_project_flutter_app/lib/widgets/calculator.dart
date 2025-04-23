@@ -12,11 +12,11 @@
 /// WINNING GIVEN THEIR PARTICULAR HAND.
 library;
 
-/// Represents the suit of a playing card
+/// represents the suit of a playing card
 enum Suit { clubs, diamonds, hearts, spades }
 
-/// Represents the rank of a playing card
-enum Rank {
+/// represents the rank of a playing card
+enum CardRank {
   two,
   three,
   four,
@@ -32,9 +32,23 @@ enum Rank {
   ace
 }
 
+/// represents the rank of a particular hand
+enum HandType {
+  highCard,
+  pair,
+  twoPair,
+  threeOfAKind,
+  straight,
+  flush,
+  fullHouse,
+  fourOfAKind,
+  straightFlush,
+  royalFlush
+}
+
 /// represents an individual card
 class Card {
-  final Rank rank;
+  final CardRank rank;
   final Suit suit;
 
   /// returns a numerical value representing the rank of the card
@@ -51,6 +65,18 @@ class Card {
     return other is Card && other.rank == rank && other.suit == suit;
   }
 
+  /// implement > operator for comparing cards by rank
+  bool operator >(Card other) => value > other.value;
+
+  /// implement < operator for comparing cards by rank
+  bool operator <(Card other) => value < other.value;
+
+  /// implement >= operator for comparing cards by rank
+  bool operator >=(Card other) => value >= other.value;
+
+  /// implement <= operator for comparing cards by rank
+  bool operator <=(Card other) => value <= other.value;
+
   /// override hashCode for proper use in collections
   @override
   int get hashCode => rank.hashCode ^ suit.hashCode;
@@ -60,28 +86,28 @@ class Card {
     if (str.length != 2)
       throw FormatException('Card string must be 2 characters');
 
-    Rank rank;
+    CardRank rank;
     switch (str[0]) {
       case 'A':
-        rank = Rank.ace;
+        rank = CardRank.ace;
         break;
       case 'K':
-        rank = Rank.king;
+        rank = CardRank.king;
         break;
       case 'Q':
-        rank = Rank.queen;
+        rank = CardRank.queen;
         break;
       case 'J':
-        rank = Rank.jack;
+        rank = CardRank.jack;
         break;
       case 'T':
-        rank = Rank.ten;
+        rank = CardRank.ten;
         break;
       default:
         final rankValue = int.tryParse(str[0]);
         if (rankValue == null || rankValue < 2 || rankValue > 9)
           throw FormatException('Invalid rank: ${str[0]}');
-        rank = Rank.values[rankValue - 2];
+        rank = CardRank.values[rankValue - 2];
     }
 
     Suit suit;
@@ -111,19 +137,19 @@ class Card {
   String toString() {
     String rankStr;
     switch (rank) {
-      case Rank.ace:
+      case CardRank.ace:
         rankStr = 'A';
         break;
-      case Rank.king:
+      case CardRank.king:
         rankStr = 'K';
         break;
-      case Rank.queen:
+      case CardRank.queen:
         rankStr = 'Q';
         break;
-      case Rank.jack:
+      case CardRank.jack:
         rankStr = 'J';
         break;
-      case Rank.ten:
+      case CardRank.ten:
         rankStr = 'T';
         break;
       default:
@@ -147,5 +173,24 @@ class Card {
     }
 
     return '$rankStr$suitStr';
+  }
+}
+
+/// represents the result of a hand evaluation
+class HandResult {
+  final HandType type;
+  final List<Card> relevantCards;
+
+  HandResult(this.type, this.relevantCards);
+
+  /// this will be likely used to compare other player's hands
+  bool operator >(HandResult other) => type.index > other.type.index;
+  bool operator <(HandResult other) => type.index < other.type.index;
+  bool operator >=(HandResult other) => type.index >= other.type.index;
+  bool operator <=(HandResult other) => type.index <= other.type.index;
+
+  @override
+  String toString() {
+    return 'HandResult{type: $type, relevantCards: $relevantCards}';
   }
 }
