@@ -5,26 +5,40 @@ import 'package:flutter/material.dart';
 
 class ShopButton extends PositionComponent
     with TapCallbacks, HasGameRef<PokerParty> {
+  Sprite? sprite;
+
+  @override
+  Future<void> onLoad() async {
+    double exportScale = 5; // Adjust this value based on your export scale
+    double yPositionOffset = 75; // Adjust this value based on your export scale
+    await super.onLoad();
+    final image =
+        await gameRef.images.load("art/buttons/Master Button Sheet.png");
+    sprite = Sprite(
+      image,
+      srcPosition: Vector2(69 * exportScale,
+          76 * exportScale), // multiplied original coordinates
+      srcSize: Vector2(67 * exportScale,
+          13 * exportScale), // change width and height as needed
+    );
+
+    // Optionally, adjust the size based on your asset's dimensions.
+    if (sprite != null) {
+      size = sprite!.srcSize;
+
+      position = Vector2(
+        gameRef.size.x / 2 - size.x / 2,
+        (gameRef.size.y / 2 - size.y / 2) - yPositionOffset * -3,
+      );
+    }
+  }
+
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-
-    final paint = Paint()..color = const Color(0xFFFF0000);
-    canvas.drawRect(size.toRect(), paint);
-
-    final textPainter = TextPainter(
-      text: const TextSpan(
-        text: 'Shop',
-        style: TextStyle(color: Colors.white, fontSize: 24),
-      ),
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout();
-    textPainter.paint(
-      canvas,
-      Offset(size.x / 2 - textPainter.width / 2,
-          size.y / 2 - textPainter.height / 2),
-    );
+    if (sprite != null) {
+      sprite!.renderRect(canvas, size.toRect());
+    }
   }
 
   @override

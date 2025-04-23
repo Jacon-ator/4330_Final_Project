@@ -10,11 +10,15 @@ class RulesButton extends PositionComponent
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+    double exportScale = 5; // Adjust this value based on your export scale
+    double yPositionOffset = 75; // Adjust this value based on your export scale
+
     final image =
         await gameRef.images.load("art/buttons/Master Button Sheet.png");
     sprite = Sprite(
       image,
-      srcPosition: Vector2(345, 240), // multiplied original coordinates
+      srcPosition: Vector2(69 * exportScale,
+          48 * exportScale), // multiplied original coordinates
       srcSize: Vector2(335, 65), // change width and height as needed
     );
 
@@ -24,7 +28,7 @@ class RulesButton extends PositionComponent
 
       position = Vector2(
         gameRef.size.x / 2 - size.x / 2,
-        (gameRef.size.y / 2 - size.y / 2),
+        (gameRef.size.y / 2 - size.y / 2) - yPositionOffset * -2,
       );
     }
   }
