@@ -4,9 +4,9 @@ allprojects {
         mavenCentral()
     }
 
-    dependencies {
-        classpath 'com.google.gms.google-services:4.4.1'
-    }
+    // dependencies {
+    //     classpath 'com.google.gms.google-services:4.4.1'
+    // }
 }
 
 rootProject.buildDir = "../build"

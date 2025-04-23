@@ -12,14 +12,16 @@ void main() {
     MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: Colors.black,
-        body: FittedBox(
-          fit: BoxFit.contain,
-          child: SizedBox(
-            // your “logical” canvas size:
-            width: 1265,
-            height: 685,
-            child: GameWidget(game: PokerParty()),
+        backgroundColor: Color(0xFF468232),
+        body: Center(
+          child: FittedBox(
+            fit: BoxFit.contain,
+            child: SizedBox(
+              // your “logical” canvas size:
+              width: 1265,
+              height: 685,
+              child: GameWidget(game: PokerParty()),
+            ),
           ),
         ),
       ),
