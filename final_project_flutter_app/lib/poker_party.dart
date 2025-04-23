@@ -10,7 +10,7 @@ import 'screens/rules_screen.dart';
 import 'screens/support_screen.dart';
 
 class PokerParty extends FlameGame {
-  // late final CameraComponent cameraComponent = CameraComponent();
+  late CameraComponent cameraComponent = CameraComponent();
   late final RouterComponent router;
   late SpriteComponent background;
 
@@ -22,6 +22,13 @@ class PokerParty extends FlameGame {
   @override
   Future<void> onLoad() async {
     super.onLoad();
+
+    // Setup a fixed resolution viewport
+    cameraComponent = CameraComponent.withFixedResolution(
+      width: 2570,
+      height: 1190,
+    );
+    add(cameraComponent);
 
     // add(cameraComponent);
     /*
