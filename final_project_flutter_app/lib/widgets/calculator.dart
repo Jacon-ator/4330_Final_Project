@@ -271,3 +271,439 @@ HandResult evaluateHand({
     return _createHighCardResult(allCards);
   }
 }
+
+/// checks if the cards contain a royal flush
+/// a royal flush is A, K, Q, J, 10 of the same suit
+/// returns true if the cards contain a royal flush, false otherwise
+bool _isRoyalFlush(List<Card> cards) {
+  final bySuit = _groupCardsBySuit(cards);
+  
+  // check each suit group that has at least 5 cards
+  for (final suitCards in bySuit.values) {
+    if (suitCards.length >= 5) {
+      // check for A, K, Q, J, 10 of the same suit
+      bool hasAce = suitCards.any((card) => card.rank == CardRank.ace);
+      bool hasKing = suitCards.any((card) => card.rank == CardRank.king);
+      bool hasQueen = suitCards.any((card) => card.rank == CardRank.queen);
+      bool hasJack = suitCards.any((card) => card.rank == CardRank.jack);
+      bool hasTen = suitCards.any((card) => card.rank == CardRank.ten);
+      
+      if (hasAce && hasKing && hasQueen && hasJack && hasTen) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/// creates a royal flush hand result
+/// finds the specific A, K, Q, J, 10 cards that form the royal flush
+/// returns a HandResult with type HandType.royalFlush and the relevant cards
+HandResult _createRoyalFlushResult(List<Card> cards) {
+  final bySuit = _groupCardsBySuit(cards);
+  
+  for (final suit in bySuit.keys) {
+    final suitCards = bySuit[suit]!;
+    
+    // check for A, K, Q, J, 10 of the same suit
+    final ace = suitCards.firstWhere(
+      (card) => card.rank == CardRank.ace,
+      orElse: () => Card(CardRank.two, Suit.clubs) // Default that should never be reached
+    );
+    
+    final king = suitCards.firstWhere(
+      (card) => card.rank == CardRank.king,
+      orElse: () => Card(CardRank.two, Suit.clubs)
+    );
+    
+    final queen = suitCards.firstWhere(
+      (card) => card.rank == CardRank.queen,
+      orElse: () => Card(CardRank.two, Suit.clubs)
+    );
+    
+    final jack = suitCards.firstWhere(
+      (card) => card.rank == CardRank.jack,
+      orElse: () => Card(CardRank.two, Suit.clubs)
+    );
+    
+    final ten = suitCards.firstWhere(
+      (card) => card.rank == CardRank.ten,
+      orElse: () => Card(CardRank.two, Suit.clubs)
+    );
+    
+    if (ace.rank == CardRank.ace && king.rank == CardRank.king &&
+        queen.rank == CardRank.queen && jack.rank == CardRank.jack &&
+        ten.rank == CardRank.ten) {
+      return HandResult(
+        HandType.royalFlush,
+        [ace, king, queen, jack, ten]
+      );
+    }
+  }
+  
+  // This should never happen if _isRoyalFlush was true
+  throw StateError('Failed to create royal flush result');
+}
+
+/// checks if the cards contain a straight flush (5 sequential cards of the same suit)
+/// returns true if the cards contain a straight flush, false otherwise
+bool _isStraightFlush(List<Card> cards) {
+  final bySuit = _groupCardsBySuit(cards);
+  
+  for (final suitCards in bySuit.values) {
+    if (suitCards.length >= 5) {
+      // check for 5 cards in sequence
+      if (_containsStraight(suitCards)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/// creates a straight flush hand result
+/// finds the 5 highest sequential cards of the same suit
+/// returns a HandResult with type HandType.straightFlush and the relevant cards
+HandResult _createStraightFlushResult(List<Card> cards) {
+  final bySuit = _groupCardsBySuit(cards);
+  
+  for (final suit in bySuit.keys) {
+    final suitCards = bySuit[suit]!;
+    if (suitCards.length >= 5) {
+      final straightCards = _findStraightCards(suitCards);
+      if (straightCards.isNotEmpty) {
+        return HandResult(HandType.straightFlush, straightCards);
+      }
+    }
+  }
+  
+  // This should never happen if _isStraightFlush was true
+  throw StateError('Failed to create straight flush result');
+}
+
+/// helper method to check if a list of cards contains a straight
+/// a straight is 5 cards in sequential rank (e.g., 5-6-7-8-9)
+/// also handles the special case A-2-3-4-5 where Ace is low
+bool _containsStraight(List<Card> cards) {
+  if (cards.length < 5) return false;
+  
+  // Sort by rank
+  final sortedCards = _sortCardsByRankDescending(cards);
+  
+  // Handle the special case for A-5-4-3-2 (Ace can be low)
+  final hasAce = sortedCards.any((card) => card.rank == CardRank.ace);
+  final hasFive = sortedCards.any((card) => card.rank == CardRank.five);
+  final hasFour = sortedCards.any((card) => card.rank == CardRank.four);
+  final hasThree = sortedCards.any((card) => card.rank == CardRank.three);
+  final hasTwo = sortedCards.any((card) => card.rank == CardRank.two);
+  
+  if (hasAce && hasFive && hasFour && hasThree && hasTwo) {
+    return true;
+  }
+  
+  // Check for regular straights
+  // Get distinct ranks to handle duplicates
+  final distinctRanks = sortedCards.map((card) => card.rank).toSet().toList();
+  distinctRanks.sort((a, b) => b.index.compareTo(a.index));
+  
+  for (int i = 0; i <= distinctRanks.length - 5; i++) {
+    bool isStraight = true;
+    for (int j = 0; j < 4; j++) {
+      if (distinctRanks[i + j].index != distinctRanks[i + j + 1].index + 1) {
+        isStraight = false;
+        break;
+      }
+    }
+    if (isStraight) return true;
+  }
+  
+  return false;
+}
+
+/// helper method to find the cards that form a straight
+/// returns the 5 highest sequential cards or the wheel (A-5-4-3-2)
+List<Card> _findStraightCards(List<Card> cards) {
+  final sortedCards = _sortCardsByRankDescending(cards);
+  
+  // Handle the special case for A-5-4-3-2
+  final hasAce = sortedCards.any((card) => card.rank == CardRank.ace);
+  final hasFive = sortedCards.any((card) => card.rank == CardRank.five);
+  final hasFour = sortedCards.any((card) => card.rank == CardRank.four);
+  final hasThree = sortedCards.any((card) => card.rank == CardRank.three);
+  final hasTwo = sortedCards.any((card) => card.rank == CardRank.two);
+  
+  if (hasAce && hasFive && hasFour && hasThree && hasTwo) {
+    final ace = sortedCards.firstWhere((card) => card.rank == CardRank.ace);
+    final five = sortedCards.firstWhere((card) => card.rank == CardRank.five);
+    final four = sortedCards.firstWhere((card) => card.rank == CardRank.four);
+    final three = sortedCards.firstWhere((card) => card.rank == CardRank.three);
+    final two = sortedCards.firstWhere((card) => card.rank == CardRank.two);
+    return [ace, five, four, three, two];
+  }
+  
+  // Get distinct rank cards (taking the highest suit for each rank)
+  final distinctRankMap = <CardRank, Card>{};
+  for (final card in sortedCards) {
+    if (!distinctRankMap.containsKey(card.rank) || 
+        card.suit.index > distinctRankMap[card.rank]!.suit.index) {
+      distinctRankMap[card.rank] = card;
+    }
+  }
+  
+  final distinctRankCards = distinctRankMap.values.toList();
+  distinctRankCards.sort((a, b) => b.value.compareTo(a.value));
+  
+  // check for regular straights
+  for (int i = 0; i <= distinctRankCards.length - 5; i++) {
+    bool isStraight = true;
+    for (int j = 0; j < 4; j++) {
+      if (distinctRankCards[i + j].value != distinctRankCards[i + j + 1].value + 1) {
+        isStraight = false;
+        break;
+      }
+    }
+    if (isStraight) {
+      return distinctRankCards.sublist(i, i + 5);
+    }
+  }
+  
+  return [];
+}
+
+/// checks if the cards contain four of a kind (4 cards of the same rank)
+/// returns true if the cards contain four of a kind, false otherwise
+bool _isFourOfAKind(List<Card> cards) {
+  final byRank = _groupCardsByRank(cards);
+  return byRank.values.any((rankCards) => rankCards.length >= 4);
+}
+
+/// creates a four of a kind hand result
+/// finds the 4 cards of the same rank plus the highest kicker
+/// returns a HandResult with type HandType.fourOfAKind and the relevant cards
+HandResult _createFourOfAKindResult(List<Card> cards) {
+  final byRank = _groupCardsByRank(cards);
+  final fourOfAKind = byRank.entries
+      .firstWhere((entry) => entry.value.length >= 4);
+  
+  // get the four cards of the same rank
+  final fourCards = fourOfAKind.value.take(4).toList();
+  
+  // get the highest remaining card as the kicker
+  final remainingCards = cards.where(
+    (card) => card.rank != fourOfAKind.key
+  ).toList();
+  
+  final kicker = _sortCardsByRankDescending(remainingCards).first;
+  
+  return HandResult(
+    HandType.fourOfAKind,
+    [...fourCards, kicker]
+  );
+}
+
+/// checks if the cards contain a full house (three of a kind plus a pair)
+/// returns true if the cards contain a full house, false otherwise
+bool _isFullHouse(List<Card> cards) {
+  final byRank = _groupCardsByRank(cards);
+  
+  bool hasThreeOfKind = false;
+  bool hasPair = false;
+  CardRank? threeOfKindRank;
+  
+  for (final entry in byRank.entries) {
+    if (entry.value.length >= 3) {
+      hasThreeOfKind = true;
+      threeOfKindRank = entry.key;
+      break;
+    }
+  }
+  
+  if (hasThreeOfKind) {
+    for (final entry in byRank.entries) {
+      if (entry.key != threeOfKindRank && entry.value.length >= 2) {
+        hasPair = true;
+        break;
+      }
+    }
+  }
+  
+  return hasThreeOfKind && hasPair;
+}
+
+/// creates a full house hand result
+/// finds the 3 cards of the highest rank plus 2 cards of the next highest rank
+/// returns a HandResult with type HandType.fullHouse and the relevant cards
+HandResult _createFullHouseResult(List<Card> cards) {
+  final byRank = _groupCardsByRank(cards);
+  
+  // Find three of a kind with highest rank
+  var threeOfAKindEntries = byRank.entries
+      .where((entry) => entry.value.length >= 3)
+      .toList()
+      ..sort((a, b) => b.key.index.compareTo(a.key.index));
+  
+  final threeOfAKind = threeOfAKindEntries.first.value.take(3).toList();
+  final threeOfAKindRank = threeOfAKindEntries.first.key;
+  
+  // Find pair with highest rank
+  var pairEntries = byRank.entries
+      .where((entry) => entry.key != threeOfAKindRank && entry.value.length >= 2)
+      .toList()
+      ..sort((a, b) => b.key.index.compareTo(a.key.index));
+  
+  final pair = pairEntries.first.value.take(2).toList();
+  
+  return HandResult(
+    HandType.fullHouse,
+    [...threeOfAKind, ...pair]
+  );
+}
+
+/// checks if the cards contain a flush (5 cards of the same suit)
+/// returns true if the cards contain a flush, false otherwise
+bool _isFlush(List<Card> cards) {
+  final bySuit = _groupCardsBySuit(cards);
+  return bySuit.values.any((suitCards) => suitCards.length >= 5);
+}
+
+/// creates a flush hand result
+/// finds the 5 highest cards of the same suit
+/// returns a HandResult with type HandType.flush and the relevant cards
+HandResult _createFlushResult(List<Card> cards) {
+  final bySuit = _groupCardsBySuit(cards);
+  
+  // Find the suit with at least 5 cards
+  final flushSuitEntry = bySuit.entries
+      .firstWhere((entry) => entry.value.length >= 5);
+  
+  // Get the 5 highest cards of that suit
+  final flushCards = _sortCardsByRankDescending(flushSuitEntry.value)
+      .take(5)
+      .toList();
+  
+  return HandResult(HandType.flush, flushCards);
+}
+
+/// checks if the cards contain a straight (5 sequential cards)
+/// returns true if the cards contain a straight, false otherwise
+bool _isStraight(List<Card> cards) {
+  return _containsStraight(cards);
+}
+
+/// creates a straight hand result
+/// finds the 5 highest sequential cards
+/// returns a HandResult with type HandType.straight and the relevant cards
+HandResult _createStraightResult(List<Card> cards) {
+  final straightCards = _findStraightCards(cards);
+  return HandResult(HandType.straight, straightCards);
+}
+
+/// checks if the cards contain three of a kind (3 cards of the same rank)
+/// returns true if the cards contain three of a kind, false otherwise
+bool _isThreeOfAKind(List<Card> cards) {
+  final byRank = _groupCardsByRank(cards);
+  return byRank.values.any((rankCards) => rankCards.length >= 3);
+}
+
+/// creates a three of a kind hand result
+/// finds the 3 cards of the same rank plus the 2 highest kickers
+/// returns a HandResult with type HandType.threeOfAKind and the relevant cards
+HandResult _createThreeOfAKindResult(List<Card> cards) {
+  final byRank = _groupCardsByRank(cards);
+  
+  // Find three of a kind with highest rank
+  final threeOfAKindEntries = byRank.entries
+      .where((entry) => entry.value.length >= 3)
+      .toList()
+      ..sort((a, b) => b.key.index.compareTo(a.key.index));
+  
+  final threeOfAKindRank = threeOfAKindEntries.first.key;
+  final threeCards = threeOfAKindEntries.first.value.take(3).toList();
+  
+  // get the two highest remaining cards as kickers
+  final kickers = _sortCardsByRankDescending(
+    cards.where((card) => card.rank != threeOfAKindRank).toList()
+  ).take(2).toList();
+  
+  return HandResult(
+    HandType.threeOfAKind,
+    [...threeCards, ...kickers]
+  );
+}
+
+/// checks if the cards contain two pair (2 sets of 2 cards of the same rank)
+/// returns true if the cards contain two pair, false otherwise
+bool _isTwoPair(List<Card> cards) {
+  final byRank = _groupCardsByRank(cards);
+  final pairs = byRank.values.where((rankCards) => rankCards.length >= 2).length;
+  return pairs >= 2;
+}
+
+/// creates a two pair hand result
+/// finds the 2 highest pairs plus the highest kicker
+/// returns a HandResult with type HandType.twoPair and the relevant cards
+HandResult _createTwoPairResult(List<Card> cards) {
+  final byRank = _groupCardsByRank(cards);
+  
+  // Find the two highest pairs
+  final pairRanks = byRank.entries
+      .where((entry) => entry.value.length >= 2)
+      .toList()
+      ..sort((a, b) => b.key.index.compareTo(a.key.index));
+  
+  final highPair = pairRanks[0].value.take(2).toList();
+  final lowPair = pairRanks[1].value.take(2).toList();
+  
+  // get the highest remaining card as kicker
+  final usedRanks = [pairRanks[0].key, pairRanks[1].key];
+  final kicker = _sortCardsByRankDescending(
+    cards.where((card) => !usedRanks.contains(card.rank)).toList()
+  ).take(1).toList();
+  
+  return HandResult(
+    HandType.twoPair,
+    [...highPair, ...lowPair, ...kicker]
+  );
+}
+
+/// checks if the cards contain a pair (2 cards of the same rank)
+/// returns true if the cards contain a pair, false otherwise
+bool _isPair(List<Card> cards) {
+  final byRank = _groupCardsByRank(cards);
+  return byRank.values.any((rankCards) => rankCards.length >= 2);
+}
+
+/// creates a pair hand result
+/// finds the highest pair plus the 3 highest kickers
+/// returns a HandResult with type HandType.pair and the relevant cards
+HandResult _createPairResult(List<Card> cards) {
+  final byRank = _groupCardsByRank(cards);
+  
+  // find the highest pair
+  final pairEntries = byRank.entries
+      .where((entry) => entry.value.length >= 2)
+      .toList()
+      ..sort((a, b) => b.key.index.compareTo(a.key.index));
+  
+  final pairRank = pairEntries.first.key;
+  final pairCards = pairEntries.first.value.take(2).toList();
+  
+  // get the three highest remaining cards as kickers
+  final kickers = _sortCardsByRankDescending(
+    cards.where((card) => card.rank != pairRank).toList()
+  ).take(3).toList();
+  
+  return HandResult(
+    HandType.pair,
+    [...pairCards, ...kickers]
+  );
+}
+
+/// creates a high card hand result
+/// finds the 5 highest cards
+/// returns a HandResult with type HandType.highCard and the relevant cards
+HandResult _createHighCardResult(List<Card> cards) {
+  // get the 5 highest cards
+  final highCards = _sortCardsByRankDescending(cards).take(5).toList();
+  return HandResult(HandType.highCard, highCards);
+}
