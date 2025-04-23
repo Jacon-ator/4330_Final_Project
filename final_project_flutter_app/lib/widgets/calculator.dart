@@ -12,71 +12,46 @@
 /// WINNING GIVEN THEIR PARTICULAR HAND.
 library;
 
-class Card {
-  final String rank;
-  final String suit;
-  late final int numericRank;
+/// Represents the suit of a playing card
+enum Suit { clubs, diamonds, hearts, spades }
 
-  Card(this.rank, this.suit) {
-    numericRank = _getNumericRank();
-  }
-
-  int _getNumericRank() {
-    switch (rank) {
-      case 'A':
-        return 14;
-      case 'K':
-        return 13;
-      case 'Q':
-        return 12;
-      case 'J':
-        return 11;
-      case '10':
-        return 10;
-      case '9':
-        return 9;
-      case '8':
-        return 8;
-      case '7':
-        return 7;
-      case '6':
-        return 6;
-      case '5':
-        return 5;
-      case '4':
-        return 4;
-      case '3':
-        return 3;
-      case '2':
-        return 2;
-      default:
-        return int.tryParse(rank) ?? 0;
-    }
-  }
+/// Represents the rank of a playing card
+enum Rank {
+  two,
+  three,
+  four,
+  five,
+  six,
+  seven,
+  eight,
+  nine,
+  ten,
+  jack,
+  queen,
+  king,
+  ace
 }
 
-class HandEvaluator {
-  static const int HIGH_CARD = 1;
-  static const int PAIR = 2;
-  static const int TWO_PAIR = 3;
-  static const int THREE_OF_A_KIND = 4;
-  static const int STRAIGHT = 5;
-  static const int FLUSH = 6;
-  static const int FULL_HOUSE = 7;
-  static const int FOUR_OF_A_KIND = 8;
-  static const int STRAIGHT_FLUSH = 9;
-  static const int ROYAL_FLUSH = 10;
+/// represents an individual card
+class Card {
+  final Rank rank;
+  final Suit suit;
 
-  static const Map<int, String> handRankNames = {
-    1: "High Card",
-    2: "Pair",
-    3: "Two Pair",
-    4: "Three of a Kind",
-    5: "Straight",
-    6: "Flush",
-    7: "Full House",
-    8: "Four of a Kind",
-    9: "Straight Flush",
-    10: "Royal Flush"
-  };
+  /// returns a numerical value representing the rank of the card
+  /// (2 = 0, 3 = 1, ..., Ace = 12)
+  int get value => rank.index;
+
+  /// generic constructor for creating cards
+  const Card(this.rank, this.suit);
+
+  /// override == operator for proper equality comparison
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Card && other.rank == rank && other.suit == suit;
+  }
+
+  /// override hashCode for proper use in collections
+  @override
+  int get hashCode => rank.hashCode ^ suit.hashCode;
 }
