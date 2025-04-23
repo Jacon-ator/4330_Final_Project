@@ -29,6 +29,7 @@ class PokerParty extends FlameGame {
       height: 1190,
     );
     add(cameraComponent);
+    cameraComponent.viewfinder.anchor = Anchor.center;
 
     // add(cameraComponent);
     /*
