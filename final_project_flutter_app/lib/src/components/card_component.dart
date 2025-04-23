@@ -25,10 +25,10 @@ class CardComponent extends PositionComponent with HasGameRef<PokerParty> {
     // Create a sprite from the spritesheet using the card's position
     sprite = Sprite(spritesheet,
         srcPosition: Vector2(card.position.x, card.position.y),
-        srcSize: Vector2(cardWidth, cardHeight));
+        srcSize: Vector2(cardWidth + 1, cardHeight));
 
     // You may want to scale up the card for display
-    scale = Vector2.all(0.95); // Scale up 4x
+    scale = Vector2(1.24, 1.5); // Scale up 4x
   }
 
   @override
