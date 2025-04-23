@@ -10,7 +10,7 @@ class CommunityCardArea extends RectangleComponent with HasGameRef<PokerParty> {
   // It extends RectangleComponent to provide a rectangular area for community cards.
 
   CommunityCardArea()
-      : super(size: Vector2(305, 100), position: Vector2(195, 105));
+      : super(size: Vector2(400, 200), position: Vector2(250, 150));
 
   @override
   Future<void> onLoad() async {

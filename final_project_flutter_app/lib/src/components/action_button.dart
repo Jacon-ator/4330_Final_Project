@@ -1,56 +1,53 @@
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
+import 'package:final_project_flutter_app/poker_party.dart';
 
-class ActionButton extends PositionComponent with TapCallbacks {
-  final String action;
+class ActionButton extends PositionComponent
+    with TapCallbacks, HasGameRef<PokerParty> {
+  final String label;
   final VoidCallback onPressed;
-  final Color color;
-  static const double defaultSpacing = 10.0; // spacing between buttons
 
-  // Add optional parameters for positioning
+  // These parameters tell the button where to extract its sprite from the spritesheet.
+  final Vector2 spriteSrcPosition;
+  final Vector2 spriteSrcSize;
+
+  Sprite? sprite;
+
   ActionButton(
-    this.action,
-    this.onPressed,
-    this.color, {
-    ActionButton? previousButton, // Optional previous button to align with
-    double spacing = defaultSpacing,
-    super.position,
+    this.label,
+    this.onPressed, {
+    required this.spriteSrcPosition,
+    required this.spriteSrcSize,
+    Vector2? position,
   }) {
-    size = Vector2(120, 50);
+    if (position != null) {
+      this.position = position;
+    }
+  }
 
-    // If previousButton is provided, position this button next to it
-    if (previousButton != null) {
-      position = Vector2(
-        previousButton.position.x + previousButton.size.x + spacing,
-        previousButton.position.y,
-      );
-    } else
-      position = Vector2(0, 0);
+  @override
+  Future<void> onLoad() async {
+    await super.onLoad();
+    // Load the master button spritesheet.
+    final image =
+        await gameRef.images.load("art/buttons/Master Button Sheet.png");
+    sprite =
+        Sprite(image, srcPosition: spriteSrcPosition, srcSize: spriteSrcSize);
+    size = spriteSrcSize;
   }
 
   @override
   void render(Canvas canvas) {
-    final paint = Paint()..color = color;
-    canvas.drawRRect(
-        RRect.fromRectAndRadius(size.toRect(), Radius.circular(8)), paint);
-
-    final textPainter = TextPainter(
-      text: TextSpan(
-        text: action,
-        style: TextStyle(color: Colors.white, fontSize: 18),
-      ),
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout();
-    textPainter.paint(
-        canvas,
-        Offset(size.x / 2 - textPainter.width / 2,
-            size.y / 2 - textPainter.height / 2));
+    super.render(canvas);
+    // Render the sprite button background.
+    sprite?.renderRect(canvas, size.toRect());
+    // Optionally, you can draw the label text on top here.
   }
 
   @override
   void onTapDown(TapDownEvent event) {
+    super.onTapDown(event);
     onPressed();
   }
 }

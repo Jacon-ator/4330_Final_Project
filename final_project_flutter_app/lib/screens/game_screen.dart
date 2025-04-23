@@ -6,7 +6,6 @@ import 'package:final_project_flutter_app/src/components/components.dart';
 import 'package:final_project_flutter_app/src/components/hand_area.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
-import 'package:flutter/material.dart';
 
 class GameScreen extends Component with HasGameRef<PokerParty> {
   // This class will handle the game logic and UI for the game screen.
@@ -24,51 +23,67 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     print('Current player: ${gameRef.gameState.players[playerIndex].name}');
 
     // Set the base position for the first button
-    Vector2 basePosition = Vector2(50, gameRef.size.y - 100);
+    Vector2 basePosition = Vector2(50, gameRef.size.y - 140);
 
-    // First button at base position
-    final callButton = ActionButton('Call', () {
-      if (player.isCurrentTurn) {
-        // Call action logic here
-        print('${player.name} called!');
-        player.call(gameRef.gameState.bigBlind); // Example call amount
-        player.isCurrentTurn = false; // End the player's turn after calling
-        nextPlayer(); // Move to the next player
-      } else {
-        print('It is not your turn!');
-      }
-    }, Colors.green, position: basePosition);
+    final double exportScale = 5; // your export scale factor
+
+    // First button - Call button region from the spritesheet.
+    final callButton = ActionButton(
+      'Call',
+      () {
+        if (player.isCurrentTurn) {
+          print('${player.name} called!');
+          player.call(gameRef.gameState.bigBlind);
+          player.isCurrentTurn = false;
+          nextPlayer();
+        } else {
+          print('It is not your turn!');
+        }
+      },
+      // Using exported coordinates for Call button:
+      spriteSrcPosition: Vector2(0 * exportScale, 0 * exportScale),
+      spriteSrcSize: Vector2(23 * exportScale, 23 * exportScale),
+      position: basePosition,
+    );
     add(callButton);
 
-    // Second button - automatically positions after the first
-    final foldButton = ActionButton('Fold', () {
-      if (player.isCurrentTurn) {
-        // Fold action logic here
-        print('${player.name} folded!');
-        player.fold(); // Clear the hand and set folded flag
-        player.isCurrentTurn = false; // End the player's turn after folding
-        nextPlayer(); // Move to the next player
-      } else {
-        print('It is not your turn!');
-      }
-    }, Colors.red, previousButton: callButton);
+    // Second button - Fold button (adjust these coordinates as needed).
+    final foldButton = ActionButton(
+      'Fold',
+      () {
+        if (player.isCurrentTurn) {
+          print('${player.name} folded!');
+          player.fold();
+          player.isCurrentTurn = false;
+          nextPlayer();
+        } else {
+          print('It is not your turn!');
+        }
+      },
+      // Using exported coordinates for Call button:
+      spriteSrcPosition:
+          Vector2(24 * exportScale, 0 * exportScale), // change as needed
+      spriteSrcSize:
+          Vector2(23 * exportScale, 23 * exportScale), // change as needed
+      // Optionally use the previous button’s position to auto-layout.
+      position: basePosition + Vector2(150, 0),
+    );
     add(foldButton);
 
-    // Third button - automatically positions after the second
-    final raiseButton = ActionButton('Raise', () {
-      /* raise action */
-    }, Colors.blue, previousButton: foldButton);
+    // Third button - Raise button (adjust coordinates accordingly)
+    final raiseButton = ActionButton(
+      'Raise',
+      () {
+        // Raise action
+      },
+      // For example:
+      spriteSrcPosition:
+          Vector2(48 * exportScale, 0 * exportScale), // change as needed
+      spriteSrcSize:
+          Vector2(23 * exportScale, 23 * exportScale), // change as needed
+      position: basePosition + Vector2(300, 0),
+    );
     add(raiseButton);
-
-    // add(ActionButton('Raise', () {
-    //   if (gameRef.gameState.players[playerIndex].isCurrentTurn) {
-    //     // Show raise slider or input dialog to get the raise amount
-    //     // For simplicity, we will just call a placeholder method here
-    //     showRaiseDialog(gameRef.gameState.players[playerIndex]);
-    //   } else {
-    //     print('It is not your turn!');
-    //   }
-    // }, Colors.blue));
   }
 
   @override
