@@ -3,12 +3,14 @@ import 'package:final_project_flutter_app/screens/shop_screen.dart';
 import 'package:final_project_flutter_app/src/game_state.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
+import 'package:flame/camera.dart';
 
 import 'screens/main_menu_screen.dart';
 import 'screens/rules_screen.dart';
 import 'screens/support_screen.dart';
 
 class PokerParty extends FlameGame {
+  // late final CameraComponent cameraComponent = CameraComponent();
   late final RouterComponent router;
   late SpriteComponent background;
 
@@ -21,6 +23,7 @@ class PokerParty extends FlameGame {
   Future<void> onLoad() async {
     super.onLoad();
 
+    // add(cameraComponent);
     /*
       Initializes the router component with an initial route and a map of routes.
       The initial route is 'menu', which will display the MainMenuScreen.
