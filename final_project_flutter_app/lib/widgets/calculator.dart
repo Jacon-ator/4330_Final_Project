@@ -194,3 +194,44 @@ class HandResult {
     return 'HandResult{type: $type, relevantCards: $relevantCards}';
   }
 }
+
+/// helper method to group cards by suit
+/// takes a list of cards and creates a map where
+/// keys are suits and values are lists of cards of that suit
+/// example: {Clubs: [AC, 2C, 3C], Hearts: [KH, QH]}
+Map<Suit, List<Card>> _groupCardsBySuit(List<Card> cards) {
+  final result = <Suit, List<Card>>{};
+  for (final card in cards) {
+    if (!result.containsKey(card.suit)) {
+      result[card.suit] = [];
+    }
+    result[card.suit]!.add(card);
+  }
+  return result;
+}
+
+/// helper method to group cards by rank
+/// takes a list of cards and creates a map where
+/// keys are ranks and values are lists of cards of that rank
+/// example: {Ace: [AC, AH], King: [KD, KS]}
+/// useful for finding pairs, three of a kind, etc.
+Map<CardRank, List<Card>> _groupCardsByRank(List<Card> cards) {
+  final result = <CardRank, List<Card>>{};
+  for (final card in cards) {
+    if (!result.containsKey(card.rank)) {
+      result[card.rank] = [];
+    }
+    result[card.rank]!.add(card);
+  }
+  return result;
+}
+
+/// sorts cards by rank in descending order (highest first)
+/// creates a new sorted list without modifying the original
+/// example: [AC, KD, QH, 5S, 2C] becomes [AC, KD, QH, 5S, 2C]
+/// useful for evaluating high card hands and kickers
+List<Card> _sortCardsByRankDescending(List<Card> cards) {
+  final sortedCards = List<Card>.from(cards);
+  sortedCards.sort((a, b) => b.value.compareTo(a.value));
+  return sortedCards;
+}
