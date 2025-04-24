@@ -65,6 +65,8 @@ flutter:
     - assets/images/art/cards/
     - assets/images/art/buttons/
     - assets/fonts/
+    - assets/audio/
+    - assets/audio/music/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

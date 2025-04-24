@@ -1,5 +1,6 @@
 import 'package:final_project_flutter_app/screens/game_screen.dart';
 import 'package:final_project_flutter_app/screens/shop_screen.dart';
+import 'package:final_project_flutter_app/src/audio/audio_manager.dart';
 import 'package:final_project_flutter_app/src/game_state.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
@@ -14,6 +15,8 @@ class PokerParty extends FlameGame {
   late final RouterComponent router;
   late SpriteComponent background;
 
+  final AudioManager audioManager = AudioManager();
+
   final GameState gameState = GameState();
 
   final double _gameTimer = 0.0;
@@ -22,6 +25,9 @@ class PokerParty extends FlameGame {
   @override
   Future<void> onLoad() async {
     super.onLoad();
+
+    await audioManager.initialize();
+    await audioManager.playMainTheme();
 
     // Setup a fixed resolution viewport
     cameraComponent = CameraComponent.withFixedResolution(
@@ -55,5 +61,11 @@ class PokerParty extends FlameGame {
     void goTo(String route) {
       router.pushNamed(route);
     }
+  }
+
+  @override
+  void onRemove() async {
+    await audioManager.stopAll();
+    super.onRemove();
   }
 }

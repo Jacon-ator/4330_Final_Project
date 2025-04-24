@@ -9,10 +9,11 @@ class AudioManager {
 
   Future<void> initialize() async {
     if (_isInitialized) return;
-    
+
     try {
       print('Initializing audio manager...');
-      await FlameAudio.audioCache.load('audio/music/Poker_Party_Main_Theme.mp3');
+      await FlameAudio.bgm.initialize();
+      await FlameAudio.audioCache.load('music/Poker_Party_Main_Theme.mp3');
       print('Audio file loaded successfully');
       _isInitialized = true;
     } catch (e) {
@@ -24,21 +25,23 @@ class AudioManager {
     if (!_isInitialized) {
       await initialize();
     }
-    
+
     try {
       print('Playing main theme...');
-      await FlameAudio.play('audio/music/Poker_Party_Main_Theme.mp3', volume: 0.5);
+      await FlameAudio.bgm.play('music/Poker_Party_Main_Theme.mp3');
       print('Main theme playback started');
     } catch (e) {
       print('Error playing main theme: $e');
     }
   }
 
-  void stopAll() {
+  Future<void> stopAll() async {
     try {
-      FlameAudio.bgm.stop();
+      await FlameAudio.bgm.stop();
+      await FlameAudio.audioCache.clearAll();
+      await FlameAudio.bgm.dispose();
     } catch (e) {
       print('Error stopping audio: $e');
     }
   }
-} 
+}
