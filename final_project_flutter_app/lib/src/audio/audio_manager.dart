@@ -13,7 +13,7 @@ class AudioManager {
     try {
       print('Initializing audio manager...');
       await FlameAudio.bgm.initialize();
-      await FlameAudio.audioCache.load('music/Poker_Party_Main_Theme.mp3');
+      await FlameAudio.audioCache.load('music/Poker_Party_Main_Theme.ogg');
       print('Audio file loaded successfully');
       _isInitialized = true;
     } catch (e) {
@@ -21,19 +21,70 @@ class AudioManager {
     }
   }
 
-  Future<void> playMainTheme() async {
+//Start Main Theme
+  Future<void> playMainTheme() async 
+  {
     if (!_isInitialized) {
       await initialize();
     }
 
     try {
       print('Playing main theme...');
-      await FlameAudio.bgm.play('music/Poker_Party_Main_Theme.mp3');
+      await FlameAudio.bgm.play('music/Poker_Party_Main_Theme.ogg');
       print('Main theme playback started');
     } catch (e) {
       print('Error playing main theme: $e');
     }
   }
+//End Main Theme
+
+
+
+//Start Shop Theme
+
+  Future<void> playShopTheme() async 
+  {
+    if (!_isInitialized) 
+    {
+      await initialize();
+    }
+
+    try {
+      print('Playing shop theme...');
+      await FlameAudio.bgm.play('music/Poker_Party_Shop_Theme.ogg');
+      print('Shop theme playback started');
+    } catch (e) {
+      print('Error playing shop theme: $e');
+    }
+  }
+//End Shop Theme
+
+
+
+//Start Game Themes
+Future<void> playGameTheme() async 
+  {
+    if (!_isInitialized) 
+    {
+      await initialize();
+    }
+
+    try {
+      print('Playing shop theme...');
+      await FlameAudio.bgm.play('music/Poker_Party_Shop_Theme.ogg');
+      print('Shop theme playback started');
+    } catch (e) {
+      print('Error playing shop theme: $e');
+    }
+  }
+
+//End Game Themes
+
+
+
+
+
+
 
   Future<void> stopAll() async {
     try {
