@@ -707,3 +707,266 @@ HandResult _createHighCardResult(List<Card> cards) {
   final highCards = _sortCardsByRankDescending(cards).take(5).toList();
   return HandResult(HandType.highCard, highCards);
 }
+
+/// calculates the probability of a player winning based on their hand,
+/// the community cards, and the number of opponents
+/// uses an adaptive simulation approach that becomes more precise in later rounds
+double calculateWinProbability({
+  required List<Card> playerHand,
+  required List<Card> communityCards,
+  required int numberOfOpponents,
+}) {
+  // validate inputs
+  if (playerHand.length != 2) {
+    throw ArgumentError('Player hand must contain exactly 2 cards');
+  }
+  
+  if (communityCards.length > 5) {
+    throw ArgumentError('Community cards cannot exceed 5');
+  }
+  
+  if (numberOfOpponents < 1) {
+    throw ArgumentError('Number of opponents must be at least 1');
+  }
+  
+  // determine the current game stage
+  final gameStage = _determineGameStage(communityCards.length);
+  
+  // create a set of all cards in a deck
+  final allCards = _generateDeck();
+  
+  // remove cards that are already known (player hand and community cards)
+  final knownCards = [...playerHand, ...communityCards];
+  for (final card in knownCards) {
+    allCards.remove(card);
+  }
+  
+  // remaining cards in the deck
+  final remainingDeck = allCards.toList();
+  
+  // use different simulation counts based on game stage
+  // more simulations for later stages (fewer unknowns)
+  int simulationCount;
+  switch (gameStage) {
+    case 'preflop':
+      simulationCount = 2000;
+      break;
+    case 'flop':
+      simulationCount = 3000;
+      break;
+    case 'turn':
+      simulationCount = 5000;
+      break;
+    case 'river':
+      // on the river, we can do exact calculation because there are no more cards to come
+      return _calculateRiverExact(
+        playerHand: playerHand,
+        communityCards: communityCards,
+        remainingDeck: remainingDeck,
+        numberOfOpponents: numberOfOpponents
+      );
+    default:
+      simulationCount = 2000;
+  }
+  
+  // run Monte Carlo simulation
+  return _runMonteCarloSimulation(
+    playerHand: playerHand,
+    communityCards: communityCards,
+    remainingDeck: remainingDeck,
+    numberOfOpponents: numberOfOpponents,
+    simulationCount: simulationCount
+  );
+}
+
+/// determines the current stage of the game based on community card count
+String _determineGameStage(int communityCardCount) {
+  switch (communityCardCount) {
+    case 0:
+      return 'preflop';
+    case 3:
+      return 'flop';
+    case 4:
+      return 'turn';
+    case 5:
+      return 'river';
+    default:
+      return 'unknown';
+  }
+}
+
+/// runs a Monte Carlo simulation to estimate win probability
+double _runMonteCarloSimulation({
+  required List<Card> playerHand,
+  required List<Card> communityCards,
+  required List<Card> remainingDeck,
+  required int numberOfOpponents,
+  required int simulationCount,
+}) {
+  int wins = 0;
+  
+  // number of community cards to be dealt
+  final communityCardsToAdd = 5 - communityCards.length;
+  
+  for (int i = 0; i < simulationCount; i++) {
+    // shuffle the deck for this simulation
+    final shuffledDeck = List<Card>.from(remainingDeck)..shuffle();
+    
+    // deal community cards
+    final drawnCommunityCards = shuffledDeck.take(communityCardsToAdd).toList();
+    final completeCommunityCards = [...communityCards, ...drawnCommunityCards];
+    
+    // evaluate player's hand
+    final playerHandResult = evaluateHand(
+      playerHand: playerHand,
+      communityCards: completeCommunityCards
+    );
+    
+    // deal cards to opponents and check if player wins
+    bool playerWins = true;
+    int remainingCards = shuffledDeck.length - communityCardsToAdd;
+    int currentIndex = communityCardsToAdd;
+    
+    for (int j = 0; j < numberOfOpponents; j++) {
+      // ensure we have enough cards left
+      if (currentIndex + 1 >= shuffledDeck.length) {
+        break;
+      }
+      
+      final opponentHand = [
+        shuffledDeck[currentIndex],
+        shuffledDeck[currentIndex + 1]
+      ];
+      currentIndex += 2;
+      
+      final opponentHandResult = evaluateHand(
+        playerHand: opponentHand,
+        communityCards: completeCommunityCards
+      );
+      
+      // if any opponent has a better or equal hand, player loses
+      // (ties count as losses)
+      if (opponentHandResult >= playerHandResult) {
+        playerWins = false;
+        break;
+      }
+    }
+    
+    if (playerWins) {
+      wins++;
+    }
+  }
+  
+  // return probability
+  return wins / simulationCount;
+}
+
+/// calculates exact win probability on the river (all community cards known)
+/// only opponents' hands are unknown
+double _calculateRiverExact({
+  required List<Card> playerHand,
+  required List<Card> communityCards,
+  required List<Card> remainingDeck,
+  required int numberOfOpponents,
+}) {
+  // evaluate the player's hand
+  final playerHandResult = evaluateHand(
+    playerHand: playerHand, 
+    communityCards: communityCards
+  );
+  
+  int totalScenarios = 0;
+  int wins = 0;
+  
+  // if we have just one opponent, we can enumerate all possible hands
+  if (numberOfOpponents == 1) {
+    // generate all possible 2-card opponent hands
+    final opponentHands = _generateCombinations(remainingDeck, 2);
+    
+    for (final opponentHand in opponentHands) {
+      totalScenarios++;
+      
+      final opponentHandResult = evaluateHand(
+        playerHand: opponentHand,
+        communityCards: communityCards
+      );
+      
+      // player wins if their hand is better (ties count as losses)
+      if (playerHandResult > opponentHandResult) {
+        wins++;
+      }
+    }
+    
+    return wins / totalScenarios;
+  } else {
+    // for multiple opponents, fall back to simulation
+    // even on the river, exact calculation with multiple opponents is expensive
+    return _runMonteCarloSimulation(
+      playerHand: playerHand,
+      communityCards: communityCards,
+      remainingDeck: remainingDeck,
+      numberOfOpponents: numberOfOpponents,
+      simulationCount: 5000 // higher count for river
+    );
+  }
+}
+
+/// generates all possible combinations of k cards from a deck
+List<List<Card>> _generateCombinations(List<Card> deck, int k) {
+  final result = <List<Card>>[];
+  
+  // base cases
+  if (k == 0) {
+    result.add([]);
+    return result;
+  }
+  
+  if (k > deck.length) {
+    return result;
+  }
+  
+  // recursive combination generation
+  _generateCombinationsHelper(deck, k, 0, [], result);
+  
+  return result;
+}
+
+/// helper function for generating combinations
+void _generateCombinationsHelper(
+  List<Card> deck,
+  int k,
+  int start,
+  List<Card> current,
+  List<List<Card>> result,
+) {
+  // if we've selected k cards, add this combination
+  if (current.length == k) {
+    result.add(List<Card>.from(current));
+    return;
+  }
+  
+  // try each card that hasn't been used yet
+  for (int i = start; i < deck.length; i++) {
+    // add this card to our combination
+    current.add(deck[i]);
+    
+    // recursively generate combinations with this card included
+    _generateCombinationsHelper(deck, k, i + 1, current, result);
+    
+    // remove this card to try the next one
+    current.removeLast();
+  }
+}
+
+/// generates a complete deck of 52 cards
+Set<Card> _generateDeck() {
+  final deck = <Card>{};
+  
+  for (final suit in Suit.values) {
+    for (final rank in CardRank.values) {
+      deck.add(Card(rank, suit));
+    }
+  }
+  
+  return deck;
+}

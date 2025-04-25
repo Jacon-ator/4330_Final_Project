@@ -1,4 +1,4 @@
-/// A test class for verifying that hand evaluation works correctly
+/// A test class for verifying that hand evaluation and probability calculation works correctly
 
 import 'calculator.dart';
 
@@ -19,20 +19,62 @@ class CalculatorTest {
     testHighCard();
     testHandComparison();
     
+    print('\nStarting probability calculation tests...\n');
+    
+    testProbabilityCalculationPerformance();
+    
     print('\nAll tests completed!');
   }
+  
+  /// tests the performance and feasibility of the probability calculation
+  void testProbabilityCalculationPerformance() {
+    print('Testing probability calculation performance...');
+    
+    // Standard scenario: Pocket pair of aces pre-flop vs 1 opponent
+    final playerHand = <Card>[
+      Card.fromString('AS'),
+      Card.fromString('AC')
+    ];
+    
+    final communityCards = <Card>[];
+    
+    print('Calculating win probability for pocket aces pre-flop vs 1 opponent...');
+    
+    // Measure execution time
+    final stopwatch = Stopwatch()..start();
+    
+    final probability = calculateWinProbability(
+      playerHand: playerHand,
+      communityCards: communityCards,
+      numberOfOpponents: 1
+    );
+    
+    stopwatch.stop();
+    final executionTime = stopwatch.elapsedMilliseconds;
+    
+    print('Calculation completed in $executionTime ms');
+    print('Win probability: ${(probability * 100).toStringAsFixed(2)}%');
+    
+    // Pocket aces should have ~85% win rate vs random hand
+    assert(probability > 0.75 && probability < 0.95, 
+           'Pocket aces should win 75-95% of the time against one opponent');
+    
+    print('✓ Probability calculation performance test passed');
+  }
+  
+  // [All existing test methods remain unchanged]
   
   /// tests royal flush detection
   void testRoyalFlush() {
     print('Testing royal flush detection...');
     
     // Create a royal flush in hearts
-    final playerHand = [
+    final playerHand = <Card>[
       Card.fromString('AH'),
       Card.fromString('KH')
     ];
     
-    final communityCards = [
+    final communityCards = <Card>[
       Card.fromString('QH'),
       Card.fromString('JH'),
       Card.fromString('TH'),
@@ -56,12 +98,12 @@ class CalculatorTest {
     print('Testing straight flush detection...');
     
     // Create a 9-high straight flush in clubs
-    final playerHand = [
+    final playerHand = <Card>[
       Card.fromString('9C'),
       Card.fromString('8C')
     ];
     
-    final communityCards = [
+    final communityCards = <Card>[
       Card.fromString('7C'),
       Card.fromString('6C'),
       Card.fromString('5C'),
@@ -75,7 +117,7 @@ class CalculatorTest {
     );
     
     assert(result.type == HandType.straightFlush, 'Failed to detect straight flush');
-    assert(result.relevantCards.length ==.5, 'Straight flush should have 5 cards');
+    assert(result.relevantCards.length == 5, 'Straight flush should have 5 cards');
     
     print('✓ Straight flush test passed');
   }
@@ -85,12 +127,12 @@ class CalculatorTest {
     print('Testing four of a kind detection...');
     
     // Create four aces
-    final playerHand = [
+    final playerHand = <Card>[
       Card.fromString('AC'),
       Card.fromString('AS')
     ];
     
-    final communityCards = [
+    final communityCards = <Card>[
       Card.fromString('AD'),
       Card.fromString('AH'),
       Card.fromString('KS'),
@@ -116,12 +158,12 @@ class CalculatorTest {
     print('Testing full house detection...');
     
     // Create kings full of queens
-    final playerHand = [
+    final playerHand = <Card>[
       Card.fromString('KH'),
       Card.fromString('KS')
     ];
     
-    final communityCards = [
+    final communityCards = <Card>[
       Card.fromString('KC'),
       Card.fromString('QD'),
       Card.fromString('QH'),
@@ -145,12 +187,12 @@ class CalculatorTest {
     print('Testing flush detection...');
     
     // Create a diamond flush
-    final playerHand = [
+    final playerHand = <Card>[
       Card.fromString('AD'),
       Card.fromString('KD')
     ];
     
-    final communityCards = [
+    final communityCards = <Card>[
       Card.fromString('9D'),
       Card.fromString('5D'),
       Card.fromString('2D'),
@@ -175,12 +217,12 @@ class CalculatorTest {
     print('Testing straight detection...');
     
     // Create a 9-high straight
-    final playerHand = [
+    final playerHand = <Card>[
       Card.fromString('9H'),
       Card.fromString('8S')
     ];
     
-    final communityCards = [
+    final communityCards = <Card>[
       Card.fromString('7C'),
       Card.fromString('6D'),
       Card.fromString('5C'),
@@ -197,12 +239,12 @@ class CalculatorTest {
     assert(result.relevantCards.length == 5, 'Straight should have 5 cards');
     
     // Test wheel (A-5-4-3-2) straight
-    final wheelPlayerHand = [
+    final wheelPlayerHand = <Card>[
       Card.fromString('AH'),
       Card.fromString('2S')
     ];
     
-    final wheelCommunityCards = [
+    final wheelCommunityCards = <Card>[
       Card.fromString('3C'),
       Card.fromString('4D'),
       Card.fromString('5C'),
@@ -225,12 +267,12 @@ class CalculatorTest {
     print('Testing three of a kind detection...');
     
     // Create three jacks
-    final playerHand = [
+    final playerHand = <Card>[
       Card.fromString('JH'),
       Card.fromString('JD')
     ];
     
-    final communityCards = [
+    final communityCards = <Card>[
       Card.fromString('JS'),
       Card.fromString('AH'),
       Card.fromString('KC'),
@@ -254,12 +296,12 @@ class CalculatorTest {
     print('Testing two pair detection...');
     
     // Create aces and kings
-    final playerHand = [
+    final playerHand = <Card>[
       Card.fromString('AH'),
       Card.fromString('KD')
     ];
     
-    final communityCards = [
+    final communityCards = <Card>[
       Card.fromString('AS'),
       Card.fromString('KS'),
       Card.fromString('QC'),
@@ -283,12 +325,12 @@ class CalculatorTest {
     print('Testing pair detection...');
     
     // Create a pair of queens
-    final playerHand = [
+    final playerHand = <Card>[
       Card.fromString('QH'),
       Card.fromString('KD')
     ];
     
-    final communityCards = [
+    final communityCards = <Card>[
       Card.fromString('QS'),
       Card.fromString('JC'),
       Card.fromString('9C'),
@@ -311,13 +353,13 @@ class CalculatorTest {
   void testHighCard() {
     print('Testing high card detection...');
     
-    // dand with nothing but high cards
-    final playerHand = [
+    // hand with nothing but high cards
+    final playerHand = <Card>[
       Card.fromString('AH'),
       Card.fromString('KD')
     ];
     
-    final communityCards = [
+    final communityCards = <Card>[
       Card.fromString('QS'),
       Card.fromString('JC'),
       Card.fromString('9C'),
@@ -344,12 +386,12 @@ class CalculatorTest {
     // royal flush vs straight flush
     final royalFlush = HandResult(
       HandType.royalFlush,
-      [Card(CardRank.ace, Suit.hearts), Card(CardRank.king, Suit.hearts)]
+      <Card>[Card(CardRank.ace, Suit.hearts), Card(CardRank.king, Suit.hearts)]
     );
     
     final straightFlush = HandResult(
       HandType.straightFlush,
-      [Card(CardRank.king, Suit.clubs), Card(CardRank.queen, Suit.clubs)]
+      <Card>[Card(CardRank.king, Suit.clubs), Card(CardRank.queen, Suit.clubs)]
     );
     
     assert(royalFlush > straightFlush, 'Royal flush should beat straight flush');
@@ -358,12 +400,12 @@ class CalculatorTest {
     // Full house vs flush
     final fullHouse = HandResult(
       HandType.fullHouse,
-      [Card(CardRank.ace, Suit.hearts), Card(CardRank.ace, Suit.diamonds)]
+      <Card>[Card(CardRank.ace, Suit.hearts), Card(CardRank.ace, Suit.diamonds)]
     );
     
     final flush = HandResult(
       HandType.flush,
-      [Card(CardRank.ace, Suit.clubs), Card(CardRank.king, Suit.clubs)]
+      <Card>[Card(CardRank.ace, Suit.clubs), Card(CardRank.king, Suit.clubs)]
     );
     
     assert(fullHouse > flush, 'Full house should beat flush');
