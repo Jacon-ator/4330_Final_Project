@@ -2,13 +2,18 @@ import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:final_project_flutter_app/src/components/components.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+import 'package:final_project_flutter_app/services/auth_service.dart';
 
 class LoginScreen extends Component with HasGameRef<PokerParty> {
   late Vector2 size;
+  late String email;
+  late String password;
   @override
   Future<void> onLoad() async {
     size = gameRef
         .size; // Set the size of the login screen to fill the game window
+    email = ''; //Sets the email and password to an empty string
+    password = '';
     super.onLoad();
     // Load login screen components here (text fields for username and password)
     // For example, you can add a background or text explaining the rules
@@ -52,6 +57,28 @@ class LoginScreen extends Component with HasGameRef<PokerParty> {
         ],
       ),
       textDirection: TextDirection.ltr,
+    );
+
+    //text field for the user's email
+    final emailfield = TextField(
+        keyboardType: TextInputType.emailAddress,
+        decoration: const InputDecoration(
+          label: Text('Email address'),
+        ),
+        onChanged: (value){
+          email = value;
+        },
+    );
+
+    //text field for the password
+    final passwordfield = TextField(
+      obscureText: true,
+      decoration: const InputDecoration(
+        label: Text('Password')
+      ),
+      onChanged: (value) {
+        password = value;
+      },
     );
     titleText.layout();
     titleText.paint(
