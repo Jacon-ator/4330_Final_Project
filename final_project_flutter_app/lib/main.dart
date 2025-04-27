@@ -4,12 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   Flame.device.fullScreen();
   Flame.device.setLandscape();
-
+  Firebase.initializeApp(
+    options: FirebaseOptions(apiKey: "AIzaSyBEI1LMAwr18HR06SRkwF4Bnlqp6q2BnO4", appId: "1:136301614529:android:e8a3444fd77d64df570b40", messagingSenderId: "136301614529", projectId: "poker-party-80b1a") 
+  );
   runApp(
     MaterialApp(
       debugShowCheckedModeBanner: false,
