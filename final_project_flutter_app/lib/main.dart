@@ -1,4 +1,5 @@
 import 'package:final_project_flutter_app/src/components/profile_button.dart';
+import 'package:final_project_flutter_app/src/components/login_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
@@ -30,6 +31,11 @@ void main() {
               top: 20,
               left: 20,
               child: ProfileButton(name: "Player"), // Or dynamically set name
+            ),
+            Positioned(
+              top: 40,
+              left: 20,
+              child: LoginButton(name: "Player"), // Or dynamically set name
             ),
           ],
         ),
