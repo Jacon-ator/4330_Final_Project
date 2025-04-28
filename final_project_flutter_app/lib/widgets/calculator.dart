@@ -711,9 +711,6 @@ HandResult _createHighCardResult(List<Card> cards) {
 /// calculates the probability of a player winning based on their hand,
 /// the community cards, and the number of opponents
 /// uses an adaptive simulation approach that becomes more precise in later rounds
-/// calculates the probability of a player winning based on their hand,
-/// the community cards, and the number of opponents
-/// uses an adaptive simulation approach that becomes more precise in later rounds
 double calculateWinProbability({
   required List<Card> playerHand,
   required List<Card> communityCards,
