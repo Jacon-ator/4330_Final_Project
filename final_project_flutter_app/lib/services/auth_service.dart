@@ -15,6 +15,7 @@ class AuthService {
       UserCredential user = await _auth.createUserWithEmailAndPassword(
         email: email, 
         password: password);
+      print(user);
       return user;
     } on FirebaseAuthException catch(e) { //gets the error from firebase and prints it to the console, can be changed to show on app later
       String message = '';
