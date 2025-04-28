@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 class ShopScreen extends Component with HasGameRef<PokerParty> {
   late Vector2 size;
+  static bool ownsTableSkin = false;
 
   @override
   Future<void> onLoad() async {
@@ -17,11 +18,16 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
       ..position = Vector2(size.x / 2 - size.x / 12, size.y * 0.8);
 
     final BuyCardButton buyCardButton = BuyCardButton()
-      ..size = Vector2(size.x / 3, 60)
-      ..position = Vector2(size.x / 2 - size.x / 6, size.y * 0.6);
+      ..size = Vector2(size.x / 3.5, 60)
+      ..position = Vector2(size.x / 2 - size.x / 3, size.y * 0.55);
+
+    final BuyTableSkinButton buyTableSkinButton = BuyTableSkinButton()
+      ..size = Vector2(size.x / 3.5, 60)
+      ..position = Vector2(size.x / 2 + size.x / 20, size.y * 0.55); 
 
     add(mainMenuButton);
     add(buyCardButton);
+    add(buyTableSkinButton);
   }
 
   @override
@@ -34,14 +40,13 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
     final titleText = TextPainter(
       text: const TextSpan(
         text: 'Shop',
-        style: TextStyle(
-            color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
+        style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
       ),
       textDirection: TextDirection.ltr,
     );
 
-    // Description / item
-    final itemText = TextPainter(
+    // Description for Card
+    final cardSkinText = TextPainter(
       text: const TextSpan(
         text: 'Fancy Card - 500 Coins',
         style: TextStyle(color: Colors.white, fontSize: 20),
@@ -49,47 +54,35 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
       textDirection: TextDirection.ltr,
     );
 
-    titleText.layout();
-    itemText.layout();
-
-    titleText.paint(
-        canvas,
-        Offset(size.x / 2 - titleText.width / 2,
-            size.y / 10 - titleText.height / 2));
-    itemText.paint(
-        canvas,
-        Offset(size.x / 2 - itemText.width / 2,
-            size.y / 2 - itemText.height / 2));
-  }
-}
-
-// Simple Buy Button for Shop
-class BuyCardButton extends PositionComponent with TapCallbacks, HasGameRef<PokerParty> {
-  @override
-  void render(Canvas canvas) {
-    super.render(canvas);
-
-    final paint = Paint()..color = const Color(0xFF008000); // green
-    canvas.drawRect(size.toRect(), paint);
-
-    final textPainter = TextPainter(
+    // Description for Table Skin
+    final tableSkinText = TextPainter(
       text: const TextSpan(
-        text: 'Buy Card',
+        text: 'Table Skin - 1000 Coins',
         style: TextStyle(color: Colors.white, fontSize: 20),
       ),
       textDirection: TextDirection.ltr,
     );
-    textPainter.layout();
-    textPainter.paint(
-      canvas,
-      Offset(size.x / 2 - textPainter.width / 2,
-          size.y / 2 - textPainter.height / 2),
-    );
-  }
 
-  @override
-  void onTapDown(TapDownEvent event) {
-    // Add logic for buying the card
-    print("Buy Card tapped!");
+    titleText.layout();
+    cardSkinText.layout();
+    tableSkinText.layout();
+
+    // Title
+    titleText.paint(
+      canvas,
+      Offset(size.x / 2 - titleText.width / 2, size.y / 10 - titleText.height / 2),
+    );
+
+    // Card Skin Text
+    cardSkinText.paint(
+      canvas,
+      Offset(size.x / 2 - size.x / 3 + (size.x / 7) - cardSkinText.width / 2, size.y * 0.5,),
+    );
+
+    // Table Skin Texrt
+    tableSkinText.paint(
+      canvas,
+      Offset(size.x / 2 + size.x / 20 + (size.x / 7) - tableSkinText.width / 2, size.y * 0.5,),
+    );
   }
 }
