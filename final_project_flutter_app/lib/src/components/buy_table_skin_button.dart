@@ -1,19 +1,20 @@
 import 'package:final_project_flutter_app/poker_party.dart';
+import 'package:final_project_flutter_app/screens/shop_screen.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 
-class BuyCardButton extends PositionComponent with TapCallbacks, HasGameRef<PokerParty> {
+class BuyTableSkinButton extends PositionComponent with TapCallbacks, HasGameRef<PokerParty> {
   @override
   void render(Canvas canvas) {
     super.render(canvas);
 
-    final paint = Paint()..color = const Color(0xFF008000); // Green color
+    final paint = Paint()..color = const Color(0xFF2196F3); // Blue color
     canvas.drawRect(size.toRect(), paint);
 
     final textPainter = TextPainter(
       text: const TextSpan(
-        text: 'Buy Card Skin',
+        text: 'Buy Table Skin',
         style: TextStyle(color: Colors.white, fontSize: 20),
       ),
       textDirection: TextDirection.ltr,
@@ -28,6 +29,7 @@ class BuyCardButton extends PositionComponent with TapCallbacks, HasGameRef<Poke
 
   @override
   void onTapDown(TapDownEvent event) {
-    print("Card Skin bought!");
+    ShopScreen.ownsTableSkin = true;
+    print("Table Skin bought!");
   }
 }

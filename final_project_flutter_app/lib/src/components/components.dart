@@ -8,3 +8,4 @@ export 'card_component.dart';
 export 'community_card_area.dart';
 export 'shop_button.dart';
 export 'buy_card_button.dart';
+export 'buy_table_skin_button.dart';
