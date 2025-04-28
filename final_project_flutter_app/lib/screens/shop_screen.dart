@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 class ShopScreen extends Component with HasGameRef<PokerParty> {
   late Vector2 size;
+  static bool ownsTableSkin = false;
 
   @override
   Future<void> onLoad() async {
@@ -60,36 +61,5 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
         canvas,
         Offset(size.x / 2 - itemText.width / 2,
             size.y / 2 - itemText.height / 2));
-  }
-}
-
-// Simple Buy Button for Shop
-class BuyCardButton extends PositionComponent with TapCallbacks, HasGameRef<PokerParty> {
-  @override
-  void render(Canvas canvas) {
-    super.render(canvas);
-
-    final paint = Paint()..color = const Color(0xFF008000); // green
-    canvas.drawRect(size.toRect(), paint);
-
-    final textPainter = TextPainter(
-      text: const TextSpan(
-        text: 'Buy Card',
-        style: TextStyle(color: Colors.white, fontSize: 20),
-      ),
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout();
-    textPainter.paint(
-      canvas,
-      Offset(size.x / 2 - textPainter.width / 2,
-          size.y / 2 - textPainter.height / 2),
-    );
-  }
-
-  @override
-  void onTapDown(TapDownEvent event) {
-    // Add logic for buying the card
-    print("Buy Card tapped!");
   }
 }
