@@ -718,15 +718,15 @@ double calculateWinProbability({
 }) {
   // validate inputs
   if (playerHand.length != 2) {
-    throw ArgumentError('Player hand must contain exactly 2 cards');
+    throw ArgumentError('player hand must contain exactly 2 cards');
   }
   
   if (communityCards.length > 5) {
-    throw ArgumentError('Community cards cannot exceed 5');
+    throw ArgumentError('community cards cannot exceed 5');
   }
   
   if (numberOfOpponents < 1) {
-    throw ArgumentError('Number of opponents must be at least 1');
+    throw ArgumentError('number of opponents must be at least 1');
   }
   
   // determine the current game stage
@@ -749,13 +749,13 @@ double calculateWinProbability({
   int simulationCount;
   switch (gameStage) {
     case 'preflop':
-      simulationCount = 2000;
+      simulationCount = 5000; // increased from 2000
       break;
     case 'flop':
-      simulationCount = 3000;
+      simulationCount = 7000; // increased from 3000
       break;
     case 'turn':
-      simulationCount = 5000;
+      simulationCount = 10000; // increased from 5000
       break;
     case 'river':
       // on the river, we can do exact calculation because there are no more cards to come
@@ -766,10 +766,10 @@ double calculateWinProbability({
         numberOfOpponents: numberOfOpponents
       );
     default:
-      simulationCount = 2000;
+      simulationCount = 5000;
   }
   
-  // run Monte Carlo simulation
+  // run monte carlo simulation
   return _runMonteCarloSimulation(
     playerHand: playerHand,
     communityCards: communityCards,
