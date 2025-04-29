@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:final_project_flutter_app/services/auth_service.dart';
 
 class PokerProfilePage extends StatefulWidget {
   final String name;
@@ -10,6 +11,7 @@ class PokerProfilePage extends StatefulWidget {
 }
 
 class _PokerProfilePageState extends State<PokerProfilePage> {
+  final AuthService _authService = AuthService();
   int wins = 0;
   int losses = 0;
   int chipsWon = 0;
@@ -122,6 +124,22 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
                       ],
                     ),
                   ],
+                ),
+                const SizedBox(height: 30),
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    await _authService.signout();
+                    if (context.mounted) {
+                      Navigator.of(context).pushReplacementNamed('/');
+                    }
+                  },
+                  icon: const Icon(Icons.logout, color: Colors.white),
+                  label: const Text('Sign Out', style: TextStyle(color: Colors.white)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red[700],
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
                 ),
               ],
             ),
