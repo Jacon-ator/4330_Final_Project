@@ -795,7 +795,7 @@ String _determineGameStage(int communityCardCount) {
   }
 }
 
-/// runs a Monte Carlo simulation to estimate win probability
+/// runs a monte carlo simulation to estimate win probability
 double _runMonteCarloSimulation({
   required List<Card> playerHand,
   required List<Card> communityCards,
@@ -804,6 +804,7 @@ double _runMonteCarloSimulation({
   required int simulationCount,
 }) {
   int wins = 0;
+  int ties = 0;
   
   // number of community cards to be dealt
   final communityCardsToAdd = 5 - communityCards.length;
@@ -822,13 +823,15 @@ double _runMonteCarloSimulation({
       communityCards: completeCommunityCards
     );
     
-    // deal cards to opponents and check if player wins
-    bool playerWins = true;
-    int remainingCards = shuffledDeck.length - communityCardsToAdd;
+    // track if this scenario results in a win, tie, or loss
+    bool isWin = true;
+    bool isTie = false;
+    
+    // start at the index after the community cards
     int currentIndex = communityCardsToAdd;
     
     for (int j = 0; j < numberOfOpponents; j++) {
-      // ensure we have enough cards left
+      // ensure we have enough cards left for this opponent
       if (currentIndex + 1 >= shuffledDeck.length) {
         break;
       }
@@ -844,21 +847,53 @@ double _runMonteCarloSimulation({
         communityCards: completeCommunityCards
       );
       
-      // if any opponent has a better or equal hand, player loses
-      // (ties count as losses)
-      if (opponentHandResult >= playerHandResult) {
-        playerWins = false;
-        break;
+      // compare hand types first
+      if (opponentHandResult.type.index > playerHandResult.type.index) {
+        // opponent has a better hand type
+        isWin = false;
+        isTie = false;
+        break; // one opponent with a better hand means player loses
+      } else if (opponentHandResult.type.index == playerHandResult.type.index) {
+        // same hand type, need to compare the relevant cards
+        bool playerHasBetterCards = _compareRelevantCards(
+          playerHandResult.relevantCards, 
+          opponentHandResult.relevantCards
+        );
+        
+        if (!playerHasBetterCards) {
+          // check if it's a true tie by comparing the other way around
+          bool opponentHasBetterCards = _compareRelevantCards(
+            opponentHandResult.relevantCards, 
+            playerHandResult.relevantCards
+          );
+          
+          if (opponentHasBetterCards) {
+            // opponent has better cards within the same hand type
+            isWin = false;
+            isTie = false;
+            break; // one opponent with a better hand means player loses
+          } else {
+            // it's a true tie
+            isWin = false;
+            isTie = true;
+            // don't break, continue checking other opponents
+          }
+        }
+        // if player has better cards, continue checking other opponents
       }
+      // if player has a better hand type, continue checking other opponents
     }
     
-    if (playerWins) {
+    if (isWin) {
       wins++;
+    } else if (isTie) {
+      ties++;
     }
   }
   
-  // return probability
-  return wins / simulationCount;
+  // return probability (counting ties as half-wins)
+  // in poker, ties result in splitting the pot, so a tie is worth 0.5 wins
+  return (wins + ties * 0.5) / simulationCount;
 }
 
 /// calculates exact win probability on the river (all community cards known)
