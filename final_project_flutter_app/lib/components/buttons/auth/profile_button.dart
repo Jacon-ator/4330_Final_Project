@@ -1,10 +1,10 @@
-import 'package:final_project_flutter_app/widgets/signup_page.dart';
+import 'package:final_project_flutter_app/screens/profile_page.dart';
 import 'package:flutter/material.dart';
 
-class LoginButton extends StatelessWidget {
+class ProfileButton extends StatelessWidget {
   final String name;
 
-  const LoginButton({super.key, required this.name});
+  const ProfileButton({super.key, required this.name});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +13,7 @@ class LoginButton extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => SignUpPage(name: name),
+            builder: (context) => PokerProfilePage(name: name),
           ),
         );
       },
@@ -24,7 +24,7 @@ class LoginButton extends StatelessWidget {
           color: Colors.white, // white circular background
         ),
         child: const Icon(
-          Icons.login,
+          Icons.person,
           size: 32, // size of the icon
           color: Colors.black, // icon color
         ),

@@ -1,4 +1,4 @@
-import 'package:final_project_flutter_app/src/components/components.dart';
+import 'package:final_project_flutter_app/components/components.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 

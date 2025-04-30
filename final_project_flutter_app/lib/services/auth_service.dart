@@ -1,8 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthService {
 
-  Future<void> signup({
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Future signup({
     required String email,
     required String password
   }) async {
@@ -10,10 +13,13 @@ class AuthService {
     try {
 
       //tries to create a new account with the given email and password
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      UserCredential user = await _auth.createUserWithEmailAndPassword(
         email: email, 
         password: password);
-
+      print(user);
+      //creates a document in the firestore database that will hold the users info and their chats
+      FirebaseFirestore.instance.collection('users').doc(_auth.currentUser?.uid).collection("userinfo").doc("info").set({"testing" : "works"});
+      return user;
     } on FirebaseAuthException catch(e) { //gets the error from firebase and prints it to the console, can be changed to show on app later
       String message = '';
       if (e.code == 'weak-password'){
@@ -22,10 +28,11 @@ class AuthService {
         message = 'This email is already in use.';
       }
       print(message);
+      return null;
     }
   }
 
-  Future<void> login({
+  Future login({
     required String email,
     required String password
   }) async {
@@ -33,10 +40,10 @@ class AuthService {
     try {
 
       //tries to sign into an account with the given email and password
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      UserCredential user = await _auth.signInWithEmailAndPassword(
         email: email, 
         password: password);
-
+      return user;
     } on FirebaseAuthException catch(e) { //gets the error from firebase and prints it to the console, can be changed to show on app later
       String message = '';
       if (e.code == 'user-not-found'){
@@ -45,6 +52,7 @@ class AuthService {
         message = 'Wrong password provided for this user.';
       }
       print(message);
+      return null;
     }
   }
 
@@ -52,6 +60,6 @@ class AuthService {
   Future<void> signout() 
     async {
 
-      await FirebaseAuth.instance.signOut();
+      await _auth.signOut();
     }
 }

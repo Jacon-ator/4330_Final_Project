@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:final_project_flutter_app/services/auth_service.dart';
 
 class PokerProfilePage extends StatefulWidget {
   final String name;
@@ -10,22 +11,32 @@ class PokerProfilePage extends StatefulWidget {
 }
 
 class _PokerProfilePageState extends State<PokerProfilePage> {
+  final AuthService _authService = AuthService();
   int wins = 0;
   int losses = 0;
   int chipsWon = 0;
   int chipsLost = 0;
+  int currentChips = 5000; // Starting chips
 
-  void _simulateWin() {
+  // These methods could be called from real game logic later:
+  void recordWin(int amountWon) {
     setState(() {
       wins++;
-      chipsWon += 1000;
+      currentChips += amountWon;
+      chipsWon += amountWon;
     });
   }
 
-  void _simulateLoss() {
+  void recordLoss(int amountLost) {
     setState(() {
       losses++;
-      chipsLost += 500;
+      if (currentChips >= amountLost) {
+        currentChips -= amountLost;
+        chipsLost += amountLost;
+      } else {
+        chipsLost += currentChips;
+        currentChips = 0;
+      }
     });
   }
 
@@ -78,6 +89,15 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
                 Text("$wins Wins / $losses Losses",
                     style: const TextStyle(color: Colors.white70)),
                 const SizedBox(height: 24),
+                Text(
+                  "Current Chips: $currentChips",
+                  style: const TextStyle(
+                    color: Colors.amberAccent,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -106,15 +126,50 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
                   ],
                 ),
                 const SizedBox(height: 30),
-                ElevatedButton(
-                  onPressed: _simulateWin,
-                  child: const Text("Simulate Win"),
+                Row(
+                  //temp
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        recordWin(500); // Simulate winning 500 chips
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green[600],
+                      ),
+                      child: const Text("+500 Chips",
+                          style: TextStyle(color: Colors.white)),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        recordLoss(300); // Simulate losing 300 chips
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red[600],
+                      ),
+                      child: const Text("-300 Chips",
+                          style: TextStyle(color: Colors.white)),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: _simulateLoss,
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                  child: const Text("Simulate Loss"),
+                const SizedBox(height: 20), //temp
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    await _authService.signout();
+                    if (context.mounted) {
+                      Navigator.of(context).pushReplacementNamed('/');
+                    }
+                  },
+                  icon: const Icon(Icons.logout, color: Colors.white),
+                  label: const Text('Sign Out',
+                      style: TextStyle(color: Colors.white)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red[700],
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
                 ),
               ],
             ),
