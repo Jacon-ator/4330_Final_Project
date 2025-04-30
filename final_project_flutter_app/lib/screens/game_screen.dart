@@ -1,11 +1,9 @@
+import 'package:final_project_flutter_app/components/components.dart';
+import 'package:final_project_flutter_app/config.dart';
 import 'package:final_project_flutter_app/models/card.dart';
 import 'package:final_project_flutter_app/models/player.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
-import 'package:final_project_flutter_app/components/card_component.dart';
-import 'package:final_project_flutter_app/components/components.dart';
-import 'package:final_project_flutter_app/components/hand_area.dart';
 import 'package:flame/components.dart';
-import 'package:flame/extensions.dart';
 
 class GameScreen extends Component with HasGameRef<PokerParty> {
   // This class will handle the game logic and UI for the game screen.
@@ -16,7 +14,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
   int playerIndex = 0;
   int dealerIndex = 0; // Index of the dealer player
 
-  void showPlayerActions(player) {
+  void showPlayerActions(Player player) {
     updateHandUI(player, 0); // Update the hand UI for the current player
     updateHandUI(player, 1); // Update the hand UI for the second card
     print('Showing player actions...');
@@ -91,10 +89,11 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     await super.onLoad();
 
     await gameRef.images.loadAll([
-      'art/cards/Cards Mock Up.png',
-      'art/Base Poker Table.png',
-      'art/Base Player UI.png',
-      'art/Chat Menu.png'
+      AssetPaths.cardFronts,
+      AssetPaths.cardBacks,
+      // AssetPaths.pokerTable,
+      // AssetPaths.playerGUI,
+      // AssetPaths.chatMenu,
     ]);
 
     // Load sprites

@@ -1,14 +1,15 @@
 import 'dart:ui';
 
+import 'package:final_project_flutter_app/config.dart';
 import 'package:final_project_flutter_app/models/card.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
-import 'package:final_project_flutter_app/config.dart';
 import 'package:flame/components.dart';
 
 class CardComponent extends PositionComponent with HasGameRef<PokerParty> {
   late Sprite sprite;
   final PlayingCard card;
-  // final String imagePath;
+  late Image spritesheet;
+  late Image cardBack;
 
   CardComponent({
     required this.card,
@@ -20,7 +21,8 @@ class CardComponent extends PositionComponent with HasGameRef<PokerParty> {
 
   @override
   Future<void> onLoad() async {
-    final spritesheet = game.images.fromCache('art/cards/Cards Mock Up.png');
+    spritesheet = game.images.fromCache(AssetPaths.cardFronts);
+    cardBack = game.images.fromCache(AssetPaths.cardBacks);
 
     // Create a sprite from the spritesheet using the card's position
     sprite = Sprite(spritesheet,
