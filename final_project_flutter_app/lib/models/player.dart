@@ -51,9 +51,10 @@ class Player {
     return 'Player{name: $name, balance: $balance, bet: $bet, hand: $hand}';
   }
 
-  void makeAIDecision() {
+  Future<void> makeAIDecision() async {
     // Placeholder for AI decision-making logic
     // This could be expanded with actual AI strategies
+    await Future.delayed(Duration(milliseconds: 200));
     placeBet(10);
   }
 }

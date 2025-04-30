@@ -69,6 +69,9 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     add(chatMenu);
     add(playerUI);
 
+    add(HandArea());
+    add(CommunityCardArea());
+
     print("Starting game...");
     gameState.initializePlayers();
     await startGame();
@@ -77,14 +80,17 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
   Future<void> startGame() async {
     gameState.resetGame();
 
-    children.whereType<HandArea>().forEach(remove);
-    children.whereType<CommunityCardArea>().forEach(remove);
+    HandArea? handArea = children.whereType<HandArea>().firstOrNull;
+    CommunityCardArea? ccardArea =
+        children.whereType<CommunityCardArea>().firstOrNull;
 
-    add(HandArea());
-    add(CommunityCardArea());
+    if (handArea != null) {
+      handArea.clearCards();
+    }
+    if (ccardArea != null) {
+      ccardArea.clearCards();
+    }
     await dealCards();
-
-    showCommunityCards(gameState.round);
 
     playerIndex = 0;
     await playerTurn();
@@ -96,11 +102,6 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     for (Player player in gameState.players) {
       player.receiveCard(gameState.deck.dealCard());
       player.receiveCard(gameState.deck.dealCard());
-
-      if (!player.isAI) {
-        updateHandUI(player, 0);
-        updateHandUI(player, 1);
-      }
 
       print("Community cards dealt: ${gameState.communityCards.toString()}");
       print(
@@ -142,7 +143,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       // If it's an AI player's turn, handle AI logic here
       print('AI Player ${currentPlayer.name}\'s turn.');
       endRoundIfFolded(currentPlayer);
-      currentPlayer.makeAIDecision();
+      await currentPlayer.makeAIDecision();
       currentPlayer.isCurrentTurn = false; // End AI turn after decision
       endRoundIfFolded(currentPlayer);
 
@@ -308,7 +309,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
         }
         break;
       case 4: // End of game
-        Player winnner = determineWinner();
+        Player winner = determineWinner();
 
         await startGame();
         break;

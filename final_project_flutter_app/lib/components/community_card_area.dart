@@ -33,18 +33,12 @@ class CommunityCardArea extends RectangleComponent with HasGameRef<PokerParty> {
     add(ccardcomponent);
   }
 
-  /* Debug Window 
-
-  @override
-  void render(Canvas canvas) {
-    super.render(canvas);
-    // Optionally, you can draw additional elements like borders or text
-    final borderPaint = Paint()
-      ..color = const Color.fromARGB(255, 0, 0, 0) // Black border
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-    canvas.drawRect(size.toRect(), borderPaint);
+  void clearCards() {
+    // Remove all child components (community cards) from the CommunityCardArea
+    for (var child in children) {
+      if (child is CardComponent) {
+        remove(child);
+      }
+    }
   }
-
-  */
 }

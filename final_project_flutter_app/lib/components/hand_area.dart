@@ -37,20 +37,16 @@ class HandArea extends PositionComponent with HasGameRef<PokerParty> {
     position = Vector2(
         gameRef.size.x / 2 - 91, gameRef.size.y / 2 + 180); // Bottom of screen
     size = Vector2(gameRef.size.x - 1082, 155); // Full width, 150px height
+  }
 
-    // DEBUG: Draws Window
-    // final bgPaint = Paint()
-    //   ..color = const Color.fromARGB(51, 178, 21, 21); // Semi-transparent black
-    // add(RectangleComponent(
-    //   size: size,
-    //   paint: bgPaint,
-    // ));
+  void clearCards() {
+    // Clear all player cards
+    for (var player in playerCards.keys) {
+      for (var card in playerCards[player]!) {
+        remove(card); // Remove from HandArea's children
+      }
+      playerCards[player]!.clear(); // Clear the list for the player
+    }
+    playerCards.clear(); // Clear the map of players and their cards
   }
 }
-
-//   @override
-//   void render(Canvas canvas) {
-//     super.render(canvas);
-//     // Optionally draw background area
-//   }
-// }
