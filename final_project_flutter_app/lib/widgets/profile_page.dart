@@ -126,6 +126,33 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
                   ],
                 ),
                 const SizedBox(height: 30),
+                Row(
+                  //temp
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        recordWin(500); // Simulate winning 500 chips
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green[600],
+                      ),
+                      child: const Text("+500 Chips",
+                          style: TextStyle(color: Colors.white)),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        recordLoss(300); // Simulate losing 300 chips
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red[600],
+                      ),
+                      child: const Text("-300 Chips",
+                          style: TextStyle(color: Colors.white)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20), //temp
                 ElevatedButton.icon(
                   onPressed: () async {
                     await _authService.signout();
@@ -134,11 +161,14 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
                     }
                   },
                   icon: const Icon(Icons.logout, color: Colors.white),
-                  label: const Text('Sign Out', style: TextStyle(color: Colors.white)),
+                  label: const Text('Sign Out',
+                      style: TextStyle(color: Colors.white)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red[700],
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
                   ),
                 ),
               ],
