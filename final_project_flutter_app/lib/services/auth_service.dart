@@ -17,7 +17,7 @@ class AuthService {
         email: email, 
         password: password);
       print(user);
-      FirebaseFirestore.instance.collection('users').add({"test" : "works"});
+      FirebaseFirestore.instance.collection('users').doc(_auth.currentUser?.uid).set({"testing" : "works"});
       return user;
     } on FirebaseAuthException catch(e) { //gets the error from firebase and prints it to the console, can be changed to show on app later
       String message = '';
