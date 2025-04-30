@@ -16,6 +16,8 @@ class Player {
   void resetHand() {
     hand.clear();
     bet = 0;
+    isCurrentTurn = false;
+    isFolded = false;
   }
 
   void placeBet(int amount) {

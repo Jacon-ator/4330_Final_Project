@@ -1,6 +1,6 @@
+import 'package:final_project_flutter_app/components/card_component.dart';
 import 'package:final_project_flutter_app/models/player.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
-import 'package:final_project_flutter_app/components/card_component.dart';
 import 'package:flame/components.dart';
 
 // In hand_area.dart
@@ -8,7 +8,7 @@ class HandArea extends PositionComponent with HasGameRef<PokerParty> {
   // Map to store player cards
   final Map<Player, List<CardComponent>> playerCards = {};
 
-  void addCard(Player player, CardComponent card, int index, dynamic gameRef) {
+  void addCard(Player player, CardComponent card, int index) {
     // Initialize the list for the player if it doesn't exist
     playerCards.putIfAbsent(player, () => []);
 

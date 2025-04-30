@@ -5,7 +5,9 @@ import 'package:final_project_flutter_app/models/table.dart';
 
 class GameState {
   List<Player> players = [];
-  int currentPlayerIndex = 0;
+
+  // not used
+  // int currentPlayerIndex = 0;
 
   List<PlayingCard> communityCards = [];
   Deck deck = Deck(name: "Standard Deck", cards: []);
@@ -47,13 +49,16 @@ class GameState {
   void resetGame() {
     print("Resetting game state...");
     // Initialize the game state with default values
-    initializePlayers();
+    for (Player player in players) {
+      player.resetHand(); // Reset each player's hand and bet
+    }
     communityCards = [];
     deck.resetDeck(); // Start with no community cards
-    deck.cards = deck.generateDeck(); // Generate the deck of cards
     deck.shuffleDeck(); // Shuffle the deck
-    currentPlayerIndex = 0;
+    // not used
+    // currentPlayerIndex = 0;
     pot = 0;
+    round = 0;
     isGameOver = false;
   }
 

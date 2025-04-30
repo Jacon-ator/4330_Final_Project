@@ -14,7 +14,6 @@ class CardComponent extends PositionComponent with HasGameRef<PokerParty> {
 
   CardComponent({
     required this.card,
-    required Vector2 position,
   }) : super(size: Vector2(cardWidth, cardHeight), anchor: Anchor.topLeft) {
     // Load the sprite for the card based on its suit and rank
   }

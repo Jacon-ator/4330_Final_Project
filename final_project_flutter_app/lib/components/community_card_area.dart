@@ -1,8 +1,8 @@
 import 'dart:ui';
 
+import 'package:final_project_flutter_app/components/card_component.dart';
 import 'package:final_project_flutter_app/models/card.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
-import 'package:final_project_flutter_app/components/card_component.dart';
 import 'package:flame/components.dart';
 
 class CommunityCardArea extends RectangleComponent with HasGameRef<PokerParty> {
@@ -23,8 +23,9 @@ class CommunityCardArea extends RectangleComponent with HasGameRef<PokerParty> {
 
   void addCard(PlayingCard communityCard, int i, PokerParty gameRef) {
     // Create a CardComponent for the community card
-    final ccardcomponent =
-        CardComponent(card: communityCard, imagePath: '', position: position);
+    final ccardcomponent = CardComponent(
+      card: communityCard,
+    );
     // Position the card based on its index
     ccardcomponent.position =
         Vector2(38 + (i * 80), 45); // Adjust position as needed
