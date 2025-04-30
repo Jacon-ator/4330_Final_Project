@@ -7,6 +7,9 @@ class AudioManager {
 
   bool _isInitialized = false;
 
+  double musicVolume = 1.0;
+  double sfxVolume = 1.0;
+
   Future<void> initialize() async {
     if (_isInitialized) return;
 
@@ -33,6 +36,19 @@ class AudioManager {
     } catch (e) {
       print('Error playing main theme: $e');
     }
+  }
+
+  void setMusicVolume(double volume) {
+    musicVolume = volume;
+    FlameAudio.bgm.setVolume(volume);
+  }
+
+  void setSfxVolume(double volume) {
+    sfxVolume = volume;
+  }
+
+  void playSfx(String fileName) {
+    FlameAudio.play(fileName, volume: sfxVolume);
   }
 
   Future<void> stopAll() async {
