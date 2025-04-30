@@ -1,7 +1,7 @@
 import 'package:final_project_flutter_app/screens/game_screen.dart';
 import 'package:final_project_flutter_app/screens/shop_screen.dart';
-import 'package:final_project_flutter_app/src/audio/audio_manager.dart';
-import 'package:final_project_flutter_app/src/game_state.dart';
+import 'package:final_project_flutter_app/audio/audio_manager.dart';
+import 'package:final_project_flutter_app/services/game_state.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/camera.dart';

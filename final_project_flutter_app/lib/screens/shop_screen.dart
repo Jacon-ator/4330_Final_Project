@@ -1,5 +1,5 @@
 import 'package:final_project_flutter_app/poker_party.dart';
-import 'package:final_project_flutter_app/src/components/components.dart';
+import 'package:final_project_flutter_app/components/components.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +23,7 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
 
     final BuyTableSkinButton buyTableSkinButton = BuyTableSkinButton()
       ..size = Vector2(size.x / 3.5, 60)
-      ..position = Vector2(size.x / 2 + size.x / 20, size.y * 0.55); 
+      ..position = Vector2(size.x / 2 + size.x / 20, size.y * 0.55);
 
     add(mainMenuButton);
     add(buyCardButton);
@@ -40,7 +40,8 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
     final titleText = TextPainter(
       text: const TextSpan(
         text: 'Shop',
-        style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
+        style: TextStyle(
+            color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
       ),
       textDirection: TextDirection.ltr,
     );
@@ -70,19 +71,26 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
     // Title
     titleText.paint(
       canvas,
-      Offset(size.x / 2 - titleText.width / 2, size.y / 10 - titleText.height / 2),
+      Offset(
+          size.x / 2 - titleText.width / 2, size.y / 10 - titleText.height / 2),
     );
 
     // Card Skin Text
     cardSkinText.paint(
       canvas,
-      Offset(size.x / 2 - size.x / 3 + (size.x / 7) - cardSkinText.width / 2, size.y * 0.5,),
+      Offset(
+        size.x / 2 - size.x / 3 + (size.x / 7) - cardSkinText.width / 2,
+        size.y * 0.5,
+      ),
     );
 
     // Table Skin Texrt
     tableSkinText.paint(
       canvas,
-      Offset(size.x / 2 + size.x / 20 + (size.x / 7) - tableSkinText.width / 2, size.y * 0.5,),
+      Offset(
+        size.x / 2 + size.x / 20 + (size.x / 7) - tableSkinText.width / 2,
+        size.y * 0.5,
+      ),
     );
   }
 }

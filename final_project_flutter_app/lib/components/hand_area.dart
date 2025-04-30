@@ -1,6 +1,6 @@
 import 'package:final_project_flutter_app/models/player.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
-import 'package:final_project_flutter_app/src/components/card_component.dart';
+import 'package:final_project_flutter_app/components/card_component.dart';
 import 'package:flame/components.dart';
 
 // In hand_area.dart

@@ -1,5 +1,5 @@
 import 'package:final_project_flutter_app/models/card.dart';
-import 'package:final_project_flutter_app/src/config.dart';
+import 'package:final_project_flutter_app/config.dart';
 import 'package:flame/game.dart';
 
 class Deck {

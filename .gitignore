@@ -27,5 +27,4 @@ doc/api/
 *configure_fingerprint.bin
 final_project_flutter_app/linux/flutter/
 final_project_flutter_app/macos/Flutter/
-final_project_flutter_app/windows/flutter/generated_plugin_registrant.cc
-final_project_flutter_app/windows/flutter/generated_plugins.cmake
+final_project_flutter_app/windows/flutter/

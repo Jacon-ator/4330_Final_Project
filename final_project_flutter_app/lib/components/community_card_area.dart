@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:final_project_flutter_app/models/card.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
-import 'package:final_project_flutter_app/src/components/card_component.dart';
+import 'package:final_project_flutter_app/components/card_component.dart';
 import 'package:flame/components.dart';
 
 class CommunityCardArea extends RectangleComponent with HasGameRef<PokerParty> {

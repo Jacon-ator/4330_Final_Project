@@ -1,5 +1,5 @@
 import 'package:final_project_flutter_app/poker_party.dart';
-import 'package:final_project_flutter_app/src/components/components.dart';
+import 'package:final_project_flutter_app/components/components.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:final_project_flutter_app/services/auth_service.dart';
@@ -23,7 +23,7 @@ class LoginScreen extends Component with HasGameRef<PokerParty> {
       ..position = Vector2(size.x / 2 - size.x / 12, size.y * 0.8);
 
     add(mainMenuButton);
-  } 
+  }
 
   @override
   void render(Canvas canvas) {
@@ -61,21 +61,19 @@ class LoginScreen extends Component with HasGameRef<PokerParty> {
 
     //text field for the user's email
     final emailfield = TextField(
-        keyboardType: TextInputType.emailAddress,
-        decoration: const InputDecoration(
-          label: Text('Email address'),
-        ),
-        onChanged: (value){
-          email = value;
-        },
+      keyboardType: TextInputType.emailAddress,
+      decoration: const InputDecoration(
+        label: Text('Email address'),
+      ),
+      onChanged: (value) {
+        email = value;
+      },
     );
 
     //text field for the password
     final passwordfield = TextField(
       obscureText: true,
-      decoration: const InputDecoration(
-        label: Text('Password')
-      ),
+      decoration: const InputDecoration(label: Text('Password')),
       onChanged: (value) {
         password = value;
       },
