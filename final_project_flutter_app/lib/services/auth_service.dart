@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthService {
 
@@ -16,6 +17,7 @@ class AuthService {
         email: email, 
         password: password);
       print(user);
+      FirebaseFirestore.instance.collection('users').add({"test" : "works"});
       return user;
     } on FirebaseAuthException catch(e) { //gets the error from firebase and prints it to the console, can be changed to show on app later
       String message = '';
