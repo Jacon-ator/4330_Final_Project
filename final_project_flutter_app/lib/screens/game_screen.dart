@@ -223,7 +223,6 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     final cardComponent = CardComponent(
       card: player.hand[index],
       position: Vector2.zero(), // Position will be determined by HandArea
-      imagePath: '',
     );
 
     // Add the card to the HandArea instead of directly to the screen

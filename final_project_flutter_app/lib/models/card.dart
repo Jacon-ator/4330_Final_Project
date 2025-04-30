@@ -10,6 +10,7 @@ class PlayingCard {
     required this.suit,
     required this.rank,
     required this.position,
+    this.isFlipped = false,
   });
 
   static compareCard(PlayingCard a, PlayingCard b) {
