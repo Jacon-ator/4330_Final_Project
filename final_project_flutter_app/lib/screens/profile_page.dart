@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project_flutter_app/services/auth_service.dart';
 import 'package:final_project_flutter_app/services/database_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class PokerProfilePage extends StatefulWidget {
@@ -20,6 +22,7 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
   int chipsLost = 0;
   String? email = '';
   int currentChips = 5000; // Starting chips
+  Map<String, dynamic> data = {};
 
   // These methods could be called from real game logic later:
   void recordWin(int amountWon) {
@@ -47,9 +50,16 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
   Widget build(BuildContext context) {
 
     //calls the database service to get the user's data
-    
+    final docRef = FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser?.email);
+    docRef.get().then(
+    (DocumentSnapshot doc) {
+      data = doc.data() as Map<String, dynamic>;
+    // ...
+    },
+    onError: (e) => print("Error getting document: $e"),
+    );
     //sets the values using the data
-    
+    email = data["Email"];
     final totalGames = wins + losses;
     final winRatio = totalGames > 0 ? wins / totalGames : 0.0;
 
@@ -57,7 +67,7 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
       backgroundColor: Colors.grey[900],
       appBar: AppBar(
         title: Text("$email's Profile"),
-        backgroundColor: Colors.black,
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       ),
       body: Center(
         child: Card(
