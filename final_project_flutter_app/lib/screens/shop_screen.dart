@@ -1,17 +1,26 @@
-import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:final_project_flutter_app/components/components.dart';
+import 'package:final_project_flutter_app/poker_party.dart';
+import 'package:final_project_flutter_app/services/database_service.dart';
 import 'package:flame/components.dart';
-import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
+
 
 class ShopScreen extends Component with HasGameRef<PokerParty> {
   late Vector2 size;
   static bool ownsTableSkin = false;
+  static int coinBalance = 0;
+  late userData? currentUser;
 
   @override
   Future<void> onLoad() async {
     super.onLoad();
     size = gameRef.size;
+
+    // Load user data 
+    final db = DatabaseService();
+    currentUser = await db.getUserData();
+    ShopScreen.coinBalance = currentUser?.money ?? 0;
+    print("User coins: ${ShopScreen.coinBalance}");
 
     final MainMenuButton mainMenuButton = MainMenuButton()
       ..size = Vector2(size.x / 6, size.y / 6)
@@ -64,9 +73,20 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
       textDirection: TextDirection.ltr,
     );
 
+    final coinText = TextPainter(
+      text: TextSpan(
+        text: 'Coins: ${ShopScreen.coinBalance}',
+        style: const TextStyle(color: Colors.yellow, fontSize: 20),
+      ),
+      textDirection: TextDirection.ltr,
+    );
+
     titleText.layout();
     cardSkinText.layout();
     tableSkinText.layout();
+    coinText.layout();
+
+    coinText.paint(canvas, const Offset(20, 20));
 
     // Title
     titleText.paint(

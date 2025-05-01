@@ -16,11 +16,14 @@ class DatabaseService {
       fromFirestore: userData.fromFirestore, 
       toFirestore: (userData userdata, _) => userdata.toFirestore());
     final docSnap = await ref.get();
-    final userdata = docSnap.data() as userData;
-    
-    print(userdata);
-    return userdata;
+
+    if (docSnap.exists) {
+      return docSnap.data(); // returns userData
+    } else {
+        print("No user document found for: ${_auth.currentUser?.email}");
+        return null; // avoids casting null to userData
     }
+  }
 }
 
 //a class that represents the user's info
