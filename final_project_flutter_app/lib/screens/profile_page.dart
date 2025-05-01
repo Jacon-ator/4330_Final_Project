@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:final_project_flutter_app/services/auth_service.dart';
+import 'package:final_project_flutter_app/services/database_service.dart';
+import 'package:flutter/material.dart';
 
 class PokerProfilePage extends StatefulWidget {
   final String name;
@@ -12,10 +13,12 @@ class PokerProfilePage extends StatefulWidget {
 
 class _PokerProfilePageState extends State<PokerProfilePage> {
   final AuthService _authService = AuthService();
+  final DatabaseService _databaseService = DatabaseService();
   int wins = 0;
   int losses = 0;
   int chipsWon = 0;
   int chipsLost = 0;
+  String? email = '';
   int currentChips = 5000; // Starting chips
 
   // These methods could be called from real game logic later:
@@ -42,13 +45,18 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+
+    //calls the database service to get the user's data
+    
+    //sets the values using the data
+    
     final totalGames = wins + losses;
     final winRatio = totalGames > 0 ? wins / totalGames : 0.0;
 
     return Scaffold(
       backgroundColor: Colors.grey[900],
       appBar: AppBar(
-        title: Text("${widget.name}'s Profile"),
+        title: Text("$email's Profile"),
         backgroundColor: Colors.black,
       ),
       body: Center(
