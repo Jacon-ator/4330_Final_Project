@@ -34,9 +34,14 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
       ..size = Vector2(size.x / 3.5, 60)
       ..position = Vector2(size.x / 2 + size.x / 20, size.y * 0.55);
 
+    final AddCoinsButton addCoinsButton = AddCoinsButton()
+      ..size = Vector2(160, 50)
+      ..position = Vector2(size.x / 2 - 80, size.y * 0.7);
+
     add(mainMenuButton);
     add(buyCardButton);
     add(buyTableSkinButton);
+    add(addCoinsButton);
   }
 
   @override

@@ -9,7 +9,7 @@ class BuyTableSkinButton extends PositionComponent with TapCallbacks, HasGameRef
   void render(Canvas canvas) {
     super.render(canvas);
 
-    final paint = Paint()..color = const Color(0xFF2196F3); // Blue color
+    final paint = Paint()..color = const Color(0xFF2196F3);
     canvas.drawRect(size.toRect(), paint);
 
     final textPainter = TextPainter(
