@@ -65,6 +65,20 @@ class _SignUpPageState extends State<SignUpPage> {
       backgroundColor: const Color(0xFF468232),
       body: Stack(
         children: [
+          // Background image with poker elements
+          Image.asset(
+            'assets/images/art/Title Screen.png',
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
+          ),
+          // Add a semi-transparent overlay to make the form more readable
+          Container(
+            color: const Color(0xFF468232).withOpacity(0.7),
+            width: double.infinity,
+            height: double.infinity,
+          ),
+          // No title text - removed as requested
           Center(
             child: SingleChildScrollView(
           child: Container(
