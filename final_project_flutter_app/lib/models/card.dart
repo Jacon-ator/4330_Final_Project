@@ -4,11 +4,13 @@ class PlayingCard {
   final String suit;
   final int rank;
   final Vector2 position;
+  bool isFlipped = false; // Indicates if the card is flipped
 
   PlayingCard({
     required this.suit,
     required this.rank,
     required this.position,
+    this.isFlipped = false,
   });
 
   static compareCard(PlayingCard a, PlayingCard b) {
@@ -24,5 +26,10 @@ class PlayingCard {
   @override
   String toString() {
     return 'PlayingCard{suit: $suit, rank: $rank, position: $position}';
+  }
+
+  bool flipCard() {
+    isFlipped = !isFlipped;
+    return isFlipped;
   }
 }

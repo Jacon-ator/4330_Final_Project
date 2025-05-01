@@ -5,39 +5,60 @@ import 'package:final_project_flutter_app/models/table.dart';
 
 class GameState {
   List<Player> players = [];
+
+  // not used
+  // int currentPlayerIndex = 0;
+
   List<PlayingCard> communityCards = [];
-  Deck deck =
-      Deck(name: "Standard Deck", cards: []); // Initialize with an empty deck
+  Deck deck = Deck(name: "Standard Deck", cards: []);
+
   Table table = Table(
-      id: "table1",
-      name: "Main Table",
-      capacity: 4,
-      isAvailable: true); // Initialize the table
-  int currentPlayerIndex = 0;
+    id: "table1",
+    name: "Main Table",
+    totalCapacity: 4,
+    isAvailable: true,
+  );
+
+  // (pre-flop: 0, flop: 1, turn: 2, river: 3)
+  int round = 0;
+
   int pot = 0;
+  int bigBlind = 10;
+  int smallBlind = 25;
+
   bool isGameOver = false;
-  int round =
-      0; // Track the current round (pre-flop: 0, flop: 1, turn: 2, river: 3)
-  int bigBlind = 10; // Big blind amount
-  int smallBlind = 25; // Small blind amount
 
   GameState();
-  void initializePlayer(String playerName, bool isAI) {
-    // Initialize players with given names and default balances
-    players
-        .add(Player(playerName, 1000, isAI: isAI)); // Default balance of 1000
+  bool initializePlayer(String playerName, bool isAI) {
+    if (players.length >= table.totalCapacity) {
+      print("Cannot add more players. Table is full.");
+      return false;
+    }
+
+    players.add(
+      Player(
+        playerName,
+        1000,
+        isAI: isAI,
+      ),
+    ); // Default balance of 1000
+
+    return true;
   }
 
   void resetGame() {
     print("Resetting game state...");
     // Initialize the game state with default values
-    initializePlayers();
+    for (Player player in players) {
+      player.resetHand(); // Reset each player's hand and bet
+    }
     communityCards = [];
     deck.resetDeck(); // Start with no community cards
-    deck.cards = deck.generateDeck(); // Generate the deck of cards
     deck.shuffleDeck(); // Shuffle the deck
-    currentPlayerIndex = 0;
+    // not used
+    // currentPlayerIndex = 0;
     pot = 0;
+    round = 0;
     isGameOver = false;
   }
 

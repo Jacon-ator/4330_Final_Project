@@ -1,8 +1,8 @@
 import 'dart:ui';
 
+import 'package:final_project_flutter_app/components/card_component.dart';
 import 'package:final_project_flutter_app/models/card.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
-import 'package:final_project_flutter_app/src/components/card_component.dart';
 import 'package:flame/components.dart';
 
 class CommunityCardArea extends RectangleComponent with HasGameRef<PokerParty> {
@@ -23,8 +23,9 @@ class CommunityCardArea extends RectangleComponent with HasGameRef<PokerParty> {
 
   void addCard(PlayingCard communityCard, int i, PokerParty gameRef) {
     // Create a CardComponent for the community card
-    final ccardcomponent =
-        CardComponent(card: communityCard, imagePath: '', position: position);
+    final ccardcomponent = CardComponent(
+      card: communityCard,
+    );
     // Position the card based on its index
     ccardcomponent.position =
         Vector2(38 + (i * 80), 45); // Adjust position as needed
@@ -32,18 +33,12 @@ class CommunityCardArea extends RectangleComponent with HasGameRef<PokerParty> {
     add(ccardcomponent);
   }
 
-  /* Debug Window 
-
-  @override
-  void render(Canvas canvas) {
-    super.render(canvas);
-    // Optionally, you can draw additional elements like borders or text
-    final borderPaint = Paint()
-      ..color = const Color.fromARGB(255, 0, 0, 0) // Black border
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-    canvas.drawRect(size.toRect(), borderPaint);
+  void clearCards() {
+    // Remove all child components (community cards) from the CommunityCardArea
+    for (var child in children) {
+      if (child is CardComponent) {
+        remove(child);
+      }
+    }
   }
-
-  */
 }

@@ -1,7 +1,7 @@
 class Table {
   final String id;
   final String name;
-  final int capacity;
+  final int totalCapacity;
   final String backgroundImage = 'art/Poker Party Gameplay Mock Up.png';
   final bool isAvailable;
   int pot = 0;
@@ -11,12 +11,12 @@ class Table {
   Table({
     required this.id,
     required this.name,
-    required this.capacity,
+    required this.totalCapacity,
     required this.isAvailable,
   });
 
   @override
   String toString() {
-    return 'Table{id: $id, name: $name, capacity: $capacity, isAvailable: $isAvailable}';
+    return 'Table{id: $id, name: $name, capacity: $totalCapacity, isAvailable: $isAvailable}';
   }
 }

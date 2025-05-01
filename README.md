@@ -13,3 +13,4 @@
 | Matthew Nguyen  | Implemented backend logic        |
 | Carol White  | Wrote unit tests and documentation |
 | Dave Brown   | Managed deployment and DevOps    |
+| Lee Minseo   | Bug fixes, UI, and implemented poker AI model   |

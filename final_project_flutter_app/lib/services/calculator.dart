@@ -245,7 +245,7 @@ HandResult evaluateHand({
 }) {
   // combine player hand and community cards to get all available cards
   final allCards = [...playerHand, ...communityCards];
-  
+
   // check for each hand type in descending order (best to worst)
   // as soon as a match is found, return the corresponding result
   if (_isRoyalFlush(allCards)) {
@@ -277,7 +277,7 @@ HandResult evaluateHand({
 /// returns true if the cards contain a royal flush, false otherwise
 bool _isRoyalFlush(List<Card> cards) {
   final bySuit = _groupCardsBySuit(cards);
-  
+
   // check each suit group that has at least 5 cards
   for (final suitCards in bySuit.values) {
     if (suitCards.length >= 5) {
@@ -287,7 +287,7 @@ bool _isRoyalFlush(List<Card> cards) {
       bool hasQueen = suitCards.any((card) => card.rank == CardRank.queen);
       bool hasJack = suitCards.any((card) => card.rank == CardRank.jack);
       bool hasTen = suitCards.any((card) => card.rank == CardRank.ten);
-      
+
       if (hasAce && hasKing && hasQueen && hasJack && hasTen) {
         return true;
       }
@@ -301,46 +301,37 @@ bool _isRoyalFlush(List<Card> cards) {
 /// returns a HandResult with type HandType.royalFlush and the relevant cards
 HandResult _createRoyalFlushResult(List<Card> cards) {
   final bySuit = _groupCardsBySuit(cards);
-  
+
   for (final suit in bySuit.keys) {
     final suitCards = bySuit[suit]!;
-    
+
     // check for A, K, Q, J, 10 of the same suit
-    final ace = suitCards.firstWhere(
-      (card) => card.rank == CardRank.ace,
-      orElse: () => Card(CardRank.two, Suit.clubs) // Default that should never be reached
-    );
-    
-    final king = suitCards.firstWhere(
-      (card) => card.rank == CardRank.king,
-      orElse: () => Card(CardRank.two, Suit.clubs)
-    );
-    
-    final queen = suitCards.firstWhere(
-      (card) => card.rank == CardRank.queen,
-      orElse: () => Card(CardRank.two, Suit.clubs)
-    );
-    
-    final jack = suitCards.firstWhere(
-      (card) => card.rank == CardRank.jack,
-      orElse: () => Card(CardRank.two, Suit.clubs)
-    );
-    
-    final ten = suitCards.firstWhere(
-      (card) => card.rank == CardRank.ten,
-      orElse: () => Card(CardRank.two, Suit.clubs)
-    );
-    
-    if (ace.rank == CardRank.ace && king.rank == CardRank.king &&
-        queen.rank == CardRank.queen && jack.rank == CardRank.jack &&
+    final ace = suitCards.firstWhere((card) => card.rank == CardRank.ace,
+        orElse: () => Card(
+            CardRank.two, Suit.clubs) // Default that should never be reached
+        );
+
+    final king = suitCards.firstWhere((card) => card.rank == CardRank.king,
+        orElse: () => Card(CardRank.two, Suit.clubs));
+
+    final queen = suitCards.firstWhere((card) => card.rank == CardRank.queen,
+        orElse: () => Card(CardRank.two, Suit.clubs));
+
+    final jack = suitCards.firstWhere((card) => card.rank == CardRank.jack,
+        orElse: () => Card(CardRank.two, Suit.clubs));
+
+    final ten = suitCards.firstWhere((card) => card.rank == CardRank.ten,
+        orElse: () => Card(CardRank.two, Suit.clubs));
+
+    if (ace.rank == CardRank.ace &&
+        king.rank == CardRank.king &&
+        queen.rank == CardRank.queen &&
+        jack.rank == CardRank.jack &&
         ten.rank == CardRank.ten) {
-      return HandResult(
-        HandType.royalFlush,
-        [ace, king, queen, jack, ten]
-      );
+      return HandResult(HandType.royalFlush, [ace, king, queen, jack, ten]);
     }
   }
-  
+
   // This should never happen if _isRoyalFlush was true
   throw StateError('Failed to create royal flush result');
 }
@@ -349,7 +340,7 @@ HandResult _createRoyalFlushResult(List<Card> cards) {
 /// returns true if the cards contain a straight flush, false otherwise
 bool _isStraightFlush(List<Card> cards) {
   final bySuit = _groupCardsBySuit(cards);
-  
+
   for (final suitCards in bySuit.values) {
     if (suitCards.length >= 5) {
       // check for 5 cards in sequence
@@ -366,7 +357,7 @@ bool _isStraightFlush(List<Card> cards) {
 /// returns a HandResult with type HandType.straightFlush and the relevant cards
 HandResult _createStraightFlushResult(List<Card> cards) {
   final bySuit = _groupCardsBySuit(cards);
-  
+
   for (final suit in bySuit.keys) {
     final suitCards = bySuit[suit]!;
     if (suitCards.length >= 5) {
@@ -376,7 +367,7 @@ HandResult _createStraightFlushResult(List<Card> cards) {
       }
     }
   }
-  
+
   // This should never happen if _isStraightFlush was true
   throw StateError('Failed to create straight flush result');
 }
@@ -386,26 +377,26 @@ HandResult _createStraightFlushResult(List<Card> cards) {
 /// also handles the special case A-2-3-4-5 where Ace is low
 bool _containsStraight(List<Card> cards) {
   if (cards.length < 5) return false;
-  
+
   // Sort by rank
   final sortedCards = _sortCardsByRankDescending(cards);
-  
+
   // Handle the special case for A-5-4-3-2 (Ace can be low)
   final hasAce = sortedCards.any((card) => card.rank == CardRank.ace);
   final hasFive = sortedCards.any((card) => card.rank == CardRank.five);
   final hasFour = sortedCards.any((card) => card.rank == CardRank.four);
   final hasThree = sortedCards.any((card) => card.rank == CardRank.three);
   final hasTwo = sortedCards.any((card) => card.rank == CardRank.two);
-  
+
   if (hasAce && hasFive && hasFour && hasThree && hasTwo) {
     return true;
   }
-  
+
   // Check for regular straights
   // Get distinct ranks to handle duplicates
   final distinctRanks = sortedCards.map((card) => card.rank).toSet().toList();
   distinctRanks.sort((a, b) => b.index.compareTo(a.index));
-  
+
   for (int i = 0; i <= distinctRanks.length - 5; i++) {
     bool isStraight = true;
     for (int j = 0; j < 4; j++) {
@@ -416,7 +407,7 @@ bool _containsStraight(List<Card> cards) {
     }
     if (isStraight) return true;
   }
-  
+
   return false;
 }
 
@@ -424,14 +415,14 @@ bool _containsStraight(List<Card> cards) {
 /// returns the 5 highest sequential cards or the wheel (A-5-4-3-2)
 List<Card> _findStraightCards(List<Card> cards) {
   final sortedCards = _sortCardsByRankDescending(cards);
-  
+
   // Handle the special case for A-5-4-3-2
   final hasAce = sortedCards.any((card) => card.rank == CardRank.ace);
   final hasFive = sortedCards.any((card) => card.rank == CardRank.five);
   final hasFour = sortedCards.any((card) => card.rank == CardRank.four);
   final hasThree = sortedCards.any((card) => card.rank == CardRank.three);
   final hasTwo = sortedCards.any((card) => card.rank == CardRank.two);
-  
+
   if (hasAce && hasFive && hasFour && hasThree && hasTwo) {
     final ace = sortedCards.firstWhere((card) => card.rank == CardRank.ace);
     final five = sortedCards.firstWhere((card) => card.rank == CardRank.five);
@@ -440,24 +431,25 @@ List<Card> _findStraightCards(List<Card> cards) {
     final two = sortedCards.firstWhere((card) => card.rank == CardRank.two);
     return [ace, five, four, three, two];
   }
-  
+
   // Get distinct rank cards (taking the highest suit for each rank)
   final distinctRankMap = <CardRank, Card>{};
   for (final card in sortedCards) {
-    if (!distinctRankMap.containsKey(card.rank) || 
+    if (!distinctRankMap.containsKey(card.rank) ||
         card.suit.index > distinctRankMap[card.rank]!.suit.index) {
       distinctRankMap[card.rank] = card;
     }
   }
-  
+
   final distinctRankCards = distinctRankMap.values.toList();
   distinctRankCards.sort((a, b) => b.value.compareTo(a.value));
-  
+
   // check for regular straights
   for (int i = 0; i <= distinctRankCards.length - 5; i++) {
     bool isStraight = true;
     for (int j = 0; j < 4; j++) {
-      if (distinctRankCards[i + j].value != distinctRankCards[i + j + 1].value + 1) {
+      if (distinctRankCards[i + j].value !=
+          distinctRankCards[i + j + 1].value + 1) {
         isStraight = false;
         break;
       }
@@ -466,7 +458,7 @@ List<Card> _findStraightCards(List<Card> cards) {
       return distinctRankCards.sublist(i, i + 5);
     }
   }
-  
+
   return [];
 }
 
@@ -482,34 +474,30 @@ bool _isFourOfAKind(List<Card> cards) {
 /// returns a HandResult with type HandType.fourOfAKind and the relevant cards
 HandResult _createFourOfAKindResult(List<Card> cards) {
   final byRank = _groupCardsByRank(cards);
-  final fourOfAKind = byRank.entries
-      .firstWhere((entry) => entry.value.length >= 4);
-  
+  final fourOfAKind =
+      byRank.entries.firstWhere((entry) => entry.value.length >= 4);
+
   // get the four cards of the same rank
   final fourCards = fourOfAKind.value.take(4).toList();
-  
+
   // get the highest remaining card as the kicker
-  final remainingCards = cards.where(
-    (card) => card.rank != fourOfAKind.key
-  ).toList();
-  
+  final remainingCards =
+      cards.where((card) => card.rank != fourOfAKind.key).toList();
+
   final kicker = _sortCardsByRankDescending(remainingCards).first;
-  
-  return HandResult(
-    HandType.fourOfAKind,
-    [...fourCards, kicker]
-  );
+
+  return HandResult(HandType.fourOfAKind, [...fourCards, kicker]);
 }
 
 /// checks if the cards contain a full house (three of a kind plus a pair)
 /// returns true if the cards contain a full house, false otherwise
 bool _isFullHouse(List<Card> cards) {
   final byRank = _groupCardsByRank(cards);
-  
+
   bool hasThreeOfKind = false;
   bool hasPair = false;
   CardRank? threeOfKindRank;
-  
+
   for (final entry in byRank.entries) {
     if (entry.value.length >= 3) {
       hasThreeOfKind = true;
@@ -517,7 +505,7 @@ bool _isFullHouse(List<Card> cards) {
       break;
     }
   }
-  
+
   if (hasThreeOfKind) {
     for (final entry in byRank.entries) {
       if (entry.key != threeOfKindRank && entry.value.length >= 2) {
@@ -526,7 +514,7 @@ bool _isFullHouse(List<Card> cards) {
       }
     }
   }
-  
+
   return hasThreeOfKind && hasPair;
 }
 
@@ -535,28 +523,26 @@ bool _isFullHouse(List<Card> cards) {
 /// returns a HandResult with type HandType.fullHouse and the relevant cards
 HandResult _createFullHouseResult(List<Card> cards) {
   final byRank = _groupCardsByRank(cards);
-  
+
   // Find three of a kind with highest rank
   var threeOfAKindEntries = byRank.entries
       .where((entry) => entry.value.length >= 3)
       .toList()
-      ..sort((a, b) => b.key.index.compareTo(a.key.index));
-  
+    ..sort((a, b) => b.key.index.compareTo(a.key.index));
+
   final threeOfAKind = threeOfAKindEntries.first.value.take(3).toList();
   final threeOfAKindRank = threeOfAKindEntries.first.key;
-  
+
   // Find pair with highest rank
   var pairEntries = byRank.entries
-      .where((entry) => entry.key != threeOfAKindRank && entry.value.length >= 2)
+      .where(
+          (entry) => entry.key != threeOfAKindRank && entry.value.length >= 2)
       .toList()
-      ..sort((a, b) => b.key.index.compareTo(a.key.index));
-  
+    ..sort((a, b) => b.key.index.compareTo(a.key.index));
+
   final pair = pairEntries.first.value.take(2).toList();
-  
-  return HandResult(
-    HandType.fullHouse,
-    [...threeOfAKind, ...pair]
-  );
+
+  return HandResult(HandType.fullHouse, [...threeOfAKind, ...pair]);
 }
 
 /// checks if the cards contain a flush (5 cards of the same suit)
@@ -571,16 +557,15 @@ bool _isFlush(List<Card> cards) {
 /// returns a HandResult with type HandType.flush and the relevant cards
 HandResult _createFlushResult(List<Card> cards) {
   final bySuit = _groupCardsBySuit(cards);
-  
+
   // Find the suit with at least 5 cards
-  final flushSuitEntry = bySuit.entries
-      .firstWhere((entry) => entry.value.length >= 5);
-  
+  final flushSuitEntry =
+      bySuit.entries.firstWhere((entry) => entry.value.length >= 5);
+
   // Get the 5 highest cards of that suit
-  final flushCards = _sortCardsByRankDescending(flushSuitEntry.value)
-      .take(5)
-      .toList();
-  
+  final flushCards =
+      _sortCardsByRankDescending(flushSuitEntry.value).take(5).toList();
+
   return HandResult(HandType.flush, flushCards);
 }
 
@@ -610,32 +595,31 @@ bool _isThreeOfAKind(List<Card> cards) {
 /// returns a HandResult with type HandType.threeOfAKind and the relevant cards
 HandResult _createThreeOfAKindResult(List<Card> cards) {
   final byRank = _groupCardsByRank(cards);
-  
+
   // Find three of a kind with highest rank
   final threeOfAKindEntries = byRank.entries
       .where((entry) => entry.value.length >= 3)
       .toList()
-      ..sort((a, b) => b.key.index.compareTo(a.key.index));
-  
+    ..sort((a, b) => b.key.index.compareTo(a.key.index));
+
   final threeOfAKindRank = threeOfAKindEntries.first.key;
   final threeCards = threeOfAKindEntries.first.value.take(3).toList();
-  
+
   // get the two highest remaining cards as kickers
   final kickers = _sortCardsByRankDescending(
-    cards.where((card) => card.rank != threeOfAKindRank).toList()
-  ).take(2).toList();
-  
-  return HandResult(
-    HandType.threeOfAKind,
-    [...threeCards, ...kickers]
-  );
+          cards.where((card) => card.rank != threeOfAKindRank).toList())
+      .take(2)
+      .toList();
+
+  return HandResult(HandType.threeOfAKind, [...threeCards, ...kickers]);
 }
 
 /// checks if the cards contain two pair (2 sets of 2 cards of the same rank)
 /// returns true if the cards contain two pair, false otherwise
 bool _isTwoPair(List<Card> cards) {
   final byRank = _groupCardsByRank(cards);
-  final pairs = byRank.values.where((rankCards) => rankCards.length >= 2).length;
+  final pairs =
+      byRank.values.where((rankCards) => rankCards.length >= 2).length;
   return pairs >= 2;
 }
 
@@ -644,26 +628,24 @@ bool _isTwoPair(List<Card> cards) {
 /// returns a HandResult with type HandType.twoPair and the relevant cards
 HandResult _createTwoPairResult(List<Card> cards) {
   final byRank = _groupCardsByRank(cards);
-  
+
   // Find the two highest pairs
   final pairRanks = byRank.entries
       .where((entry) => entry.value.length >= 2)
       .toList()
-      ..sort((a, b) => b.key.index.compareTo(a.key.index));
-  
+    ..sort((a, b) => b.key.index.compareTo(a.key.index));
+
   final highPair = pairRanks[0].value.take(2).toList();
   final lowPair = pairRanks[1].value.take(2).toList();
-  
+
   // get the highest remaining card as kicker
   final usedRanks = [pairRanks[0].key, pairRanks[1].key];
   final kicker = _sortCardsByRankDescending(
-    cards.where((card) => !usedRanks.contains(card.rank)).toList()
-  ).take(1).toList();
-  
-  return HandResult(
-    HandType.twoPair,
-    [...highPair, ...lowPair, ...kicker]
-  );
+          cards.where((card) => !usedRanks.contains(card.rank)).toList())
+      .take(1)
+      .toList();
+
+  return HandResult(HandType.twoPair, [...highPair, ...lowPair, ...kicker]);
 }
 
 /// checks if the cards contain a pair (2 cards of the same rank)
@@ -678,25 +660,23 @@ bool _isPair(List<Card> cards) {
 /// returns a HandResult with type HandType.pair and the relevant cards
 HandResult _createPairResult(List<Card> cards) {
   final byRank = _groupCardsByRank(cards);
-  
+
   // find the highest pair
   final pairEntries = byRank.entries
       .where((entry) => entry.value.length >= 2)
       .toList()
-      ..sort((a, b) => b.key.index.compareTo(a.key.index));
-  
+    ..sort((a, b) => b.key.index.compareTo(a.key.index));
+
   final pairRank = pairEntries.first.key;
   final pairCards = pairEntries.first.value.take(2).toList();
-  
+
   // get the three highest remaining cards as kickers
   final kickers = _sortCardsByRankDescending(
-    cards.where((card) => card.rank != pairRank).toList()
-  ).take(3).toList();
-  
-  return HandResult(
-    HandType.pair,
-    [...pairCards, ...kickers]
-  );
+          cards.where((card) => card.rank != pairRank).toList())
+      .take(3)
+      .toList();
+
+  return HandResult(HandType.pair, [...pairCards, ...kickers]);
 }
 
 /// creates a high card hand result
@@ -718,65 +698,63 @@ double calculateWinProbability({
 }) {
   // validate inputs
   if (playerHand.length != 2) {
-    throw ArgumentError('Player hand must contain exactly 2 cards');
+    throw ArgumentError('player hand must contain exactly 2 cards');
   }
-  
+
   if (communityCards.length > 5) {
-    throw ArgumentError('Community cards cannot exceed 5');
+    throw ArgumentError('community cards cannot exceed 5');
   }
-  
+
   if (numberOfOpponents < 1) {
-    throw ArgumentError('Number of opponents must be at least 1');
+    throw ArgumentError('number of opponents must be at least 1');
   }
-  
+
   // determine the current game stage
   final gameStage = _determineGameStage(communityCards.length);
-  
+
   // create a set of all cards in a deck
   final allCards = _generateDeck();
-  
+
   // remove cards that are already known (player hand and community cards)
   final knownCards = [...playerHand, ...communityCards];
   for (final card in knownCards) {
     allCards.remove(card);
   }
-  
+
   // remaining cards in the deck
   final remainingDeck = allCards.toList();
-  
+
   // use different simulation counts based on game stage
   // more simulations for later stages (fewer unknowns)
   int simulationCount;
   switch (gameStage) {
     case 'preflop':
-      simulationCount = 2000;
+      simulationCount = 5000; // increased from 2000
       break;
     case 'flop':
-      simulationCount = 3000;
+      simulationCount = 7000; // increased from 3000
       break;
     case 'turn':
-      simulationCount = 5000;
+      simulationCount = 10000; // increased from 5000
       break;
     case 'river':
       // on the river, we can do exact calculation because there are no more cards to come
       return _calculateRiverExact(
-        playerHand: playerHand,
-        communityCards: communityCards,
-        remainingDeck: remainingDeck,
-        numberOfOpponents: numberOfOpponents
-      );
+          playerHand: playerHand,
+          communityCards: communityCards,
+          remainingDeck: remainingDeck,
+          numberOfOpponents: numberOfOpponents);
     default:
-      simulationCount = 2000;
+      simulationCount = 5000;
   }
-  
-  // run Monte Carlo simulation
+
+  // run monte carlo simulation
   return _runMonteCarloSimulation(
-    playerHand: playerHand,
-    communityCards: communityCards,
-    remainingDeck: remainingDeck,
-    numberOfOpponents: numberOfOpponents,
-    simulationCount: simulationCount
-  );
+      playerHand: playerHand,
+      communityCards: communityCards,
+      remainingDeck: remainingDeck,
+      numberOfOpponents: numberOfOpponents,
+      simulationCount: simulationCount);
 }
 
 /// determines the current stage of the game based on community card count
@@ -795,7 +773,7 @@ String _determineGameStage(int communityCardCount) {
   }
 }
 
-/// runs a Monte Carlo simulation to estimate win probability
+/// runs a monte carlo simulation to estimate win probability
 double _runMonteCarloSimulation({
   required List<Card> playerHand,
   required List<Card> communityCards,
@@ -804,61 +782,93 @@ double _runMonteCarloSimulation({
   required int simulationCount,
 }) {
   int wins = 0;
-  
+  int ties = 0;
+
   // number of community cards to be dealt
   final communityCardsToAdd = 5 - communityCards.length;
-  
+
   for (int i = 0; i < simulationCount; i++) {
     // shuffle the deck for this simulation
     final shuffledDeck = List<Card>.from(remainingDeck)..shuffle();
-    
+
     // deal community cards
     final drawnCommunityCards = shuffledDeck.take(communityCardsToAdd).toList();
     final completeCommunityCards = [...communityCards, ...drawnCommunityCards];
-    
+
     // evaluate player's hand
     final playerHandResult = evaluateHand(
-      playerHand: playerHand,
-      communityCards: completeCommunityCards
-    );
-    
-    // deal cards to opponents and check if player wins
-    bool playerWins = true;
-    int remainingCards = shuffledDeck.length - communityCardsToAdd;
+        playerHand: playerHand, communityCards: completeCommunityCards);
+
+    // track if this scenario results in a win, tie, or loss
+    bool isWin = true;
+    bool isTie = false;
+
+    // start at the index after the community cards
     int currentIndex = communityCardsToAdd;
-    
+
     for (int j = 0; j < numberOfOpponents; j++) {
-      // ensure we have enough cards left
+      // ensure we have enough cards left for this opponent
       if (currentIndex + 1 >= shuffledDeck.length) {
         break;
       }
-      
+
       final opponentHand = [
         shuffledDeck[currentIndex],
         shuffledDeck[currentIndex + 1]
       ];
       currentIndex += 2;
-      
+
       final opponentHandResult = evaluateHand(
-        playerHand: opponentHand,
-        communityCards: completeCommunityCards
-      );
-      
-      // if any opponent has a better or equal hand, player loses
-      // (ties count as losses)
-      if (opponentHandResult >= playerHandResult) {
-        playerWins = false;
-        break;
+          playerHand: opponentHand, communityCards: completeCommunityCards);
+
+      // compare hand types first
+      if (opponentHandResult.type.index > playerHandResult.type.index) {
+        // opponent has a better hand type
+        isWin = false;
+        isTie = false;
+        break; // one opponent with a better hand means player loses
+      } else if (opponentHandResult.type.index == playerHandResult.type.index) {
+        // same hand type, need to compare the relevant cards
+        bool playerHasBetterCards = _compareRelevantCards(
+            playerHandResult.relevantCards, opponentHandResult.relevantCards);
+
+        if (!playerHasBetterCards) {
+          // check if it's a true tie by comparing the other way around
+          bool opponentHasBetterCards = _compareRelevantCards(
+              opponentHandResult.relevantCards, playerHandResult.relevantCards);
+
+          if (opponentHasBetterCards) {
+            // opponent has better cards within the same hand type
+            isWin = false;
+            isTie = false;
+            break; // one opponent with a better hand means player loses
+          } else {
+            // it's a true tie
+            isWin = false;
+            isTie = true;
+            // don't break, continue checking other opponents
+          }
+        }
+        // if player has better cards, continue checking other opponents
       }
+      // if player has a better hand type, continue checking other opponents
     }
-    
-    if (playerWins) {
+
+    if (isWin) {
       wins++;
+    } else if (isTie) {
+      ties++;
     }
   }
-  
-  // return probability
-  return wins / simulationCount;
+
+  // return probability (counting ties as half-wins)
+  // in poker, ties result in splitting the pot, so a tie is worth 0.5 wins
+  return (wins + ties * 0.5) / simulationCount;
+}
+
+bool _compareRelevantCards(
+    List<Card> relevantCards, List<Card> relevantCards2) {
+  return false;
 }
 
 /// calculates exact win probability on the river (all community cards known)
@@ -870,64 +880,60 @@ double _calculateRiverExact({
   required int numberOfOpponents,
 }) {
   // evaluate the player's hand
-  final playerHandResult = evaluateHand(
-    playerHand: playerHand, 
-    communityCards: communityCards
-  );
-  
+  final playerHandResult =
+      evaluateHand(playerHand: playerHand, communityCards: communityCards);
+
   int totalScenarios = 0;
   int wins = 0;
-  
+
   // if we have just one opponent, we can enumerate all possible hands
   if (numberOfOpponents == 1) {
     // generate all possible 2-card opponent hands
     final opponentHands = _generateCombinations(remainingDeck, 2);
-    
+
     for (final opponentHand in opponentHands) {
       totalScenarios++;
-      
+
       final opponentHandResult = evaluateHand(
-        playerHand: opponentHand,
-        communityCards: communityCards
-      );
-      
+          playerHand: opponentHand, communityCards: communityCards);
+
       // player wins if their hand is better (ties count as losses)
       if (playerHandResult > opponentHandResult) {
         wins++;
       }
     }
-    
+
     return wins / totalScenarios;
   } else {
     // for multiple opponents, fall back to simulation
     // even on the river, exact calculation with multiple opponents is expensive
     return _runMonteCarloSimulation(
-      playerHand: playerHand,
-      communityCards: communityCards,
-      remainingDeck: remainingDeck,
-      numberOfOpponents: numberOfOpponents,
-      simulationCount: 5000 // higher count for river
-    );
+        playerHand: playerHand,
+        communityCards: communityCards,
+        remainingDeck: remainingDeck,
+        numberOfOpponents: numberOfOpponents,
+        simulationCount: 5000 // higher count for river
+        );
   }
 }
 
 /// generates all possible combinations of k cards from a deck
 List<List<Card>> _generateCombinations(List<Card> deck, int k) {
   final result = <List<Card>>[];
-  
+
   // base cases
   if (k == 0) {
     result.add([]);
     return result;
   }
-  
+
   if (k > deck.length) {
     return result;
   }
-  
+
   // recursive combination generation
   _generateCombinationsHelper(deck, k, 0, [], result);
-  
+
   return result;
 }
 
@@ -944,15 +950,15 @@ void _generateCombinationsHelper(
     result.add(List<Card>.from(current));
     return;
   }
-  
+
   // try each card that hasn't been used yet
   for (int i = start; i < deck.length; i++) {
     // add this card to our combination
     current.add(deck[i]);
-    
+
     // recursively generate combinations with this card included
     _generateCombinationsHelper(deck, k, i + 1, current, result);
-    
+
     // remove this card to try the next one
     current.removeLast();
   }
@@ -961,12 +967,12 @@ void _generateCombinationsHelper(
 /// generates a complete deck of 52 cards
 Set<Card> _generateDeck() {
   final deck = <Card>{};
-  
+
   for (final suit in Suit.values) {
     for (final rank in CardRank.values) {
       deck.add(Card(rank, suit));
     }
   }
-  
+
   return deck;
 }
