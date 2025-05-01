@@ -1,5 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService {
 
@@ -17,8 +17,17 @@ class AuthService {
         email: email, 
         password: password);
       print(user);
-      //creates a document in the firestore database that will hold the users info and their chats
-      FirebaseFirestore.instance.collection('users').doc(_auth.currentUser?.uid).collection("userinfo").doc("info").set({"testing" : "works"});
+      //creates a document in the firestore database that will hold the users info
+      FirebaseFirestore.instance.collection('users').doc(_auth.currentUser?.email).set(
+        {
+        "Email" : _auth.currentUser?.email,
+        "Money" : 0,
+        "Games Won" : 0,
+        "Games Lost" : 0
+        }
+        );
+      //creates a collection owned by the user that will hold documents for all of their chats with other players
+      FirebaseFirestore.instance.collection('users').doc(_auth.currentUser?.email).collection("Chats").doc("Support Chat").set({});
       return user;
     } on FirebaseAuthException catch(e) { //gets the error from firebase and prints it to the console, can be changed to show on app later
       String message = '';
