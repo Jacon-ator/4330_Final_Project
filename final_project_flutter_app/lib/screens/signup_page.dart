@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:final_project_flutter_app/services/auth_service.dart';
 import 'package:final_project_flutter_app/audio/audio_manager.dart';
+import 'package:final_project_flutter_app/components/volume_control.dart';
 
 class SignUpPage extends StatefulWidget {
   final String name;
@@ -62,8 +63,10 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF468232),
-      body: Center(
-        child: SingleChildScrollView(
+      body: Stack(
+        children: [
+          Center(
+            child: SingleChildScrollView(
           child: Container(
             constraints: const BoxConstraints(maxWidth: 400),
             child: Card(
@@ -228,6 +231,14 @@ class _SignUpPageState extends State<SignUpPage> {
             ),
           ),
         ),
+          ),
+          // Volume control in top right corner
+          Positioned(
+            top: 20,
+            right: 20,
+            child: const VolumeControl(),
+          ),
+        ],
       ),
     );
   }
