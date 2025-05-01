@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:final_project_flutter_app/services/auth_service.dart';
+import 'package:final_project_flutter_app/audio/audio_manager.dart';
 
 class SignUpPage extends StatefulWidget {
   final String name;
@@ -15,9 +16,22 @@ class _SignUpPageState extends State<SignUpPage> {
   String email = '';
   String password = '';
   AuthService authservice = AuthService();
+  final AudioManager _audioManager = AudioManager();
 
   // Track if there's an error message to display
   String? errorMessage;
+  
+  @override
+  void initState() {
+    super.initState();
+    // Initialize and play the main theme music
+    _initAudio();
+  }
+  
+  Future<void> _initAudio() async {
+    await _audioManager.initialize();
+    await _audioManager.playMainTheme();
+  }
 
   void _signup() async {
     if (email.isEmpty || password.isEmpty) {
