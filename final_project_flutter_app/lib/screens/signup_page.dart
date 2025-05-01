@@ -48,13 +48,13 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF468232),
-      body: SingleChildScrollView(
-        child: Center(
+      body: Center(
+        child: SingleChildScrollView(
           child: Container(
             constraints: const BoxConstraints(maxWidth: 400),
             child: Card(
               color: Colors.white.withOpacity(0.9),
-              margin: const EdgeInsets.all(32),
+              margin: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
