@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 class ShopScreen extends Component with HasGameRef<PokerParty> {
   late Vector2 size;
+  static bool ownsCardSkin = false;
   static bool ownsTableSkin = false;
   static int coinBalance = 0;
   late userData? currentUser;
@@ -91,7 +92,6 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
     tableSkinText.layout();
     coinText.layout();
 
-    coinText.paint(canvas, const Offset(20, 20));
 
     // Title
     titleText.paint(
@@ -117,5 +117,10 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
         size.y * 0.5,
       ),
     );
+
+    coinText.paint(
+      canvas,
+      const Offset(20, 20));
+
   }
 }
