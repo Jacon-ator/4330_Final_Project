@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project_flutter_app/services/auth_service.dart';
 import 'package:final_project_flutter_app/services/database_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class PokerProfilePage extends StatefulWidget {
@@ -30,6 +32,15 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
       currentChips += amountWon;
       chipsWon += amountWon;
     });
+    
+    // Update Firestore
+    final email = FirebaseAuth.instance.currentUser?.email;
+    if (email != null) {
+      FirebaseFirestore.instance.collection("users").doc(email).update({
+        "Games Won": wins,
+        "Money": currentChips
+      });
+    }
   }
 
   void recordLoss(int amountLost) {
@@ -43,6 +54,15 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
         currentChips = 0;
       }
     });
+
+    // Update Firestore
+    final email = FirebaseAuth.instance.currentUser?.email;
+    if (email != null) {
+      FirebaseFirestore.instance.collection("users").doc(email).update({
+        "Games Lost": losses,
+        "Money": currentChips
+      });
+    }
   }
 
   // Load only once when screen opens
