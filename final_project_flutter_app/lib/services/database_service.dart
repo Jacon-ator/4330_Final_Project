@@ -29,13 +29,15 @@ class DatabaseService {
 //a class that represents the user's info
 class userData {
   final String? email;
-  final int? money;
+  final int? chips;         // Chips for playing in game
+  final int? coins;         // Coins for shop
   final int? games_won;
   final int? games_lost;
-
+  
   userData({
     this.email,
-    this.money,
+    this.chips,
+    this.coins,
     this.games_won,
     this.games_lost
   });
@@ -47,7 +49,8 @@ class userData {
     final data = snapshot.data();
     return userData(
       email: data?['Email'],
-      money: data?['Money'],
+      chips: data?['Chips'],
+      coins: data?['Coins'],  
       games_won: data?['Games Won'],
       games_lost: data?['Games Lost'],
     );
@@ -56,7 +59,8 @@ class userData {
   Map<String, dynamic> toFirestore() {
     return {
       if (email != null) "Email": email,
-      if (money != null) "Money": money,
+      if (chips != null) "Chips": chips,
+      if (coins != null) "Chips": coins,
       if (games_won != null) "Games Won": games_won,
       if (games_lost != null) "Games Lost": games_lost,
     };

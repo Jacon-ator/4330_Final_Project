@@ -22,7 +22,7 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
   int chipsWon = 0;
   int chipsLost = 0;
   String? email = '';
-  int currentChips = 5000; // Starting chips
+  int currentChips = 0;
   Map<String, dynamic> data = {};
 
   // These methods could be called from real game logic later:
@@ -38,7 +38,7 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
     if (email != null) {
       FirebaseFirestore.instance.collection("users").doc(email).update({
         "Games Won": wins,
-        "Money": currentChips
+        "Chips": currentChips
       });
     }
   }
@@ -60,7 +60,7 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
     if (email != null) {
       FirebaseFirestore.instance.collection("users").doc(email).update({
         "Games Lost": losses,
-        "Money": currentChips
+        "Chips": currentChips
       });
     }
   }
@@ -81,7 +81,8 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
     // PRINT FIRESTORE DATA TO DEBUG CONSOLE
       print("----- Firestore Data -----");
       print("Email: ${currentUserData?.email}");
-      print("Money: ${currentUserData?.money}");
+      print("Chips: ${currentUserData?.chips}");
+      print("Coins: ${currentUserData?.coins}");
       print("Games Won: ${currentUserData?.games_won}");
       print("Games Lost: ${currentUserData?.games_lost}");
       print("--------------------------");
@@ -93,7 +94,7 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
       email = currentUserData?.email ?? '';
       wins = currentUserData?.games_won ?? 0;
       losses = currentUserData?.games_lost ?? 0;
-      currentChips = currentUserData?.money ?? 0;
+      currentChips = currentUserData?.chips ?? 0;
     
     });
   }
