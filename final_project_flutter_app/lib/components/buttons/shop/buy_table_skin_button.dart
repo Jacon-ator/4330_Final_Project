@@ -43,7 +43,7 @@ class BuyTableSkinButton extends PositionComponent with TapCallbacks, HasGameRef
 
       final email = FirebaseAuth.instance.currentUser?.email;
       if (email != null) {
-        await FirebaseFirestore.instance.collection("users").doc(email).update({"Money": ShopScreen.coinBalance,});
+        await FirebaseFirestore.instance.collection("users").doc(email).update({"Coins": ShopScreen.coinBalance,});
       }
     } else {
       print("Not enough coins to buy Table Skin. You have ${ShopScreen.coinBalance}.");

@@ -23,7 +23,8 @@ class AuthService {
       FirebaseFirestore.instance.collection('users').doc(_auth.currentUser?.email).set(
         {
         "Email" : _auth.currentUser?.email,
-        "Money" : 0,
+        "Chips" : 5000, //Start with 5000 chips
+        "Coins" : 150, //Start with 150 Coins
         "Games Won" : 0,
         "Games Lost" : 0
         }

@@ -20,7 +20,7 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
     // Load user data 
     final db = DatabaseService();
     currentUser = await db.getUserData();
-    ShopScreen.coinBalance = currentUser?.money ?? 0;
+    ShopScreen.coinBalance = currentUser?.coins ?? 0;
     print("User coins: ${ShopScreen.coinBalance}");
 
     final MainMenuButton mainMenuButton = MainMenuButton()

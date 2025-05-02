@@ -16,12 +16,14 @@ class PokerProfilePage extends StatefulWidget {
 class _PokerProfilePageState extends State<PokerProfilePage> {
   final AuthService _authService = AuthService();
   final DatabaseService _databaseService = DatabaseService();
+
+  userData? currentUserData;
+  String? email = '';
   int wins = 0;
   int losses = 0;
   int chipsWon = 0;
   int chipsLost = 0;
-  String? email = '';
-  int currentChips = 5000; // Starting chips
+  int currentChips = 0;
   Map<String, dynamic> data = {};
 
   // These methods could be called from real game logic later:
@@ -31,6 +33,15 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
       currentChips += amountWon;
       chipsWon += amountWon;
     });
+    
+    // Update Firestore
+    final email = FirebaseAuth.instance.currentUser?.email;
+    if (email != null) {
+      FirebaseFirestore.instance.collection("users").doc(email).update({
+        "Games Won": wins,
+        "Chips": currentChips
+      });
+    }
   }
 
   void recordLoss(int amountLost) {
@@ -44,23 +55,54 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
         currentChips = 0;
       }
     });
+
+    // Update Firestore
+    final email = FirebaseAuth.instance.currentUser?.email;
+    if (email != null) {
+      FirebaseFirestore.instance.collection("users").doc(email).update({
+        "Games Lost": losses,
+        "Chips": currentChips
+      });
+    }
+  }
+
+  // Load only once when screen opens
+  @override
+  void initState() {        
+    super.initState();
+    loadUserData();
+  }
+
+  // Loads user data from Firestore
+  void loadUserData() async {
+
+    // Reads the document from the "users" collection for the current user's email.
+    currentUserData = await _databaseService.getUserData();  
+
+    // PRINT FIRESTORE DATA TO DEBUG CONSOLE
+    print("flutter: ----- Firestore Data -----");
+    print("flutter: Email: ${currentUserData?.email}");
+    print("flutter: Chips: ${currentUserData?.chips}");
+    print("flutter: Coins: ${currentUserData?.coins}");
+    print("flutter: Games Won: ${currentUserData?.games_won}");
+    print("flutter: Games Lost: ${currentUserData?.games_lost}");
+    print("flutter: --------------------------");
+
+    // After we get the data, update the state so the UI shows the correct info.
+    setState(() {
+
+      // Update the email field with the value from Firestore, if it's null, use an empty string as a fallback.
+      email = currentUserData?.email ?? '';
+      wins = currentUserData?.games_won ?? 0;
+      losses = currentUserData?.games_lost ?? 0;
+      currentChips = currentUserData?.chips ?? 0;
+    
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    //calls the database service to get the user's data
-    final docRef = FirebaseFirestore.instance
-        .collection("users")
-        .doc(FirebaseAuth.instance.currentUser?.email);
-    docRef.get().then(
-      (DocumentSnapshot doc) {
-        data = doc.data() as Map<String, dynamic>;
-        // ...
-      },
-      onError: (e) => print("Error getting document: $e"),
-    );
     //sets the values using the data
-    email = data["Email"];
     final totalGames = wins + losses;
     final winRatio = totalGames > 0 ? wins / totalGames : 0.0;
 
