@@ -15,6 +15,7 @@ class PokerParty extends FlameGame {
   late SpriteComponent background;
 
   final AudioManager audioManager = AudioManager();
+  bool _audioInitialized = false;
 
   final GameState gameState = GameState();
 
@@ -25,8 +26,12 @@ class PokerParty extends FlameGame {
   Future<void> onLoad() async {
     super.onLoad();
 
-    await audioManager.initialize();
-    await audioManager.playMainTheme();
+    // Initialize audio only if not already initialized
+    if (!_audioInitialized) {
+      await audioManager.initialize();
+      await audioManager.playMainTheme();
+      _audioInitialized = true;
+    }
 
     // Setup a fixed resolution viewport
     cameraComponent = CameraComponent.withFixedResolution(
@@ -56,9 +61,21 @@ class PokerParty extends FlameGame {
     );
 
     add(router);
+  }
 
-    void goTo(String route) {
-      router.pushNamed(route);
+  void goTo(String route) {
+    print('Navigating to route: $route');
+    router.pushNamed(route);
+    // Handle theme switching based on route
+    if (route == 'shop') {
+      print('Switching to shop theme');
+      audioManager.playShopTheme();
+    } else if (route == 'menu') {
+      print('Switching to main theme');
+      audioManager.playMainTheme();
+    } else if (route == 'game') {
+      print('Switching to in-play theme');
+      audioManager.playInPlayTheme();
     }
   }
 

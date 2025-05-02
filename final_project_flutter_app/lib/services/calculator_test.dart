@@ -1,4 +1,5 @@
 /// A test class for verifying that hand evaluation and probability calculation works correctly
+library;
 
 import 'calculator.dart';
 

@@ -47,7 +47,6 @@ class StartGameButton extends PositionComponent
   @override
   void onTapDown(TapDownEvent event) {
     super.onTapDown(event);
-    // Navigate to the main menu screen when the button is tapped
-    gameRef.router.pushNamed('game');
+    gameRef.goTo('game');
   }
 }

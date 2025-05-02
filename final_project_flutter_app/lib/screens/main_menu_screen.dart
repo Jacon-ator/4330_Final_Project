@@ -1,14 +1,16 @@
-import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:final_project_flutter_app/components/components.dart';
+import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 
 class MainMenuScreen extends Component with HasGameRef<PokerParty> {
   late Vector2 size;
   late SpriteComponent background;
+
   @override
   Future<void> onLoad() async {
     super.onLoad();
+    
     // Set the size of the main menu screen to fill the game window
     size = gameRef.size;
 

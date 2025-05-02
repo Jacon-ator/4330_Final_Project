@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:final_project_flutter_app/services/auth_service.dart';
 import 'package:final_project_flutter_app/audio/audio_manager.dart';
 import 'package:final_project_flutter_app/components/volume_control.dart';
+import 'package:final_project_flutter_app/services/auth_service.dart';
+import 'package:flutter/material.dart';
 
 class SignUpPage extends StatefulWidget {
   final String name;
