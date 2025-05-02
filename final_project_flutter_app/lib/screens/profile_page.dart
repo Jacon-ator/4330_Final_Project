@@ -16,12 +16,13 @@ class PokerProfilePage extends StatefulWidget {
 class _PokerProfilePageState extends State<PokerProfilePage> {
   final AuthService _authService = AuthService();
   final DatabaseService _databaseService = DatabaseService();
+
   userData? currentUserData;
+  String? email = '';
   int wins = 0;
   int losses = 0;
   int chipsWon = 0;
   int chipsLost = 0;
-  String? email = '';
   int currentChips = 0;
   Map<String, dynamic> data = {};
 
@@ -79,13 +80,13 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
     currentUserData = await _databaseService.getUserData();  
 
     // PRINT FIRESTORE DATA TO DEBUG CONSOLE
-      print("----- Firestore Data -----");
-      print("Email: ${currentUserData?.email}");
-      print("Chips: ${currentUserData?.chips}");
-      print("Coins: ${currentUserData?.coins}");
-      print("Games Won: ${currentUserData?.games_won}");
-      print("Games Lost: ${currentUserData?.games_lost}");
-      print("--------------------------");
+    print("flutter: ----- Firestore Data -----");
+    print("flutter: Email: ${currentUserData?.email}");
+    print("flutter: Chips: ${currentUserData?.chips}");
+    print("flutter: Coins: ${currentUserData?.coins}");
+    print("flutter: Games Won: ${currentUserData?.games_won}");
+    print("flutter: Games Lost: ${currentUserData?.games_lost}");
+    print("flutter: --------------------------");
 
     // After we get the data, update the state so the UI shows the correct info.
     setState(() {
