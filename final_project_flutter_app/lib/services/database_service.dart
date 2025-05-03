@@ -24,6 +24,26 @@ class DatabaseService {
         return null; // avoids casting null to userData
     }
   }
+
+  Future createNewChat(String recipientemail)
+  async {
+    final recipientDoc = _firestore.collection("users").doc(recipientemail);
+    String useremail = _auth.currentUser?.email ?? "Guest";
+  
+    //checks if the given email is a user in the database
+    final docSnap = await recipientDoc.get();
+    if (!docSnap.exists){
+      print("Failed to find user with this email");
+      return null;
+    }
+
+    //creates a document that will hold the chat in the user's "Chat" collection
+    final chatRef = _firestore.collection('users').doc(_auth.currentUser?.email).collection("Chats").doc(_auth.currentUser?.email);
+    chatRef.set({"1" : "${_auth.currentUser?.email} says hello!"});
+
+    //adds the document reference to the recipient's "Chat" collection so that they share the document
+    _firestore.collection("users").doc(recipientemail).collection("Chats").doc(useremail).set({"Document" : chatRef});
+  }
 }
 
 //a class that represents the user's info

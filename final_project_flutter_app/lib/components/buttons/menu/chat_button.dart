@@ -1,4 +1,4 @@
-import 'package:final_project_flutter_app/screens/profile_page.dart';
+import 'package:final_project_flutter_app/screens/chat_list_page.dart';
 import 'package:flutter/material.dart';
 
 class ChatButton extends StatelessWidget {
@@ -13,7 +13,7 @@ class ChatButton extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => PokerProfilePage(name: name),
+            builder: (context) => ChatListPage(name: "bruh"),
           ),
         );
       },
