@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project_flutter_app/components/components.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:final_project_flutter_app/services/database_service.dart';
@@ -20,8 +21,14 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
     // Load user data 
     final db = DatabaseService();
     currentUser = await db.getUserData();
-    ShopScreen.coinBalance = currentUser?.money ?? 0;
+    ShopScreen.coinBalance = currentUser?.coins ?? 0;
+    ShopScreen.ownsCardSkin = currentUser?.ownCardSkin ?? false;
+    ShopScreen.ownsTableSkin = currentUser?.ownTableSkin ?? false;
+
     print("User coins: ${ShopScreen.coinBalance}");
+    print("Owns Card Skin: ${ShopScreen.ownsCardSkin}");
+    print("Owns Table Skin: ${ShopScreen.ownsTableSkin}");
+    
 
     final MainMenuButton mainMenuButton = MainMenuButton()
       ..size = Vector2(size.x / 6, size.y / 6)
@@ -43,6 +50,46 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
     add(buyCardButton);
     add(buyTableSkinButton);
     add(addCoinsButton);
+  }
+
+  void buyTableSkin() {
+    if (!ownsTableSkin && coinBalance >= 1000) {
+      coinBalance -= 1000;
+      ownsTableSkin = true;
+
+      // Update Firestore
+      FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser?.email) // use the email from currentUser
+        .update({
+          "Coins": coinBalance,
+          "ownTableSkin": true
+        });
+
+      print("Table skin purchased!");
+    } else {
+      print("Not enough coins or already owned.");
+    }
+  }
+
+  void buyCardSkin() {
+    if (!ownsCardSkin && coinBalance >= 500) {
+      coinBalance -= 500;
+      ownsCardSkin = true;
+
+      // Update Firestore
+      FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser?.email)
+        .update({
+          "Coins": coinBalance,
+          "ownCardSkin": true
+        });
+
+      print("Card skin purchased!");
+    } else {
+      print("Not enough coins or already owned.");
+    }
   }
 
   @override

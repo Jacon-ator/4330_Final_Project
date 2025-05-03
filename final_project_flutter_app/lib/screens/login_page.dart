@@ -1,19 +1,19 @@
 import 'package:final_project_flutter_app/audio/audio_manager.dart';
 import 'package:final_project_flutter_app/components/volume_control.dart';
-import 'package:final_project_flutter_app/screens/login_page.dart';
+import 'package:final_project_flutter_app/screens/signup_page.dart';
 import 'package:final_project_flutter_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
 
-class SignUpPage extends StatefulWidget {
+class LoginPage extends StatefulWidget {
   final String name;
 
-  const SignUpPage({super.key, required this.name});
+  const LoginPage({super.key, required this.name});
 
   @override
-  State<SignUpPage> createState() => _SignUpPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _SignUpPageState extends State<SignUpPage> {
+class _LoginPageState extends State<LoginPage> {
   //fields for the entered email and password and an AuthService
   String email = '';
   String password = '';
@@ -35,7 +35,7 @@ class _SignUpPageState extends State<SignUpPage> {
     await _audioManager.playMainTheme();
   }
 
-  void _signup() async {
+  void _login() async {
     if (email.isEmpty || password.isEmpty) {
       setState(() {
         errorMessage = 'Please enter both email and password';
@@ -44,13 +44,13 @@ class _SignUpPageState extends State<SignUpPage> {
     }
 
     try {
-      final result = await authservice.signup(email: email, password: password);
+      final result = await authservice.login(email: email, password: password);
       if (result != null) {
         // Navigates to the game screen after successful signup
         Navigator.of(context).pushReplacementNamed('/game');
       } else {
         setState(() {
-          errorMessage = 'Signup failed. Please try again.';
+          errorMessage = 'Login failed. Please try again.';
         });
       }
     } catch (e) {
@@ -97,7 +97,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const Text(
-                      'Create an Account',
+                      'Log into an Account',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 24,
@@ -214,9 +214,9 @@ class _SignUpPageState extends State<SignUpPage> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        onPressed: _signup,
+                        onPressed: _login,
                         child: const Text(
-                          'SIGN UP',
+                          'LOGIN',
                           style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
@@ -242,11 +242,11 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     TextButton(
                       onPressed: () {
-                        // Goes to the login page
-                        Navigator.of(context).pushReplacement(MaterialPageRoute<LoginPage>(builder: (BuildContext context) {return LoginPage(name: "bruh");}));
+                        // Goes to the sign up page
+                        Navigator.of(context).pushReplacement(MaterialPageRoute<LoginPage>(builder: (BuildContext context) {return SignUpPage(name: "bruh");}));
                       },
                       child: const Text(
-                        'Log into an account',
+                        'Create an account',
                         style: TextStyle(
                           color: Color(0xFF468232),
                           fontWeight: FontWeight.w500,

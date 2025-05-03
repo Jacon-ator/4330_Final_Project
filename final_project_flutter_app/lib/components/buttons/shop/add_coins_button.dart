@@ -35,7 +35,13 @@ class AddCoinsButton extends PositionComponent with TapCallbacks, HasGameRef<Pok
 
     final email = FirebaseAuth.instance.currentUser?.email;
     if (email != null) {
-      await FirebaseFirestore.instance.collection("users").doc(email).update({"Money": ShopScreen.coinBalance,});
+      await FirebaseFirestore.instance.collection("users").doc(email).update({
+        "Coins": ShopScreen.coinBalance
+      }).then((_) {
+        print("Coins updated successfully");
+      }).catchError((e) {
+        print("Failed to update coins: $e");
+      });
     }
   }
 }
