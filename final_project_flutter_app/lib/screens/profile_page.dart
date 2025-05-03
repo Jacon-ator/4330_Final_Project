@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:final_project_flutter_app/screens/shop_screen.dart';
 import 'package:final_project_flutter_app/services/auth_service.dart';
 import 'package:final_project_flutter_app/services/database_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -86,6 +87,8 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
     print("flutter: Coins: ${currentUserData?.coins}");
     print("flutter: Games Won: ${currentUserData?.games_won}");
     print("flutter: Games Lost: ${currentUserData?.games_lost}");
+    print("flutter: Owns Card Skin: ${currentUserData?.ownCardSkin}");
+    print("flutter: Owns Table Skin: ${currentUserData?.ownTableSkin}");
     print("flutter: --------------------------");
 
     // After we get the data, update the state so the UI shows the correct info.
@@ -96,6 +99,9 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
       wins = currentUserData?.games_won ?? 0;
       losses = currentUserData?.games_lost ?? 0;
       currentChips = currentUserData?.chips ?? 0;
+      ShopScreen.coinBalance = currentUserData?.coins ?? 0;
+      ShopScreen.ownsCardSkin = currentUserData?.ownCardSkin ?? false;
+      ShopScreen.ownsTableSkin = currentUserData?.ownTableSkin ?? false;
     
     });
   }

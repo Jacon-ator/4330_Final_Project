@@ -26,7 +26,9 @@ class AuthService {
         "Chips" : 5000, //Start with 5000 chips
         "Coins" : 150, //Start with 150 Coins
         "Games Won" : 0,
-        "Games Lost" : 0
+        "Games Lost" : 0,
+        "ownTableSkin": false,
+        "ownCardSkin": false
         }
         );
       //creates a collection owned by the user that will hold documents for all of their chats with other players

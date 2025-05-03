@@ -33,13 +33,17 @@ class userData {
   final int? coins;         // Coins for shop
   final int? games_won;
   final int? games_lost;
+  final bool? ownTableSkin;
+  final bool? ownCardSkin;   
   
   userData({
     this.email,
     this.chips,
     this.coins,
     this.games_won,
-    this.games_lost
+    this.games_lost,
+    this.ownTableSkin,
+    this.ownCardSkin,
   });
 
   factory userData.fromFirestore(
@@ -53,6 +57,8 @@ class userData {
       coins: data?['Coins'],  
       games_won: data?['Games Won'],
       games_lost: data?['Games Lost'],
+      ownTableSkin: data?['ownTableSkin'] ?? false,
+      ownCardSkin: data?['ownCardSkin'] ?? false
     );
   }
 
@@ -60,9 +66,11 @@ class userData {
     return {
       if (email != null) "Email": email,
       if (chips != null) "Chips": chips,
-      if (coins != null) "Chips": coins,
+      if (coins != null) "Coins": coins,
       if (games_won != null) "Games Won": games_won,
       if (games_lost != null) "Games Lost": games_lost,
+      if (ownTableSkin != null) "ownTableSkin": ownTableSkin,
+      if (ownCardSkin != null) "ownCardSkin": ownCardSkin
     };
   }
 }
