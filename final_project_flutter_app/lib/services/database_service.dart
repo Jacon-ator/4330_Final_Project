@@ -84,6 +84,29 @@ class DatabaseService {
     //returns the sorted map
     return sortedMap;
   }
+
+  Future getAllChats()
+  async {
+
+    //Gets the user's "Chat" collection
+    CollectionReference collectRef = _firestore.collection("users").doc(_auth.currentUser?.email).collection("Chats");
+
+    //adds all of the document references in the collection to a list
+    List<QueryDocumentSnapshot> docList = [];
+    collectRef.get().then(
+      (querySnapshot) {
+        print("Successfully completed");
+        for (var docSnapshot in querySnapshot.docs) {
+          print('${docSnapshot.id} => ${docSnapshot.data()}');
+          docList.add(docSnapshot);
+        }
+      },
+      onError: (e) => print("Error completing: $e"),
+    );
+
+    //returns the list
+    return docList;
+  }
 }
 
 //a class that represents the user's info

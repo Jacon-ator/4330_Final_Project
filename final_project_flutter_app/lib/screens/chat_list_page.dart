@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project_flutter_app/components/volume_control.dart';
 import 'package:final_project_flutter_app/services/auth_service.dart';
 import 'package:final_project_flutter_app/services/database_service.dart';
@@ -18,16 +19,39 @@ class _ChatListPageState extends State<ChatListPage> {
   final DatabaseService _databaseService = DatabaseService();
 
   String recipientemail = "";
+  List<QueryDocumentSnapshot> chatList = [];
 
   // Track if there's an error message to display
   String? errorMessage;
 
+  // Load only once when screen opens
+  @override
+  void initState() {        
+    super.initState();
+    loadUserChats();
+  }
+
+  //loads the user's chats
+  void loadUserChats() async {
+    chatList = await _databaseService.getAllChats();
+
+    print("Called loadUserChats");
+
+    //update the list of chats
+    setState(() {
+      chatList = chatList;
+    });
+  } 
+
   void _createNewChat(){
     _databaseService.createNewChat(recipientemail);
+    //updates the visible list of chats
+    loadUserChats();
   }
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       backgroundColor: const Color(0xFF468232),
       body: Stack(
@@ -71,7 +95,7 @@ class _ChatListPageState extends State<ChatListPage> {
                         color: Color(0xFF468232),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
                     Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
@@ -156,20 +180,7 @@ class _ChatListPageState extends State<ChatListPage> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    TextButton(
-                      onPressed: () {
-                        // Go directly to the game screen as a guest
-                        Navigator.of(context).pushReplacementNamed('/game');
-                      },
-                      child: const Text(
-                        'Continue as Guest',
-                        style: TextStyle(
-                          color: Color(0xFF468232),
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
+                    
                   ],
                 ),
               ),
