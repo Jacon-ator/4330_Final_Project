@@ -1,11 +1,12 @@
 import 'package:final_project_flutter_app/components/buttons/auth/profile_button.dart';
-import 'package:flutter/material.dart';
+import 'package:final_project_flutter_app/components/buttons/menu/chat_button.dart';
+import 'package:final_project_flutter_app/components/volume_control.dart';
+import 'package:final_project_flutter_app/poker_party.dart';
+import 'package:final_project_flutter_app/screens/signup_page.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
-import 'package:final_project_flutter_app/poker_party.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:final_project_flutter_app/screens/signup_page.dart';
-import 'package:final_project_flutter_app/components/volume_control.dart';
+import 'package:flutter/material.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,6 +44,12 @@ Future<void> main() async {
                     top: 20,
                     left: 20,
                     child: ProfileButton(
+                        name: "Player"), // Or dynamically set name
+                  ),
+                  Positioned(
+                    top: 90,
+                    left: 20,
+                    child: ChatButton(
                         name: "Player"), // Or dynamically set name
                   ),
                   // Volume control in top right corner
