@@ -43,6 +43,46 @@ class DatabaseService {
 
     //adds the document reference to the recipient's "Chat" collection so that they share the document
     _firestore.collection("users").doc(recipientemail).collection("Chats").doc(useremail).set({"Document" : chatRef});
+
+    //returns the reference to the newly created document so that you can go the chat viewer for the document
+    return chatRef;
+  }
+
+  Future writeToChat(DocumentReference docRef, String message)
+  async {
+    //gets a snapshot of the document
+    final docSnap = await docRef.get();
+
+    //gets the length of the keys in the document to know what the index of the next message will be
+    int doclength = (docSnap.data() as Map<String, dynamic>).keys.toList().length;
+
+    //creates a header for the message with the user's email and appends the message to it
+    String messageheader = "${_auth.currentUser?.email}: ";
+    String fullmessage = messageheader + message;
+
+    int nextlength = doclength++;
+    String newIndex = nextlength.toString();
+    docRef.update({newIndex : fullmessage});
+  }
+
+  Future readFromChat(DocumentReference docRef)
+  async {
+    //gets a snapshot of the document
+    final docSnap = await docRef.get();
+    //converts the data into a map of strings
+    Map<String, String> chatmessages = docSnap.data() as Map<String, String>;
+    
+    //creates a new map with integers as the keys for sorting purposes
+    Map<int, String> newMap = {};
+    for (String key in chatmessages.keys){
+      newMap[int.parse(key)] = chatmessages[key] ?? "Unable to show message";
+    }
+
+    //sorts the map by integer value so that newer messages are seen first
+    Map<int, String> sortedMap = Map.fromEntries(newMap.entries.toList()..sort((e1, e2) => e1.key.compareTo(e2.key)));
+
+    //returns the sorted map
+    return sortedMap;
   }
 }
 
