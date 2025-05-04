@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project_flutter_app/components/volume_control.dart';
+import 'package:final_project_flutter_app/screens/chat_viewer_page.dart';
 import 'package:final_project_flutter_app/services/auth_service.dart';
 import 'package:final_project_flutter_app/services/database_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -194,7 +195,13 @@ class _ChatListPageState extends State<ChatListPage> {
                         scrollDirection: Axis.vertical,
                         itemBuilder: (BuildContext context, int index) {
                           return ElevatedButton(
-                            onPressed: (){}, 
+                            onPressed: (){
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ChatViewerPage(docRef: chatList[index]))
+                              );
+                            }, 
                             child: Text(chatList[index].id)
                             );
                         }
