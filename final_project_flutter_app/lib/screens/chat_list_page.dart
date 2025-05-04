@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project_flutter_app/components/volume_control.dart';
 import 'package:final_project_flutter_app/services/auth_service.dart';
 import 'package:final_project_flutter_app/services/database_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ChatListPage extends StatefulWidget {
@@ -17,9 +18,8 @@ class _ChatListPageState extends State<ChatListPage> {
 
   final AuthService _authService = AuthService();
   final DatabaseService _databaseService = DatabaseService();
-
   String recipientemail = "";
-  List<QueryDocumentSnapshot> chatList = [];
+  List<DocumentReference> chatList = [FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser?.email)];
 
   // Track if there's an error message to display
   String? errorMessage;
@@ -33,13 +33,13 @@ class _ChatListPageState extends State<ChatListPage> {
 
   //loads the user's chats
   void loadUserChats() async {
-    chatList = await _databaseService.getAllChats();
+    List<DocumentReference> newList = await _databaseService.getAllChats();
 
     print("Called loadUserChats");
-
+    print(newList);
     //update the list of chats
     setState(() {
-      chatList = chatList;
+      chatList = List.from(newList);
     });
   } 
 
@@ -180,7 +180,7 @@ class _ChatListPageState extends State<ChatListPage> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    
+                    Text(chatList[0].id)
                   ],
                 ),
               ),

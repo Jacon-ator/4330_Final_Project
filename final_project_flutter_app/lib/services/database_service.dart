@@ -38,7 +38,7 @@ class DatabaseService {
     }
 
     //creates a document that will hold the chat in the user's "Chat" collection
-    final chatRef = _firestore.collection('users').doc(_auth.currentUser?.email).collection("Chats").doc(_auth.currentUser?.email);
+    final chatRef = _firestore.collection('users').doc(_auth.currentUser?.email).collection("Chats").doc(recipientemail);
     chatRef.set({"1" : "${_auth.currentUser?.email} says hello!"});
 
     //adds the document reference to the recipient's "Chat" collection so that they share the document
@@ -92,17 +92,13 @@ class DatabaseService {
     CollectionReference collectRef = _firestore.collection("users").doc(_auth.currentUser?.email).collection("Chats");
 
     //adds all of the document references in the collection to a list
-    List<QueryDocumentSnapshot> docList = [];
-    collectRef.get().then(
-      (querySnapshot) {
-        print("Successfully completed");
-        for (var docSnapshot in querySnapshot.docs) {
-          print('${docSnapshot.id} => ${docSnapshot.data()}');
-          docList.add(docSnapshot);
-        }
-      },
-      onError: (e) => print("Error completing: $e"),
-    );
+    List<DocumentReference> docList = [];
+    
+    QuerySnapshot refSnap = await collectRef.get();
+    for (QueryDocumentSnapshot docSnapshot in refSnap.docs){
+      print('${docSnapshot.id} => ${docSnapshot.data()}');
+      docList.add(docSnapshot.reference);
+    }
 
     //returns the list
     return docList;
