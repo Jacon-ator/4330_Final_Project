@@ -179,8 +179,21 @@ class _ChatListPageState extends State<ChatListPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    Text(chatList[0].id)
+                    SizedBox(
+                      height: 200,
+                      width: 100,
+                      child: ListView.builder(
+                        padding: const EdgeInsets.all(8),
+                        itemCount: chatList.length,
+                        scrollDirection: Axis.vertical,
+                        itemBuilder: (BuildContext context, int index) {
+                          return ElevatedButton(
+                            onPressed: (){}, 
+                            child: Text(chatList[index].id)
+                            );
+                        }
+                        ),
+                    ),
                   ],
                 ),
               ),
