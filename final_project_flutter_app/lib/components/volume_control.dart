@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:final_project_flutter_app/audio/audio_manager.dart';
+import 'package:flutter/material.dart';
 
 class VolumeControl extends StatefulWidget {
   const VolumeControl({super.key});
