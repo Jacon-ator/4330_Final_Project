@@ -59,8 +59,9 @@ class _ChatViewerPageState extends State<ChatViewerPage> {
     return Scaffold(
       backgroundColor: const Color(0xFF468232),
       appBar: AppBar(
-          title: Text("Chatting with ${widget.docRef.id}"),
+          title: Text("Chatting with ${widget.docRef.id}", selectionColor: Colors.white,),
           backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+          forceMaterialTransparency: true,
         ),
       body: Stack(
         children: [

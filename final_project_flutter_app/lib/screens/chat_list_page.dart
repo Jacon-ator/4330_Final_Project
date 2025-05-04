@@ -55,8 +55,9 @@ class _ChatListPageState extends State<ChatListPage> {
     return Scaffold(
       backgroundColor: const Color(0xFF468232),
       appBar: AppBar(
-          title: Text("Chat"),
+          title: Text("Chat", selectionColor: Colors.white,),
           backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+          forceMaterialTransparency: true,
         ),
       body: Stack(
         children: [
@@ -94,12 +95,12 @@ class _ChatListPageState extends State<ChatListPage> {
                       'List of Chats',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF468232),
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 5),
                     Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
@@ -136,7 +137,7 @@ class _ChatListPageState extends State<ChatListPage> {
                         },
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 5),
                     if (errorMessage != null)
                       Padding(
                         padding: const EdgeInsets.only(top: 12),
@@ -149,7 +150,7 @@ class _ChatListPageState extends State<ChatListPage> {
                           textAlign: TextAlign.center,
                         ),
                       ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 10),
                     Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
@@ -183,8 +184,9 @@ class _ChatListPageState extends State<ChatListPage> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 10,),
                     SizedBox(
-                      height: 200,
+                      height: 150,
                       width: 100,
                       child: ListView.builder(
                         padding: const EdgeInsets.all(8),
