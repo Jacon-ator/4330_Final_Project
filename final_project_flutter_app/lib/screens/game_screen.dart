@@ -315,7 +315,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
 
   bool checkPotIsRight(List<Player> players) {
     for (var player in players) {
-      if (player.getCallAmount(gameRef) != 0) {
+      if (player.getCallAmount(gameRef) != 0 && !player.isFolded) {
         print('${player.name} has not called yet. Pot is not right.');
         return false; // If any player has not called, pot is not right
       }
