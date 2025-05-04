@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flame/extensions.dart';
 
 FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -115,6 +116,7 @@ class DatabaseService {
       messagehistory.add(sortedMap[message] ?? "Unable to load message");
     }
     //returns the message history list
+    messagehistory.reverse();
     return messagehistory;
   }
 

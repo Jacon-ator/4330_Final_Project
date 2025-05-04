@@ -124,6 +124,7 @@ class _ChatViewerPageState extends State<ChatViewerPage> {
                       width: double.infinity,
                       child: ListView.builder(
                         padding: const EdgeInsets.all(8),
+                        reverse: true,
                         itemCount: messagehistory.length,
                         itemBuilder: (BuildContext context, int index) {
                           return Container(
