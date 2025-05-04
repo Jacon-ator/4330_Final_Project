@@ -60,8 +60,7 @@ class DatabaseService {
     String messageheader = "${_auth.currentUser?.email}: ";
     String fullmessage = messageheader + message;
 
-    int nextlength = doclength++;
-    String newIndex = nextlength.toString();
+    String newIndex = doclength.toString();
     docRef.update({newIndex : fullmessage});
   }
 

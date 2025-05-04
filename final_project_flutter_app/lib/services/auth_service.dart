@@ -30,10 +30,15 @@ class AuthService {
         "ownTableSkin": false,
         "ownCardSkin": false
         }
-        );
+      );
+
       //creates a collection owned by the user that will hold documents for all of their chats with other players
-      FirebaseFirestore.instance.collection('users').doc(_auth.currentUser?.email).collection("Chats").doc("Support Chat").set({});
+      FirebaseFirestore.instance.collection('users').doc(_auth.currentUser?.email).collection("Chats").doc("Support Chat").set({
+        "0": "Support: Welcome! How can we assist you today?"
+      });
+
       return user;
+
     } on FirebaseAuthException catch(e) { //gets the error from firebase and prints it to the console, can be changed to show on app later
       String message = '';
       if (e.code == 'weak-password'){

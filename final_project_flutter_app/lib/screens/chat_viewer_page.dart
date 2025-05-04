@@ -119,20 +119,30 @@ class _ChatViewerPageState extends State<ChatViewerPage> {
                         ),
                       ),
                     const SizedBox(height: 24),
-                    SizedBox(
-                      height: 200,
-                      width: 100,
-                      child: ListView.builder(
-                        padding: const EdgeInsets.all(8),
-                        itemCount: messagehistory.length,
-                        scrollDirection: Axis.vertical,
-                        itemBuilder: (BuildContext context, int index) {
-                          return ElevatedButton(
-                            onPressed: (){}, 
-                            child: Text(messagehistory[index])
-                            );
-                        }
+                    
+                    // Text input
+                    TextField(
+                      onChanged: (value) {
+                        setState(() {
+                          message = value;
+                        });
+                      },
+                      decoration: const InputDecoration(
+                        hintText: 'Type your message...',
+                        border: OutlineInputBorder(),
                       ),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    // Send button
+                    ElevatedButton(
+                      onPressed: () {
+                        if (message.trim().isNotEmpty) {
+                          sendMessage();
+                        }
+                      },
+                      child: const Text("Send"),
                     ),
                   ],
                 ),
