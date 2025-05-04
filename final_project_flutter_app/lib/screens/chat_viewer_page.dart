@@ -82,7 +82,7 @@ class _ChatViewerPageState extends State<ChatViewerPage> {
           Center(
             child: SingleChildScrollView(
           child: Container(
-            constraints: const BoxConstraints(maxWidth: 400),
+            constraints: const BoxConstraints(maxWidth: 850),
             child: Card(
               color: Colors.white.withOpacity(0.9),
               margin: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
@@ -119,6 +119,35 @@ class _ChatViewerPageState extends State<ChatViewerPage> {
                         ),
                       ),
                     const SizedBox(height: 24),
+                    SizedBox(
+                      height: 200,
+                      width: double.infinity,
+                      child: ListView.builder(
+                        padding: const EdgeInsets.all(8),
+                        itemCount: messagehistory.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Container(
+                            alignment: messagehistory[index].startsWith("Support:") 
+                                ? Alignment.centerLeft 
+                                : Alignment.centerRight,
+                            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: messagehistory[index].startsWith("Support:") 
+                                    ? Colors.green[200] 
+                                    : Colors.blue[200],
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                              child: Text(
+                                messagehistory[index],
+                                style: const TextStyle(fontSize: 18),
+                              ),  
+                            ),
+                          );
+                        }
+                      ),
+                    ),
                     
                     // Text input
                     TextField(
