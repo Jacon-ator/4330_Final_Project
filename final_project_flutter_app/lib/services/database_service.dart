@@ -25,8 +25,7 @@ class DatabaseService {
     }
   }
 
-  Future createNewChat(String recipientemail)
-  async {
+  Future createNewChat(String recipientemail) async {
     final recipientDoc = _firestore.collection("users").doc(recipientemail);
     String useremail = _auth.currentUser?.email ?? "Guest";
   
@@ -37,15 +36,32 @@ class DatabaseService {
       return null;
     }
 
-    //creates a document that will hold the chat in the user's "Chat" collection
-    final chatRef = _firestore.collection('users').doc(_auth.currentUser?.email).collection("Chats").doc(recipientemail);
-    chatRef.set({"1" : "${_auth.currentUser?.email} says hello!"});
+    // Make unique ID for each user
+    String chatID;
+    if (useremail.compareTo(recipientemail) < 0) {
+      chatID = "${useremail}_$recipientemail";
+    } else {
+      chatID = "${recipientemail}_$useremail";
+    }
 
-    //adds the document reference to the recipient's "Chat" collection so that they share the document
-    _firestore.collection("users").doc(recipientemail).collection("Chats").doc(useremail).set({"Document" : chatRef});
+    final chatDoc = _firestore.collection("chats").doc(chatID);
+
+    // Creates the chat between the two users
+    final chatSnap = await chatDoc.get();
+    if (!chatSnap.exists) {
+      await chatDoc.set({
+        "0": "Chat started between $useremail and $recipientemail."
+      });
+    }
+
+    // Links the chat for sender
+    await _firestore.collection("users").doc(useremail).collection("Chats").doc(recipientemail).set({"chatID": chatID});
+
+    // Links the chat for recipient
+    await _firestore.collection("users").doc(recipientemail).collection("Chats").doc(useremail).set({"chatID": chatID});
 
     //returns the reference to the newly created document so that you can go the chat viewer for the document
-    return chatRef;
+    return chatDoc;
   }
 
   Future writeToChat(DocumentReference docRef, String message)
@@ -91,19 +107,22 @@ class DatabaseService {
     return messagehistory;
   }
 
-  Future getAllChats()
-  async {
+  Future<List<DocumentReference>> getAllChats() async {
 
     //Gets the user's "Chat" collection
-    CollectionReference collectRef = _firestore.collection("users").doc(_auth.currentUser?.email).collection("Chats");
-
+    CollectionReference userChats = _firestore.collection("users").doc(_auth.currentUser?.email).collection("Chats");
+    
     //adds all of the document references in the collection to a list
     List<DocumentReference> docList = [];
-    
-    QuerySnapshot refSnap = await collectRef.get();
-    for (QueryDocumentSnapshot docSnapshot in refSnap.docs){
-      print('${docSnapshot.id} => ${docSnapshot.data()}');
-      docList.add(docSnapshot.reference);
+
+    // Get all chat documents from the user's Chats collection
+    QuerySnapshot refSnap = await userChats.get();
+  
+    for (var doc in refSnap.docs) {
+      String chatID = (doc.data() as Map<String, dynamic>)["chatID"] ?? "";
+      if (chatID.isNotEmpty) {
+        docList.add(_firestore.collection("chats").doc(chatID));
+      }
     }
 
     //returns the list
