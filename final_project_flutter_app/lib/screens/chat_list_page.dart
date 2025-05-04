@@ -54,6 +54,10 @@ class _ChatListPageState extends State<ChatListPage> {
     
     return Scaffold(
       backgroundColor: const Color(0xFF468232),
+      appBar: AppBar(
+          title: Text("Chat"),
+          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        ),
       body: Stack(
         children: [
           // Background image with poker elements

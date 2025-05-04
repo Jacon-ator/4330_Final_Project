@@ -75,14 +75,19 @@ class DatabaseService {
     //creates a new map with integers as the keys for sorting purposes
     Map<int, String> newMap = {};
     for (String key in chatmessages.keys){
-      newMap[int.parse(key)] = chatmessages[key] ?? "Unable to show message";
+      newMap[int.parse(key)] = chatmessages[key] ?? "Unable to load message";
     }
 
     //sorts the map by integer value so that newer messages are seen first
     Map<int, String> sortedMap = Map.fromEntries(newMap.entries.toList()..sort((e1, e2) => e1.key.compareTo(e2.key)));
-
-    //returns the sorted map
-    return sortedMap;
+    
+    //creates a list to hold the messages
+    List<String> messagehistory = [];
+    for (int message in sortedMap.keys){
+      messagehistory.add(sortedMap[message] ?? "Unable to load message");
+    }
+    //returns the message history list
+    return messagehistory;
   }
 
   Future getAllChats()
