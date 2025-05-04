@@ -1,4 +1,5 @@
 import 'package:flame/game.dart';
+import 'package:poker/poker.dart' as poker;
 
 class PlayingCard {
   final String suit;
@@ -31,5 +32,18 @@ class PlayingCard {
   bool flipCard() {
     isFlipped = !isFlipped;
     return isFlipped;
+  }
+
+  poker.Card toPokerCard() {
+    // Convert PlayingCard to poker.Card
+    Map<String, String> suitMap = {
+      'Hearts': 'h',
+      'Diamonds': 'd',
+      'Clubs': 'c',
+      'Spades': 's'
+    };
+    return poker.Card(
+        rank: poker.Rank.fromIndex(rank - 2),
+        suit: poker.Suit.parse(suitMap[suit]!));
   }
 }

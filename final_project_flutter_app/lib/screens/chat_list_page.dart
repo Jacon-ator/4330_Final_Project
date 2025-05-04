@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project_flutter_app/components/volume_control.dart';
 import 'package:final_project_flutter_app/services/auth_service.dart';
 import 'package:final_project_flutter_app/services/database_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ChatListPage extends StatefulWidget {
@@ -17,9 +18,8 @@ class _ChatListPageState extends State<ChatListPage> {
 
   final AuthService _authService = AuthService();
   final DatabaseService _databaseService = DatabaseService();
-
   String recipientemail = "";
-  List<QueryDocumentSnapshot> chatList = [];
+  List<DocumentReference> chatList = [FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser?.email)];
 
   // Track if there's an error message to display
   String? errorMessage;
@@ -33,13 +33,13 @@ class _ChatListPageState extends State<ChatListPage> {
 
   //loads the user's chats
   void loadUserChats() async {
-    chatList = await _databaseService.getAllChats();
+    List<DocumentReference> newList = await _databaseService.getAllChats();
 
     print("Called loadUserChats");
-
+    print(newList);
     //update the list of chats
     setState(() {
-      chatList = chatList;
+      chatList = List.from(newList);
     });
   } 
 
@@ -54,6 +54,11 @@ class _ChatListPageState extends State<ChatListPage> {
     
     return Scaffold(
       backgroundColor: const Color(0xFF468232),
+      appBar: AppBar(
+          title: Text("Chat", selectionColor: Colors.white,),
+          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+          forceMaterialTransparency: true,
+        ),
       body: Stack(
         children: [
           // Background image with poker elements
@@ -90,12 +95,12 @@ class _ChatListPageState extends State<ChatListPage> {
                       'List of Chats',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF468232),
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 5),
                     Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
@@ -132,7 +137,7 @@ class _ChatListPageState extends State<ChatListPage> {
                         },
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 5),
                     if (errorMessage != null)
                       Padding(
                         padding: const EdgeInsets.only(top: 12),
@@ -145,7 +150,7 @@ class _ChatListPageState extends State<ChatListPage> {
                           textAlign: TextAlign.center,
                         ),
                       ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 10),
                     Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
@@ -179,8 +184,22 @@ class _ChatListPageState extends State<ChatListPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    
+                    const SizedBox(height: 10,),
+                    SizedBox(
+                      height: 150,
+                      width: 100,
+                      child: ListView.builder(
+                        padding: const EdgeInsets.all(8),
+                        itemCount: chatList.length,
+                        scrollDirection: Axis.vertical,
+                        itemBuilder: (BuildContext context, int index) {
+                          return ElevatedButton(
+                            onPressed: (){}, 
+                            child: Text(chatList[index].id)
+                            );
+                        }
+                        ),
+                    ),
                   ],
                 ),
               ),

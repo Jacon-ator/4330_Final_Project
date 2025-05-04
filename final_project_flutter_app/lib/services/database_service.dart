@@ -38,7 +38,7 @@ class DatabaseService {
     }
 
     //creates a document that will hold the chat in the user's "Chat" collection
-    final chatRef = _firestore.collection('users').doc(_auth.currentUser?.email).collection("Chats").doc(_auth.currentUser?.email);
+    final chatRef = _firestore.collection('users').doc(_auth.currentUser?.email).collection("Chats").doc(recipientemail);
     chatRef.set({"1" : "${_auth.currentUser?.email} says hello!"});
 
     //adds the document reference to the recipient's "Chat" collection so that they share the document
@@ -75,14 +75,19 @@ class DatabaseService {
     //creates a new map with integers as the keys for sorting purposes
     Map<int, String> newMap = {};
     for (String key in chatmessages.keys){
-      newMap[int.parse(key)] = chatmessages[key] ?? "Unable to show message";
+      newMap[int.parse(key)] = chatmessages[key] ?? "Unable to load message";
     }
 
     //sorts the map by integer value so that newer messages are seen first
     Map<int, String> sortedMap = Map.fromEntries(newMap.entries.toList()..sort((e1, e2) => e1.key.compareTo(e2.key)));
-
-    //returns the sorted map
-    return sortedMap;
+    
+    //creates a list to hold the messages
+    List<String> messagehistory = [];
+    for (int message in sortedMap.keys){
+      messagehistory.add(sortedMap[message] ?? "Unable to load message");
+    }
+    //returns the message history list
+    return messagehistory;
   }
 
   Future getAllChats()
@@ -92,17 +97,13 @@ class DatabaseService {
     CollectionReference collectRef = _firestore.collection("users").doc(_auth.currentUser?.email).collection("Chats");
 
     //adds all of the document references in the collection to a list
-    List<QueryDocumentSnapshot> docList = [];
-    collectRef.get().then(
-      (querySnapshot) {
-        print("Successfully completed");
-        for (var docSnapshot in querySnapshot.docs) {
-          print('${docSnapshot.id} => ${docSnapshot.data()}');
-          docList.add(docSnapshot);
-        }
-      },
-      onError: (e) => print("Error completing: $e"),
-    );
+    List<DocumentReference> docList = [];
+    
+    QuerySnapshot refSnap = await collectRef.get();
+    for (QueryDocumentSnapshot docSnapshot in refSnap.docs){
+      print('${docSnapshot.id} => ${docSnapshot.data()}');
+      docList.add(docSnapshot.reference);
+    }
 
     //returns the list
     return docList;

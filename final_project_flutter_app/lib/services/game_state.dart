@@ -23,8 +23,9 @@ class GameState {
   int round = 0;
 
   int pot = 0;
-  int bigBlind = 10;
-  int smallBlind = 25;
+  int bigBlind = 25;
+  int smallBlind = 10;
+  bool potIsRight = false;
 
   bool isGameOver = false;
 
@@ -51,6 +52,8 @@ class GameState {
     // Initialize the game state with default values
     for (Player player in players) {
       player.resetHand(); // Reset each player's hand and bet
+      player.isAllIn = false; // Reset all-in status
+      player.isFolded = false; // Reset folded status
     }
     communityCards = [];
     deck.resetDeck(); // Start with no community cards
