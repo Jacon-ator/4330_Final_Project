@@ -70,7 +70,7 @@ class DatabaseService {
     //gets a snapshot of the document
     final docSnap = await docRef.get();
     //converts the data into a map of strings
-    Map<String, String> chatmessages = docSnap.data() as Map<String, String>;
+    Map<String, dynamic> chatmessages = docSnap.data() as Map<String, dynamic>;
     
     //creates a new map with integers as the keys for sorting purposes
     Map<int, String> newMap = {};
