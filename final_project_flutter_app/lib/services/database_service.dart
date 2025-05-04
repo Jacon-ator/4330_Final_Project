@@ -80,10 +80,21 @@ class DatabaseService {
     docRef.update({newIndex : fullmessage});
   }
 
-  Future readFromChat(DocumentReference docRef)
-  async {
+  Future readFromChat(DocumentReference docRef) async {
     //gets a snapshot of the document
     final docSnap = await docRef.get();
+
+    //Check if document exists
+    if (!docSnap.exists) {
+    //Creates it with a welcome message
+    await docRef.set({
+      "0": "Support chat started. Feel free to ask your questions here."
+    });
+    
+    // Return that first message
+    return ["Welcome to your private support chat. Feel free to ask your questions here."];
+    }
+
     //converts the data into a map of strings
     Map<String, dynamic> chatmessages = docSnap.data() as Map<String, dynamic>;
     
@@ -117,7 +128,7 @@ class DatabaseService {
 
     // Get all chat documents from the user's Chats collection
     QuerySnapshot refSnap = await userChats.get();
-  
+
     for (var doc in refSnap.docs) {
       String chatID = (doc.data() as Map<String, dynamic>)["chatID"] ?? "";
       if (chatID.isNotEmpty) {

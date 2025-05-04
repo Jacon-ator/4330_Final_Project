@@ -3,6 +3,7 @@ import 'package:final_project_flutter_app/components/volume_control.dart';
 import 'package:final_project_flutter_app/screens/chat_viewer_page.dart';
 import 'package:final_project_flutter_app/services/auth_service.dart';
 import 'package:final_project_flutter_app/services/database_service.dart';
+import "package:firebase_auth/firebase_auth.dart";
 import 'package:flutter/material.dart';
 
 class ChatListPage extends StatefulWidget {
@@ -110,6 +111,23 @@ class _ChatListPageState extends State<ChatListPage> {
                       ),
                     ),
                     const SizedBox(height: 5),
+                    ElevatedButton(
+                      onPressed: () {
+                      final userEmail = FirebaseAuth.instance.currentUser?.email ?? "Guest";
+                      final supportDocRef = FirebaseFirestore.instance
+                          .collection("chats")
+                          .doc("Support_$userEmail");
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChatViewerPage(docRef: supportDocRef),
+                          ),
+                        );
+                      },
+                      child: const Text("Contact Support"),
+                    ),
+
+                    const SizedBox(height: 10),
                     Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
