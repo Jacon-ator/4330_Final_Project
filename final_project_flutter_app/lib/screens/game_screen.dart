@@ -1,6 +1,8 @@
+import 'package:final_project_flutter_app/components/buttons/gameplay/play_next_round_button.dart';
 import 'package:final_project_flutter_app/components/components.dart';
 import 'package:final_project_flutter_app/config.dart';
 import 'package:final_project_flutter_app/models/card.dart';
+import 'package:final_project_flutter_app/models/card_evaluator.dart';
 import 'package:final_project_flutter_app/models/player.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:final_project_flutter_app/services/game_state.dart';
@@ -13,8 +15,11 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
 
   List<ActionButton>? actionButtons;
   int playerIndex = 0;
-  int dealerIndex = 0;
-  late GameState gameState;
+  int dealerIndex = -1;
+  late GameState gameState = gameRef.gameState; // Reference to the game state
+  CardEvaluator cardEvaluator = CardEvaluator();
+  bool showPlayAgainButton = false;
+  int potRightCount = 0;
 
   @override
   Future<void> onLoad() async {
@@ -79,6 +84,8 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
 
   Future<void> startGame() async {
     gameState.resetGame();
+    dealerIndex =
+        (dealerIndex + 1) % gameState.players.length; // Move to the next dealer
 
     HandArea? handArea = children.whereType<HandArea>().firstOrNull;
     CommunityCardArea? ccardArea =
@@ -91,8 +98,9 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       ccardArea.clearCards();
     }
     await dealCards();
+    blinds(); // Place the blinds for the game
 
-    playerIndex = 0;
+    playerIndex = dealerIndex;
     await playerTurn();
   }
 
@@ -111,14 +119,16 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
 
   Future<void> nextPlayer() async {
     // move to next player
+    bool potRight = false; // Flag to check if the pot is right
     playerIndex = (playerIndex + 1) % gameState.players.length;
-
-    gameState.players[playerIndex].isCurrentTurn = true;
-
     if (playerIndex == dealerIndex) {
-      gameState.round++;
-      await showCommunityCards(gameState.round);
+      potRight = checkPotIsRight(gameState.players);
     }
+    if (potRight) {
+      gameState.round++;
+      await roundBasedDealing(gameState.round);
+    }
+    gameState.players[playerIndex].isCurrentTurn = true;
 
     await playerTurn();
     print('Next player is ${gameState.players[playerIndex].name}');
@@ -132,25 +142,31 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
 
     // This method will be called to start the player's turn.
     // It will show the action buttons and wait for player input.
-    if (currentPlayer.isFolded) {
-      print('${currentPlayer.name} has folded. Skipping turn.');
+    if (currentPlayer.isFolded || currentPlayer.isAllIn) {
+      print(
+          '${currentPlayer.name} has folded or cannot bet any more money. Skipping turn.');
+      currentPlayer.isCurrentTurn = false; // End the current player's turn
       await nextPlayer(); // Skip to the next player if current player has folded
       return;
     }
 
     currentPlayer.isCurrentTurn = true; // Set current player turn to true
+
+    print(
+        'Current player: ${currentPlayer.name} balance: ${currentPlayer.balance},amount to call: ${currentPlayer.getCallAmount(gameRef)}');
+
     if (currentPlayer.isAI) {
       // If it's an AI player's turn, handle AI logic here
       print('AI Player ${currentPlayer.name}\'s turn.');
       endRoundIfFolded(currentPlayer);
-      await currentPlayer.makeAIDecision();
+      int amount = await currentPlayer.makeAIDecision(gameRef);
+      gameRef.gameState.pot += amount; // Add the bet to the pot
       currentPlayer.isCurrentTurn = false; // End AI turn after decision
       endRoundIfFolded(currentPlayer);
 
       await nextPlayer(); // Move to the next player
     } else {
       showPlayerActions(currentPlayer);
-      print('It is ${currentPlayer.name}\'s turn.');
     }
   }
 
@@ -158,7 +174,8 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     updateHandUI(player, 0); // Update the hand UI for the current player
     updateHandUI(player, 1); // Update the hand UI for the second card
     print('Showing player actions...');
-    print('Current player: ${gameState.players[playerIndex].name}');
+    print(
+        'Current player: ${gameState.players[playerIndex].name}, amount to call: ${player.getCallAmount(gameRef)}');
 
     // Set the base position for the first button
     Vector2 basePosition = Vector2(50, gameRef.size.y - 140);
@@ -169,9 +186,10 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     final callButton = ActionButton(
       'Call',
       () async {
-        if (player.isCurrentTurn) {
+        if (!gameState.isGameOver && player.isCurrentTurn) {
           print('${player.name} called!');
-          player.call(gameState.bigBlind);
+          int bet = player.call(gameRef);
+          gameState.pot += bet; // Add the bet to the pot
           player.isCurrentTurn = false;
           await nextPlayer();
         } else {
@@ -189,7 +207,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     final foldButton = ActionButton(
       'Fold',
       () async {
-        if (player.isCurrentTurn) {
+        if (!gameState.isGameOver && player.isCurrentTurn) {
           print('${player.name} folded!');
           player.fold();
           player.isCurrentTurn = false;
@@ -211,8 +229,16 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     // Third button - Raise button (adjust coordinates accordingly)
     final raiseButton = ActionButton(
       'Raise',
-      () {
-        // Raise action
+      () async {
+        if (!gameState.isGameOver && player.isCurrentTurn) {
+          print('${player.name} raised!');
+          int bet = player.placeBet(50);
+          gameState.pot += bet; // Add the bet to the pot
+          player.isCurrentTurn = false;
+          await nextPlayer();
+        } else {
+          print('It is not your turn!');
+        }
       },
       // For example:
       spriteSrcPosition:
@@ -222,6 +248,27 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       position: basePosition + Vector2(300, 0),
     );
     add(raiseButton);
+  }
+
+  void blinds() {
+    // This method will handle the blinds for the game.
+    // It will deduct the small and big blinds from the players' balances.
+    if (gameState.players.length < 2) {
+      print('Not enough players to place blinds.');
+      return;
+    }
+
+    Player smallBlindPlayer =
+        gameState.players[(dealerIndex + 1) % gameState.players.length];
+    Player bigBlindPlayer =
+        gameState.players[(dealerIndex + 2) % gameState.players.length];
+
+    smallBlindPlayer.placeBet(gameState.smallBlind);
+    bigBlindPlayer.placeBet(gameState.bigBlind);
+
+    print(
+        '${smallBlindPlayer.name} placed small blind of ${gameState.smallBlind}');
+    print('${bigBlindPlayer.name} placed big blind of ${gameState.bigBlind}');
   }
 
   void updateHandUI(Player player, int index) {
@@ -261,12 +308,23 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     int foldCount = checkFolds();
     if (foldCount == gameState.players.length - 1) {
       print('All other players folded. ${currentPlayer.name} wins by default!');
-      gameState.isGameOver = true; // End the game
+      roundBasedDealing(4); // skips to the determining of the winner
       return; // Exit the turn
     }
   }
 
-  Future<void> showCommunityCards(int round) async {
+  bool checkPotIsRight(List<Player> players) {
+    for (var player in players) {
+      if (player.getCallAmount(gameRef) != 0) {
+        print('${player.name} has not called yet. Pot is not right.');
+        return false; // If any player has not called, pot is not right
+      }
+    }
+    print('Pot is right!');
+    return true;
+  }
+
+  Future<void> roundBasedDealing(int round) async {
     //find the community card area component
     final communityCardArea =
         children.whereType<CommunityCardArea>().firstOrNull;
@@ -310,8 +368,26 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
         break;
       case 4: // End of game
         Player winner = determineWinner();
+        winner.balance += gameState.pot; // Add the pot to the winner's balance
+        gameState.isGameOver = true; // Set the game state to over
+        print(
+            '${winner.name} wins the game with a ${winner.handRank.toString()}!');
 
-        await startGame();
+        // Show the play again button
+        showPlayAgainButton = true;
+        late final PlayNextRoundButton playAgainButton;
+        playAgainButton = PlayNextRoundButton(
+          spriteSrcPosition: Vector2(0, 0), // Replace with appropriate values
+          spriteSrcSize: Vector2(100, 50), // Replace with appropriate values
+          position: Vector2(gameRef.size.x / 2 - 50, gameRef.size.y / 2 - 25),
+          () async {
+            showPlayAgainButton = false; // Hide the button
+            remove(playAgainButton); // Remove the button from the screen
+            await startGame(); // Start a new game
+          },
+        );
+        add(playAgainButton);
+
         break;
       default:
         print('Invalid round number: $round');
@@ -320,7 +396,38 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
   }
 
   Player determineWinner() {
-    Player pLACEHOLDERWINNER = gameState.players[0];
-    return pLACEHOLDERWINNER;
+    Map<HandRank, int> handranksToInts = {
+      HandRank.highCard: 1,
+      HandRank.onePair: 2,
+      HandRank.twoPair: 3,
+      HandRank.threeOfAKind: 4,
+      HandRank.straight: 5,
+      HandRank.flush: 6,
+      HandRank.fullHouse: 7,
+      HandRank.fourOfAKind: 8,
+      HandRank.straightFlush: 9,
+    };
+    List<Player> contenders =
+        gameState.players.where((p) => !p.isFolded).toList();
+
+    if (contenders.length == 1) {
+      print(
+          '${contenders[0].name} is the only player left, they win by default!');
+      return contenders[0]; // If only one player is left, they win by default
+    }
+
+    for (Player contender in contenders) {
+      contender.handRank = cardEvaluator
+          .bestOfSeven([...contender.hand, ...gameState.communityCards]);
+      print(
+          '${contender.name} has a ${contender.handRank.toString()} with hand: ${contender.hand}');
+    }
+
+    contenders.sort((a, b) =>
+        handranksToInts[b.handRank]!.compareTo(handranksToInts[a.handRank]!));
+    Player winner =
+        contenders.first; // The first player in the sorted list is the winner
+    print('Winner is ${winner.name} with a ${winner.handRank.toString()}!');
+    return winner; // Return the winner
   }
 }
