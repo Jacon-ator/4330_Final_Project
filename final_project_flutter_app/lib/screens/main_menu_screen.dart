@@ -1,5 +1,5 @@
-import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:final_project_flutter_app/components/components.dart';
+import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 
@@ -40,14 +40,20 @@ class MainMenuScreen extends Component with HasGameRef<PokerParty> {
       ..size = Vector2(size.x / 3, size.y / 3)
       ..position = Vector2(size.x / 2 - size.x / 6, size.y * 0.65);
 
+    final SettingsButton settingsButton = SettingsButton()
+      ..size = Vector2(size.x / 3, size.y / 3)
+      ..position = Vector2(size.x / 2 - size.x / 6, size.y * 0.8);
+
     background = SpriteComponent()
       ..sprite = await gameRef.loadSprite('art/Title Screen.png')
       ..size = size; // Makes it fill the screen
+      
     add(background);
     add(supportButton);
     add(rulesButton);
     add(startGameButton);
     add(shopButton);
+    add(settingsButton);
   }
 
   @override
