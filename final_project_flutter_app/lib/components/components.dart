@@ -1,6 +1,7 @@
 export 'buttons/gameplay/action_button.dart';
 export 'buttons/menu/main_menu_button.dart';
 export 'buttons/menu/rules_button.dart';
+export 'buttons/menu/settings_button.dart';
 export 'buttons/menu/shop_button.dart';
 export 'buttons/menu/start_game_button.dart';
 export 'buttons/menu/support_button.dart';
