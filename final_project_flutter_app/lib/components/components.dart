@@ -10,3 +10,5 @@ export 'buttons/shop/buy_table_skin_button.dart';
 export 'card_component.dart';
 export 'community_card_area.dart';
 export 'hand_area.dart';
+export 'volume_control.dart';
+
