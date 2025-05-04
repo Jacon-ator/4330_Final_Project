@@ -74,8 +74,10 @@ class DatabaseService {
     
     //creates a new map with integers as the keys for sorting purposes
     Map<int, String> newMap = {};
-    for (String key in chatmessages.keys){
-      newMap[int.parse(key)] = chatmessages[key] ?? "Unable to load message";
+    for (String key in chatmessages.keys) {
+      if (int.tryParse(key) != null) {
+        newMap[int.parse(key)] = chatmessages[key] ?? "Unable to load message";
+      }
     }
 
     //sorts the map by integer value so that newer messages are seen first

@@ -3,7 +3,6 @@ import 'package:final_project_flutter_app/components/volume_control.dart';
 import 'package:final_project_flutter_app/screens/chat_viewer_page.dart';
 import 'package:final_project_flutter_app/services/auth_service.dart';
 import 'package:final_project_flutter_app/services/database_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ChatListPage extends StatefulWidget {
@@ -20,7 +19,7 @@ class _ChatListPageState extends State<ChatListPage> {
   final AuthService _authService = AuthService();
   final DatabaseService _databaseService = DatabaseService();
   String recipientemail = "";
-  List<DocumentReference> chatList = [FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser?.email)];
+  List<DocumentReference> chatList = []; // Treat as a chat document
 
   // Track if there's an error message to display
   String? errorMessage;
@@ -44,8 +43,17 @@ class _ChatListPageState extends State<ChatListPage> {
     });
   } 
 
-  void _createNewChat(){
-    _databaseService.createNewChat(recipientemail);
+  void _createNewChat() async {
+
+    //prevent crashing
+    if (recipientemail.trim().isEmpty) {
+      setState(() {
+        errorMessage = "Please enter an email before creating a chat.";
+      });
+      return;
+    }
+
+    await _databaseService.createNewChat(recipientemail); // wait for chat to be created before refreshing list
     //updates the visible list of chats
     loadUserChats();
   }
@@ -196,16 +204,21 @@ class _ChatListPageState extends State<ChatListPage> {
                         itemBuilder: (BuildContext context, int index) {
                           return ElevatedButton(
                             onPressed: (){
+                              if (chatList[index].id.isEmpty) {
+                                print("Skipping empty chat reference");
+                                return;
+                              }
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => ChatViewerPage(docRef: chatList[index]))
+                                  builder: (context) => ChatViewerPage(docRef: chatList[index])
+                                )
                               );
-                            }, 
+                            },
                             child: Text(chatList[index].id)
-                            );
+                          );
                         }
-                        ),
+                      ),
                     ),
                   ],
                 ),

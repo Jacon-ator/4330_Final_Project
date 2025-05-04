@@ -132,7 +132,7 @@ class _ChatViewerPageState extends State<ChatViewerPage> {
                             child: Text(messagehistory[index])
                             );
                         }
-                        ),
+                      ),
                     ),
                   ],
                 ),
