@@ -34,14 +34,14 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
       currentChips += amountWon;
       chipsWon += amountWon;
     });
-    
+
     // Update Firestore
     final email = FirebaseAuth.instance.currentUser?.email;
     if (email != null) {
-      FirebaseFirestore.instance.collection("users").doc(email).update({
-        "Games Won": wins,
-        "Chips": currentChips
-      });
+      FirebaseFirestore.instance
+          .collection("users")
+          .doc(email)
+          .update({"Games Won": wins, "Chips": currentChips});
     }
   }
 
@@ -60,25 +60,24 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
     // Update Firestore
     final email = FirebaseAuth.instance.currentUser?.email;
     if (email != null) {
-      FirebaseFirestore.instance.collection("users").doc(email).update({
-        "Games Lost": losses,
-        "Chips": currentChips
-      });
+      FirebaseFirestore.instance
+          .collection("users")
+          .doc(email)
+          .update({"Games Lost": losses, "Chips": currentChips});
     }
   }
 
   // Load only once when screen opens
   @override
-  void initState() {        
+  void initState() {
     super.initState();
     loadUserData();
   }
 
   // Loads user data from Firestore
   void loadUserData() async {
-
     // Reads the document from the "users" collection for the current user's email.
-    currentUserData = await _databaseService.getUserData();  
+    currentUserData = await _databaseService.getUserData();
 
     // PRINT FIRESTORE DATA TO DEBUG CONSOLE
     print("flutter: ----- Firestore Data -----");
@@ -93,7 +92,6 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
 
     // After we get the data, update the state so the UI shows the correct info.
     setState(() {
-
       // Update the email field with the value from Firestore, if it's null, use an empty string as a fallback.
       email = currentUserData?.email ?? '';
       wins = currentUserData?.games_won ?? 0;
@@ -102,7 +100,6 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
       ShopScreen.coinBalance = currentUserData?.coins ?? 0;
       ShopScreen.ownsCardSkin = currentUserData?.ownCardSkin ?? false;
       ShopScreen.ownsTableSkin = currentUserData?.ownTableSkin ?? false;
-    
     });
   }
 
@@ -115,7 +112,7 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
     return Scaffold(
         backgroundColor: Colors.grey[900],
         appBar: AppBar(
-          title: Text("$email's Profile"),
+          title: Text("${email?.split('@').first}'s Profile"),
           backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         ),
         body: Center(
@@ -131,12 +128,16 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      widget.name,
+                      (email != null && email!.contains('@'))
+                          ? email!.split('@').first
+                          : '',
                       style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
+
                     const SizedBox(height: 10),
                     Chip(
                       label: const Text("Poker Player"),
