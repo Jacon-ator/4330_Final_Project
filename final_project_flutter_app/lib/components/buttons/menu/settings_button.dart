@@ -12,7 +12,8 @@ class SettingsButton extends PositionComponent
   Future<void> onLoad() async {
     double exportScale = 5;
     await super.onLoad();
-    final image = await gameRef.images.load("art/buttons/Master Button Sheet.png");
+    final image =
+        await gameRef.images.load("art/buttons/Master Button Sheet.png");
     sprite = Sprite(
       image,
       srcPosition: Vector2(1 * exportScale, 48 * exportScale),
@@ -23,7 +24,8 @@ class SettingsButton extends PositionComponent
       size = sprite!.srcSize;
       position = Vector2(
         gameRef.size.x / 2 - size.x / 2,
-        gameRef.size.y * 0.8,
+        (gameRef.size.y * 0.9) -
+            6, //boofed logic to get settings button to play nice with positioning
       );
     }
   }
