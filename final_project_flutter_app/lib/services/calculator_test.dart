@@ -29,6 +29,90 @@ class CalculatorTest {
     print('\nAll tests completed!');
   }
 
+/// tests the probability calculation for pocket aces pre-flop vs 1 opponent
+void testProbabilityPocketAces() {
+  print('--------------------------------------------------------------');
+  print('TESTING: Pocket Aces (AA) pre-flop vs 1 opponent');
+  print('--------------------------------------------------------------');
+  print('Player hand: Ace of Spades, Ace of Clubs');
+  print('Community cards: None (pre-flop)');
+  print('Scenario: Player has the strongest possible starting hand in Hold\'em');
+  print('Expected outcome: Strong favorite against a random hand');
+  print('--------------------------------------------------------------');
+  
+  // standard scenario: pocket pair of aces pre-flop vs 1 opponent
+  final playerHand = <Card>[Card.fromString('AS'), Card.fromString('AC')];
+  final communityCards = <Card>[];
+  
+  print('Running simulation against 1 opponent...');
+  final stopwatch = Stopwatch()..start();
+  
+  final probability = calculateWinProbability(
+    playerHand: playerHand,
+    communityCards: communityCards,
+    numberOfOpponents: 1
+  );
+  
+  stopwatch.stop();
+  final executionTime = stopwatch.elapsedMilliseconds;
+  
+  print('Calculation completed in $executionTime ms');
+  print('RESULT: Win probability against 1 opponent: ${(probability * 100).toStringAsFixed(2)}%');
+  print('Interpretation: Pocket aces are a significant favorite pre-flop');
+  
+  // Pocket aces should have ~85% win rate vs random hand
+  assert(probability > 0.75 && probability < 0.95,
+      'Pocket aces should win 75-95% of the time against one opponent');
+  
+  print('--------------------------------------------------------------');
+  print('✓ Pocket aces probability test passed');
+}
+
+/// tests probability calculation for top pair top kicker on the flop
+void testProbabilityTopPairTopKicker() {
+  print('--------------------------------------------------------------');
+  print('TESTING: AK suited with top pair top kicker on A-7-2 rainbow flop');
+  print('--------------------------------------------------------------');
+  print('Player hand: Ace of Hearts, King of Hearts');
+  print('Community cards: Ace of Spades, Seven of Clubs, Two of Diamonds');
+  print('Scenario: Player has flopped top pair with the best kicker on a dry board');
+  print('Expected outcome: Strong favorite against a single opponent');
+  print('--------------------------------------------------------------');
+  
+  // player has AK suited and flop comes A-7-2 rainbow
+  final playerHand = <Card>[Card.fromString('AH'), Card.fromString('KH')];
+  
+  final communityCards = <Card>[
+    Card.fromString('AS'), // Top pair
+    Card.fromString('7C'),
+    Card.fromString('2D') // Rainbow flop (different suits)
+  ];
+  
+  // test against 1 opponent
+  print('Running simulation against 1 opponent...');
+  final stopwatch = Stopwatch()..start();
+  
+  final probability = calculateWinProbability(
+    playerHand: playerHand,
+    communityCards: communityCards,
+    numberOfOpponents: 1
+  );
+  
+  stopwatch.stop();
+  final executionTime = stopwatch.elapsedMilliseconds;
+  
+  print('Calculation completed in $executionTime ms');
+  print('RESULT: Win probability against 1 opponent: ${(probability * 100).toStringAsFixed(2)}%');
+  print('Interpretation: Top pair top kicker is very strong on this dry board');
+  
+  // TPTK against one opponent on this flop should win around 80-90% of the time
+  assert(probability > 0.75 && probability < 0.95,
+      'Top pair top kicker should win 75-95% of the time against one opponent on dry flop');
+  
+  print('--------------------------------------------------------------');
+  print('✓ Top pair top kicker probability test passed');
+}
+
 /// tests probability calculation for an unfavorable scenario with a weak hand against multiple opponents
 void testProbabilityOvercard() {
   print('--------------------------------------------------------------');
@@ -40,7 +124,7 @@ void testProbabilityOvercard() {
   print('Expected outcome: Significant underdog, especially vs multiple opponents');
   print('--------------------------------------------------------------');
   
-  // Player has KQ offsuit, missed the flop completely
+  // player has KQ offsuit, missed the flop completely
   final playerHand = <Card>[Card.fromString('KS'), Card.fromString('QD')];
   
   final communityCards = <Card>[
@@ -49,7 +133,7 @@ void testProbabilityOvercard() {
     Card.fromString('2D')  
   ];
   
-  // Test against 3 opponents (multiplayer pot)
+  // test against 3 opponents (multiplayer pot)
   print('Running simulation against 3 opponents...');
   final stopwatch = Stopwatch()..start();
   
@@ -70,7 +154,7 @@ void testProbabilityOvercard() {
   assert(probability < 0.40,
       'Missed flop with just overcards should win less than 40% of the time against multiple opponents');
   
-  // Also test the scenario against 1 opponent for comparison
+  // also test the scenario against 1 opponent for comparison
   print('\nRunning the same simulation against 1 opponent for comparison...');
   final stopwatchSingle = Stopwatch()..start();
   
@@ -88,87 +172,17 @@ void testProbabilityOvercard() {
   print('Interpretation: Significantly better chances vs a single opponent (more than doubled)');
   print('This demonstrates why poker pros play tighter against multiple opponents');
   
-  // The probability should be higher against 1 opponent than against 3
+  // the probability should be higher against 1 opponent than against 3
   assert(probabilityOneOpponent > probability,
       'Win probability should be higher against 1 opponent than against 3');
   
-  // Calculate the ratio to show how much worse multiple opponents makes the situation
+  // calculate the ratio to show how much worse multiple opponents makes the situation
   final ratio = probabilityOneOpponent / probability;
   print('\nKey finding: Win probability is ${ratio.toStringAsFixed(2)}x higher against 1 opponent');
   print('--------------------------------------------------------------');
   
   print('✓ Weak overcard hand probability test passed');
 }
-
-  /// tests probability calculation for top pair top kicker on the flop
-  void testProbabilityTopPairTopKicker() {
-    print(
-        'Testing probability calculation for top pair top kicker on the flop...');
-
-    // Player has AK suited and flop comes A-7-2 rainbow
-    final playerHand = <Card>[Card.fromString('AH'), Card.fromString('KH')];
-
-    final communityCards = <Card>[
-      Card.fromString('AS'), // Top pair
-      Card.fromString('7C'),
-      Card.fromString('2D') // Rainbow flop (different suits)
-    ];
-
-    // Test against 1 opponent
-    final stopwatch = Stopwatch()..start();
-
-    final probability = calculateWinProbability(
-        playerHand: playerHand,
-        communityCards: communityCards,
-        numberOfOpponents: 1);
-
-    stopwatch.stop();
-    final executionTime = stopwatch.elapsedMilliseconds;
-
-    print('Calculation completed in $executionTime ms');
-    print('Win probability: ${(probability * 100).toStringAsFixed(2)}%');
-
-    // TPTK against one opponent on this flop should win around 80-90% of the time
-    assert(probability > 0.75 && probability < 0.95,
-        'Top pair top kicker should win 75-95% of the time against one opponent on dry flop');
-
-    print('✓ Top pair top kicker probability test passed');
-  }
-
-  /// tests the performance and feasibility of the probability calculation
-  void testProbabilityPocketAces() {
-    print('Testing probability calculation performance...');
-
-    // Standard scenario: Pocket pair of aces pre-flop vs 1 opponent
-    final playerHand = <Card>[Card.fromString('AS'), Card.fromString('AC')];
-
-    final communityCards = <Card>[];
-
-    print(
-        'Calculating win probability for pocket aces pre-flop vs 1 opponent...');
-
-    // Measure execution time
-    final stopwatch = Stopwatch()..start();
-
-    final probability = calculateWinProbability(
-        playerHand: playerHand,
-        communityCards: communityCards,
-        numberOfOpponents: 1);
-
-    stopwatch.stop();
-    final executionTime = stopwatch.elapsedMilliseconds;
-
-    print('Calculation completed in $executionTime ms');
-    print('Win probability: ${(probability * 100).toStringAsFixed(2)}%');
-
-    // Pocket aces should have ~85% win rate vs random hand
-    assert(probability > 0.75 && probability < 0.95,
-        'Pocket aces should win 75-95% of the time against one opponent');
-
-    print('✓ Probability calculation performance test passed');
-  }
-
-  // [All existing test methods remain unchanged]
 
   /// tests royal flush detection
   void testRoyalFlush() {
