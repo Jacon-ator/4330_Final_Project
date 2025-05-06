@@ -1,8 +1,8 @@
+import 'package:poker/src/evaluators/evaluator.dart';
+import 'package:poker/src/evaluators/exhaustive_evaluator.dart';
+import 'package:poker/src/models/hand_range.dart';
+import 'package:poker/src/models/immutable_card_set.dart';
 import 'package:test/test.dart';
-import '../../lib/src/evaluators/evaluator.dart';
-import "../../lib/src/evaluators/exhaustive_evaluator.dart";
-import '../../lib/src/models/immutable_card_set.dart';
-import "../../lib/src/models/hand_range.dart";
 
 void main() {
   group("ExhaustiveEvaluator", () {

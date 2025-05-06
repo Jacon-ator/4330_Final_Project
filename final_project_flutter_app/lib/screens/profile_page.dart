@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:final_project_flutter_app/screens/login_page.dart';
 import 'package:final_project_flutter_app/screens/shop_screen.dart';
+import 'package:final_project_flutter_app/screens/signup_page.dart';
 import 'package:final_project_flutter_app/services/auth_service.dart';
 import 'package:final_project_flutter_app/services/database_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 
 class PokerProfilePage extends StatefulWidget {
   final String name;
@@ -76,7 +79,6 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
 
   // Loads user data from Firestore
   void loadUserData() async {
-    // Reads the document from the "users" collection for the current user's email.
     currentUserData = await _databaseService.getUserData();
 
     // PRINT FIRESTORE DATA TO DEBUG CONSOLE
@@ -92,7 +94,6 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
 
     // After we get the data, update the state so the UI shows the correct info.
     setState(() {
-      // Update the email field with the value from Firestore, if it's null, use an empty string as a fallback.
       email = currentUserData?.email ?? '';
       wins = currentUserData?.games_won ?? 0;
       losses = currentUserData?.games_lost ?? 0;
@@ -105,146 +106,202 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    //sets the values using the data
+    // Calculate total games and win percentage
     final totalGames = wins + losses;
     final winRatio = totalGames > 0 ? wins / totalGames : 0.0;
+    final winPercentage = totalGames > 0 ? (wins / totalGames) * 100 : 0.0;
 
     return Scaffold(
-        backgroundColor: Colors.grey[900],
-        appBar: AppBar(
-          title: Text("${email?.split('@').first}'s Profile"),
-          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: Colors.grey[900],
+      appBar: AppBar(
+        title: Text(
+          FirebaseAuth.instance.currentUser != null
+              ? "${email?.split('@').first}'s Profile"
+              : "Guest's Profile", // This handles the guest profile case
         ),
-        body: Center(
-          child: SingleChildScrollView(
-            child: Card(
-              color: Colors.grey[850],
-              margin: const EdgeInsets.all(20),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      (email != null && email!.contains('@'))
-                          ? email!.split('@').first
-                          : '',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Card(
+            color: Colors.grey[850],
+            margin: const EdgeInsets.all(20),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    (email != null && email!.contains('@'))
+                        ? email!.split('@').first
+                        : '',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
+                  ),
+                  const SizedBox(height: 10),
+                  Chip(
+                    label: const Text("Poker Player"),
+                    backgroundColor: Colors.green[700],
+                    labelStyle: const TextStyle(color: Colors.white),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    "Win/Loss Ratio",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                  const SizedBox(height: 5),
+                  LinearProgressIndicator(
+                    value: winRatio,
+                    color: Colors.green,
+                    backgroundColor: Colors.grey[700],
+                    minHeight: 8,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "$wins Wins / $losses Losses",
+                    style: const TextStyle(color: Colors.white70),
+                  ),
+                  const SizedBox(height: 8),
+                  // Display win percentage
+                  Text(
+                    "Win Percentage: ${winPercentage.toStringAsFixed(2)}%",
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    "Current Chips: $currentChips",
+                    style: const TextStyle(
+                      color: Colors.amberAccent,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Column(
+                        children: [
+                          Text(
+                            "+$chipsWon",
+                            style: const TextStyle(
+                                color: Colors.greenAccent,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          const Text(
+                            "Chips Won",
+                            style: TextStyle(color: Colors.white60),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Text(
+                            "-$chipsLost",
+                            style: const TextStyle(
+                                color: Colors.redAccent,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          const Text(
+                            "Chips Lost",
+                            style: TextStyle(color: Colors.white60),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 30),
+                  Row(
+                    //temp
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          recordWin(500); // Simulate winning 500 chips
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green[600],
+                        ),
+                        child: const Text("+500 Chips",
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          recordLoss(300); // Simulate losing 300 chips
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red[600],
+                        ),
+                        child: const Text("-300 Chips",
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20), //temp
 
-                    const SizedBox(height: 10),
-                    Chip(
-                      label: const Text("Poker Player"),
-                      backgroundColor: Colors.green[700],
-                      labelStyle: const TextStyle(color: Colors.white),
-                    ),
-                    const SizedBox(height: 20),
-                    const Text("Win/Loss Ratio",
-                        style: TextStyle(color: Colors.grey)),
-                    const SizedBox(height: 5),
-                    LinearProgressIndicator(
-                      value: winRatio,
-                      color: Colors.green,
-                      backgroundColor: Colors.grey[700],
-                      minHeight: 8,
-                    ),
-                    const SizedBox(height: 8),
-                    Text("$wins Wins / $losses Losses",
-                        style: const TextStyle(color: Colors.white70)),
-                    const SizedBox(height: 24),
-                    Text(
-                      "Current Chips: $currentChips",
-                      style: const TextStyle(
-                        color: Colors.amberAccent,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
+                  if (FirebaseAuth.instance.currentUser == null) ...[
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green[600],
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(builder: (_) => const LoginPage(name: "Player")),
+                          );
+                        },
+                        child: const Text("Back to Login", style: TextStyle(color: Colors.white)),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Column(
-                          children: [
-                            Text("+$chipsWon",
-                                style: const TextStyle(
-                                    color: Colors.greenAccent,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold)),
-                            const Text("Chips Won",
-                                style: TextStyle(color: Colors.white60)),
-                          ],
+                      const SizedBox(height: 12),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green[600],
                         ),
-                        Column(
-                          children: [
-                            Text("-$chipsLost",
-                                style: const TextStyle(
-                                    color: Colors.redAccent,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold)),
-                            const Text("Chips Lost",
-                                style: TextStyle(color: Colors.white60)),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 30),
-                    Row(
-                      //temp
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            recordWin(500); // Simulate winning 500 chips
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green[600],
-                          ),
-                          child: const Text("+500 Chips",
-                              style: TextStyle(color: Colors.white)),
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            recordLoss(300); // Simulate losing 300 chips
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red[600],
-                          ),
-                          child: const Text("-300 Chips",
-                              style: TextStyle(color: Colors.white)),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20), //temp
-                    ElevatedButton.icon(
-                      onPressed: () async {
-                        await _authService.signout();
-                        if (context.mounted) {
-                          Navigator.of(context).pushReplacementNamed('/');
-                        }
-                      },
-                      icon: const Icon(Icons.logout, color: Colors.white),
-                      label: const Text('Sign Out',
-                          style: TextStyle(color: Colors.white)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red[700],
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)),
+                        onPressed: () {
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(builder: (_) => const SignUpPage(name: "Player")),
+                          );
+                        },
+                        child: const Text("Create an Account", style: TextStyle(color: Colors.white)),
                       ),
+                    ],
+
+
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      await _authService.signout();
+                      if (context.mounted) {
+                        Navigator.of(context).pushReplacementNamed('/');
+                      }
+                    },
+                    icon: const Icon(Icons.logout, color: Colors.white),
+                    label: const Text('Sign Out',
+                        style: TextStyle(color: Colors.white)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red[700],
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 }

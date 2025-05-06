@@ -1,5 +1,4 @@
 import 'package:final_project_flutter_app/audio/audio_manager.dart';
-import 'package:final_project_flutter_app/components/volume_control.dart';
 import 'package:final_project_flutter_app/screens/signup_page.dart';
 import 'package:final_project_flutter_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
@@ -262,11 +261,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
           ),
           // Volume control in top right corner
-          Positioned(
-            top: 20,
-            right: 20,
-            child: const VolumeControl(),
-          ),
+
         ],
       ),
     );
