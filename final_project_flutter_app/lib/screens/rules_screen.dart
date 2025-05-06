@@ -19,7 +19,7 @@ class RulesScreen extends Component with HasGameRef {
 
     final MainMenuButton mainMenuButton = MainMenuButton()
       ..size = Vector2(size.x / 6, size.y / 6)
-      ..position = Vector2(size.x / 2 - size.x / 12, size.y * 0.8);
+      ..position = Vector2(size.x / 2 - size.x / 12, size.y * 0.65);
 
     add(mainMenuButton);
   }

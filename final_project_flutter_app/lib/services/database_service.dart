@@ -5,34 +5,33 @@ import 'package:flame/extensions.dart';
 FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
 class DatabaseService {
-
-  
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  
 
-  Future getUserData() 
-  async {
+  Future getUserData() async {
     //gets the reference to the user document to convert it to a userData
-    final ref = _firestore.collection("users").doc(_auth.currentUser?.email).withConverter(
-      fromFirestore: userData.fromFirestore, 
-      toFirestore: (userData userdata, _) => userdata.toFirestore());
+    final ref = _firestore
+        .collection("users")
+        .doc(_auth.currentUser?.email)
+        .withConverter(
+            fromFirestore: userData.fromFirestore,
+            toFirestore: (userData userdata, _) => userdata.toFirestore());
     final docSnap = await ref.get();
 
     if (docSnap.exists) {
       return docSnap.data(); // returns userData
     } else {
-        print("No user document found for: ${_auth.currentUser?.email}");
-        return null; // avoids casting null to userData
+      print("No user document found for: ${_auth.currentUser?.email}");
+      return null; // avoids casting null to userData
     }
   }
 
   Future createNewChat(String recipientemail) async {
     final recipientDoc = _firestore.collection("users").doc(recipientemail);
     String useremail = _auth.currentUser?.email ?? "Guest";
-  
+
     //checks if the given email is a user in the database
     final docSnap = await recipientDoc.get();
-    if (!docSnap.exists){
+    if (!docSnap.exists) {
       print("Failed to find user with this email");
       return null;
     }
@@ -50,35 +49,44 @@ class DatabaseService {
     // Creates the chat between the two users
     final chatSnap = await chatDoc.get();
     if (!chatSnap.exists) {
-      await chatDoc.set({
-        "0": "Chat started between $useremail and $recipientemail."
-      });
+      await chatDoc
+          .set({"0": "Chat started between $useremail and $recipientemail."});
     }
 
     // Links the chat for sender
-    await _firestore.collection("users").doc(useremail).collection("Chats").doc(recipientemail).set({"chatID": chatID});
+    await _firestore
+        .collection("users")
+        .doc(useremail)
+        .collection("Chats")
+        .doc(recipientemail)
+        .set({"chatID": chatID});
 
     // Links the chat for recipient
-    await _firestore.collection("users").doc(recipientemail).collection("Chats").doc(useremail).set({"chatID": chatID});
+    await _firestore
+        .collection("users")
+        .doc(recipientemail)
+        .collection("Chats")
+        .doc(useremail)
+        .set({"chatID": chatID});
 
     //returns the reference to the newly created document so that you can go the chat viewer for the document
     return chatDoc;
   }
 
-  Future writeToChat(DocumentReference docRef, String message)
-  async {
+  Future writeToChat(DocumentReference docRef, String message) async {
     //gets a snapshot of the document
     final docSnap = await docRef.get();
 
     //gets the length of the keys in the document to know what the index of the next message will be
-    int doclength = (docSnap.data() as Map<String, dynamic>).keys.toList().length;
+    int doclength =
+        (docSnap.data() as Map<String, dynamic>).keys.toList().length;
 
     //creates a header for the message with the user's email and appends the message to it
     String messageheader = "${_auth.currentUser?.email}: ";
     String fullmessage = messageheader + message;
 
     String newIndex = doclength.toString();
-    docRef.update({newIndex : fullmessage});
+    docRef.update({newIndex: fullmessage});
   }
 
   Future readFromChat(DocumentReference docRef) async {
@@ -87,18 +95,19 @@ class DatabaseService {
 
     //Check if document exists
     if (!docSnap.exists) {
-    //Creates it with a welcome message
-    await docRef.set({
-      "0": "Support chat started. Feel free to ask your questions here."
-    });
-    
-    // Return that first message
-    return ["Welcome to your private support chat. Feel free to ask your questions here."];
+      //Creates it with a welcome message
+      await docRef.set(
+          {"0": "Support chat started. Feel free to ask your questions here."});
+
+      // Return that first message
+      return [
+        "Welcome to your private support chat. Feel free to ask your questions here."
+      ];
     }
 
     //converts the data into a map of strings
     Map<String, dynamic> chatmessages = docSnap.data() as Map<String, dynamic>;
-    
+
     //creates a new map with integers as the keys for sorting purposes
     Map<int, String> newMap = {};
     for (String key in chatmessages.keys) {
@@ -108,11 +117,12 @@ class DatabaseService {
     }
 
     //sorts the map by integer value so that newer messages are seen first
-    Map<int, String> sortedMap = Map.fromEntries(newMap.entries.toList()..sort((e1, e2) => e1.key.compareTo(e2.key)));
-    
+    Map<int, String> sortedMap = Map.fromEntries(
+        newMap.entries.toList()..sort((e1, e2) => e1.key.compareTo(e2.key)));
+
     //creates a list to hold the messages
     List<String> messagehistory = [];
-    for (int message in sortedMap.keys){
+    for (int message in sortedMap.keys) {
       messagehistory.add(sortedMap[message] ?? "Unable to load message");
     }
     //returns the message history list
@@ -121,10 +131,12 @@ class DatabaseService {
   }
 
   Future<List<DocumentReference>> getAllChats() async {
-
     //Gets the user's "Chat" collection
-    CollectionReference userChats = _firestore.collection("users").doc(_auth.currentUser?.email).collection("Chats");
-    
+    CollectionReference userChats = _firestore
+        .collection("users")
+        .doc(_auth.currentUser?.email)
+        .collection("Chats");
+
     //adds all of the document references in the collection to a list
     List<DocumentReference> docList = [];
 
@@ -146,13 +158,13 @@ class DatabaseService {
 //a class that represents the user's info
 class userData {
   final String? email;
-  final int? chips;         // Chips for playing in game
-  final int? coins;         // Coins for shop
+  final int? chips; // Chips for playing in game
+  final int? coins; // Coins for shop
   final int? games_won;
   final int? games_lost;
   final bool? ownTableSkin;
-  final bool? ownCardSkin;   
-  
+  final bool? ownCardSkin;
+
   userData({
     this.email,
     this.chips,
@@ -169,14 +181,13 @@ class userData {
   ) {
     final data = snapshot.data();
     return userData(
-      email: data?['Email'],
-      chips: data?['Chips'],
-      coins: data?['Coins'],  
-      games_won: data?['Games Won'],
-      games_lost: data?['Games Lost'],
-      ownTableSkin: data?['ownTableSkin'] ?? false,
-      ownCardSkin: data?['ownCardSkin'] ?? false
-    );
+        email: data?['Email'],
+        chips: data?['Chips'],
+        coins: data?['Coins'],
+        games_won: data?['Games Won'],
+        games_lost: data?['Games Lost'],
+        ownTableSkin: data?['ownTableSkin'] ?? false,
+        ownCardSkin: data?['ownCardSkin'] ?? false);
   }
 
   Map<String, dynamic> toFirestore() {

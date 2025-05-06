@@ -49,8 +49,8 @@ Future<void> main() async {
                   Positioned(
                     top: 90,
                     left: 20,
-                    child: ChatButton(
-                        name: "Player"), // Or dynamically set name
+                    child:
+                        ChatButton(name: "Player"), // Or dynamically set name
                   ),
                   // Volume control in top right corner
                   Positioned(
