@@ -28,3 +28,6 @@ doc/api/
 final_project_flutter_app/linux/flutter/
 final_project_flutter_app/macos/Flutter/
 final_project_flutter_app/windows/flutter/
+
+# Android build files
+final_project_flutter_app/android/app/.cxx/Debug/

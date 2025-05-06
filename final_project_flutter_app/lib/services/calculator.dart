@@ -775,6 +775,27 @@ String _determineGameStage(int communityCardCount) {
   }
 }
 
+/// helper function to compare two sets of relevant cards
+/// returns true if the first set of cards is better than the second
+bool _compareRelevantCards(List<Card> cards1, List<Card> cards2) {
+  // assume both lists are sorted in descending order by card value
+  // compare each card in turn
+  int minLength = cards1.length < cards2.length ? cards1.length : cards2.length;
+
+  for (int i = 0; i < minLength; i++) {
+    if (cards1[i].value > cards2[i].value) {
+      return true; // first set has a higher card
+    } else if (cards1[i].value < cards2[i].value) {
+      return false; // second set has a higher card
+    }
+    // if equal, continue to next card
+  }
+
+  // if all cards are equal, or if one list is shorter than the other
+  // consider them equal (this should not happen in properly implemented hand evaluation)
+  return false;
+}
+
 /// runs a monte carlo simulation to estimate win probability
 double _runMonteCarloSimulation({
   required List<Card> playerHand,
@@ -868,11 +889,6 @@ double _runMonteCarloSimulation({
   return (wins + ties * 0.5) / simulationCount;
 }
 
-bool _compareRelevantCards(
-    List<Card> relevantCards, List<Card> relevantCards2) {
-  return false;
-}
-
 /// calculates exact win probability on the river (all community cards known)
 /// only opponents' hands are unknown
 double _calculateRiverExact({
@@ -887,6 +903,7 @@ double _calculateRiverExact({
 
   int totalScenarios = 0;
   int wins = 0;
+  int ties = 0;
 
   // if we have just one opponent, we can enumerate all possible hands
   if (numberOfOpponents == 1) {
@@ -899,13 +916,34 @@ double _calculateRiverExact({
       final opponentHandResult = evaluateHand(
           playerHand: opponentHand, communityCards: communityCards);
 
-      // player wins if their hand is better (ties count as losses)
-      if (playerHandResult > opponentHandResult) {
+      // compare hand types first
+      if (playerHandResult.type.index > opponentHandResult.type.index) {
+        // player has a better hand type
         wins++;
+      } else if (playerHandResult.type.index == opponentHandResult.type.index) {
+        // same hand type, need to compare the relevant cards
+        bool playerHasBetterCards = _compareRelevantCards(
+            playerHandResult.relevantCards, opponentHandResult.relevantCards);
+
+        if (playerHasBetterCards) {
+          wins++;
+        } else {
+          // check if it's a true tie
+          bool opponentHasBetterCards = _compareRelevantCards(
+              opponentHandResult.relevantCards, playerHandResult.relevantCards);
+
+          if (!opponentHasBetterCards) {
+            // neither has better cards, it's a tie
+            ties++;
+          }
+          // otherwise, opponent wins
+        }
       }
+      // otherwise, opponent wins
     }
 
-    return wins / totalScenarios;
+    // return probability (counting ties as half-wins)
+    return (wins + ties * 0.5) / totalScenarios;
   } else {
     // for multiple opponents, fall back to simulation
     // even on the river, exact calculation with multiple opponents is expensive
@@ -914,7 +952,7 @@ double _calculateRiverExact({
         communityCards: communityCards,
         remainingDeck: remainingDeck,
         numberOfOpponents: numberOfOpponents,
-        simulationCount: 5000 // higher count for river
+        simulationCount: 10000 // higher count for river
         );
   }
 }

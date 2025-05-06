@@ -1,4 +1,5 @@
 import 'package:final_project_flutter_app/audio/audio_manager.dart';
+import 'package:final_project_flutter_app/models/player.dart';
 import 'package:final_project_flutter_app/screens/game_screen.dart';
 import 'package:final_project_flutter_app/screens/shop_screen.dart';
 import 'package:final_project_flutter_app/services/game_state.dart';
@@ -83,5 +84,11 @@ class PokerParty extends FlameGame {
   void onRemove() async {
     await audioManager.stopAll();
     super.onRemove();
+  }
+
+  int getCurrentPlayerBalance() {
+    // Assuming you have a method to get the current player
+    Player currentPlayer = gameState.getCurrentPlayer();
+    return currentPlayer.balance;
   }
 }

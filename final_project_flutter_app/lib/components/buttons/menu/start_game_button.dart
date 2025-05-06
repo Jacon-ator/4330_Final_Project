@@ -1,4 +1,6 @@
 import 'package:final_project_flutter_app/poker_party.dart';
+import 'package:final_project_flutter_app/services/database_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
@@ -45,8 +47,15 @@ class StartGameButton extends PositionComponent
   }
 
   @override
-  void onTapDown(TapDownEvent event) {
-    super.onTapDown(event);
-    gameRef.goTo('game');
+  Future<void> onTapDown(TapDownEvent event) async {
+    final userData = await DatabaseService().getUserData();
+
+    if (userData != null || FirebaseAuth.instance.currentUser == null) {
+      super.onTapDown(event);
+      // Navigate to the main menu screen when the button is tapped
+      gameRef.router.pushNamed('game');
+    } else {
+      print("User data is null. Cannot start game.");
+    }
   }
 }

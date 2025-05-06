@@ -1,8 +1,8 @@
 //button class that will be used in the main menu
+import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
-import 'package:final_project_flutter_app/poker_party.dart';
 
 class MainMenuButton extends PositionComponent
     with TapCallbacks, HasGameRef<PokerParty> {
@@ -28,8 +28,8 @@ class MainMenuButton extends PositionComponent
       size = sprite!.srcSize;
 
       position = Vector2(
-        gameRef.size.x / 2 - size.x / 2,
-        (gameRef.size.y / 2 - size.y / 2) + yPositionOffset * 4,
+        (gameRef.size.x / 2 - size.x / 2) * 2 - 45,
+        (gameRef.size.y / 2 - size.y / 2) + yPositionOffset * 3.5 - 10,
       );
     }
   }

@@ -1,5 +1,6 @@
 import 'package:final_project_flutter_app/audio/audio_manager.dart';
 import 'package:final_project_flutter_app/components/volume_control.dart';
+import 'package:final_project_flutter_app/screens/login_page.dart';
 import 'package:final_project_flutter_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
 
@@ -232,6 +233,20 @@ class _SignUpPageState extends State<SignUpPage> {
                       },
                       child: const Text(
                         'Continue as Guest',
+                        style: TextStyle(
+                          color: Color(0xFF468232),
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        // Goes to the login page
+                        Navigator.of(context).pushReplacement(MaterialPageRoute<LoginPage>(builder: (BuildContext context) {return LoginPage(name: "bruh");}));
+                      },
+                      child: const Text(
+                        'Log into an account',
                         style: TextStyle(
                           color: Color(0xFF468232),
                           fontWeight: FontWeight.w500,
