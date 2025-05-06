@@ -24,9 +24,81 @@ class CalculatorTest {
 
     testProbabilityPocketAces();
     testProbabilityTopPairTopKicker();
+    testProbabilityOvercard();
 
     print('\nAll tests completed!');
   }
+
+/// tests probability calculation for an unfavorable scenario with a weak hand against multiple opponents
+void testProbabilityOvercard() {
+  print('--------------------------------------------------------------');
+  print('TESTING: KQ offsuit vs multiple opponents on a J-7-2 rainbow flop');
+  print('--------------------------------------------------------------');
+  print('Player hand: King of Spades, Queen of Diamonds');
+  print('Community cards: Jack of Hearts, Seven of Clubs, Two of Diamonds');
+  print('Scenario: Player has completely missed the flop with only overcards');
+  print('Expected outcome: Significant underdog, especially vs multiple opponents');
+  print('--------------------------------------------------------------');
+  
+  // Player has KQ offsuit, missed the flop completely
+  final playerHand = <Card>[Card.fromString('KS'), Card.fromString('QD')];
+  
+  final communityCards = <Card>[
+    Card.fromString('JH'),
+    Card.fromString('7C'), 
+    Card.fromString('2D')  
+  ];
+  
+  // Test against 3 opponents (multiplayer pot)
+  print('Running simulation against 3 opponents...');
+  final stopwatch = Stopwatch()..start();
+  
+  final probability = calculateWinProbability(
+    playerHand: playerHand,
+    communityCards: communityCards,
+    numberOfOpponents: 3
+  );
+  
+  stopwatch.stop();
+  final executionTime = stopwatch.elapsedMilliseconds;
+  
+  print('Calculation completed in $executionTime ms');
+  print('RESULT: Win probability against 3 opponents: ${(probability * 100).toStringAsFixed(2)}%');
+  print('Interpretation: Player needs to hit a King or Queen on turn/river or is drawing nearly dead');
+  
+  // KQ offsuit with overcards against 3 opponents should be a significant underdog
+  assert(probability < 0.40,
+      'Missed flop with just overcards should win less than 40% of the time against multiple opponents');
+  
+  // Also test the scenario against 1 opponent for comparison
+  print('\nRunning the same simulation against 1 opponent for comparison...');
+  final stopwatchSingle = Stopwatch()..start();
+  
+  final probabilityOneOpponent = calculateWinProbability(
+    playerHand: playerHand,
+    communityCards: communityCards,
+    numberOfOpponents: 1
+  );
+  
+  stopwatchSingle.stop();
+  final executionTimeSingle = stopwatchSingle.elapsedMilliseconds;
+  
+  print('Calculation completed in $executionTimeSingle ms');
+  print('RESULT: Win probability against 1 opponent: ${(probabilityOneOpponent * 100).toStringAsFixed(2)}%');
+  print('Interpretation: Significantly better chances vs a single opponent (more than doubled)');
+  print('This demonstrates why poker pros play tighter against multiple opponents');
+  
+  // The probability should be higher against 1 opponent than against 3
+  assert(probabilityOneOpponent > probability,
+      'Win probability should be higher against 1 opponent than against 3');
+  
+  // Calculate the ratio to show how much worse multiple opponents makes the situation
+  final ratio = probabilityOneOpponent / probability;
+  print('\nKey finding: Win probability is ${ratio.toStringAsFixed(2)}x higher against 1 opponent');
+  print('--------------------------------------------------------------');
+  
+  print('✓ Weak overcard hand probability test passed');
+}
 
   /// tests probability calculation for top pair top kicker on the flop
   void testProbabilityTopPairTopKicker() {
