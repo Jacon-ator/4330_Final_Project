@@ -66,9 +66,28 @@ class Player {
   Future<int> makeAIDecision(PokerParty gameRef) async {
     // Placeholder for AI decision-making logic
     // This could be expanded with actual AI strategies
-    await Future.delayed(Duration(milliseconds: 200));
-    int amount = call(gameRef); // Pass the PokerParty object directly
-    return amount;
+    // Random random = Random();
+    // int decision = random
+    //     .nextInt(3); // Randomly choose between 0 (fold), 1 (call), or 2 (raise)
+    // switch (decision) {
+    //   case 0:
+    //     fold();
+    //     print("$name folds.");
+    //     return 0; // Fold
+    //   case 1:
+    //     print("$name calls.");
+    //     return call(gameRef); // Call
+
+    //   case 2:
+    //     int raiseAmount =
+    //         random.nextInt(balance ~/ 2) + 1; // Random raise amount
+    //     print("$name raises by $raiseAmount.");
+    //     placeBet(raiseAmount);
+    //     return raiseAmount; // Raise
+    //   default:
+    //     return 0; // Default to fold if something goes wrong
+    // }
+    return call(gameRef);
   }
 
   int getCallAmount(PokerParty gameRef) {

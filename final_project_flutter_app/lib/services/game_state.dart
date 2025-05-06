@@ -82,4 +82,9 @@ class GameState {
   void rotateBlinds() {
     players.add(players.removeAt(0)); // Move the first player to the end
   }
+
+  Player getCurrentPlayer() {
+    return players.firstWhere((player) => player.isCurrentTurn,
+        orElse: () => throw Exception("No current player found"));
+  }
 }

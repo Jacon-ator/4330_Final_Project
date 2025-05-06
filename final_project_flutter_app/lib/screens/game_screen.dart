@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:final_project_flutter_app/components/buttons/gameplay/play_next_round_button.dart';
+import 'package:final_project_flutter_app/components/buttons/gameplay/raise_slider.dart';
 import 'package:final_project_flutter_app/components/components.dart';
 import 'package:final_project_flutter_app/config.dart';
 import 'package:final_project_flutter_app/models/card.dart';
@@ -7,6 +10,7 @@ import 'package:final_project_flutter_app/models/player.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:final_project_flutter_app/services/game_state.dart';
 import 'package:flame/components.dart';
+import 'package:flutter/material.dart';
 
 class GameScreen extends Component with HasGameRef<PokerParty> {
   // This class will handle the game logic and UI for the game screen.
@@ -182,6 +186,22 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
 
     final double exportScale = 5; // your export scale factor
 
+    final checkButton = ActionButton(
+      'Check',
+      () async {
+        if (!gameState.isGameOver && player.isCurrentTurn) {
+          print('${player.name} checked!');
+          player.isCurrentTurn = false;
+          await nextPlayer();
+        } else {
+          print('It is not your turn!');
+        }
+      },
+      // Using exported coordinates for Check button:
+      spriteSrcPosition: Vector2(0 * exportScale, 0 * exportScale),
+      spriteSrcSize: Vector2(23 * exportScale, 23 * exportScale),
+      position: basePosition + Vector2(150, 0),
+    );
     // First button - Call button region from the spritesheet.
     final callButton = ActionButton(
       'Call',
@@ -201,7 +221,12 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       spriteSrcSize: Vector2(23 * exportScale, 23 * exportScale),
       position: basePosition,
     );
-    add(callButton);
+
+    if (player.getCallAmount(gameRef) == 0) {
+      add(checkButton); // Remove the button if not needed
+    } else {
+      add(callButton); // Add the button to the game
+    }
 
     // Second button - Fold button (adjust these coordinates as needed).
     final foldButton = ActionButton(
@@ -231,9 +256,10 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       'Raise',
       () async {
         if (!gameState.isGameOver && player.isCurrentTurn) {
-          print('${player.name} raised!');
-          int bet = player.placeBet(50);
+          int bet = await showSlider();
+          print('${player.name} raised to $bet!');
           gameState.pot += bet; // Add the bet to the pot
+          hideRaiseSlider();
           player.isCurrentTurn = false;
           await nextPlayer();
         } else {
@@ -272,7 +298,6 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
   }
 
   void updateHandUI(Player player, int index) {
-    print('Updating hand UI for player: ${player.name}, card index: $index');
     if (index >= player.hand.length) {
       print('Error: Card index out of bounds');
       return;
@@ -314,8 +339,9 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
   }
 
   bool checkPotIsRight(List<Player> players) {
-    for (var player in players) {
-      if (player.getCallAmount(gameRef) != 0 && !player.isFolded) {
+    List<Player> activePlayers = players.where((p) => !p.isFolded).toList();
+    for (var player in activePlayers) {
+      if (player.getCallAmount(gameRef) != 0) {
         print('${player.name} has not called yet. Pot is not right.');
         return false; // If any player has not called, pot is not right
       }
@@ -429,5 +455,101 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
         contenders.first; // The first player in the sorted list is the winner
     print('Winner is ${winner.name} with a ${winner.handRank.toString()}!');
     return winner; // Return the winner
+  }
+
+  Future<int> showSlider() async {
+    final completer = Completer<int>();
+    int selectedValue = gameState.players[playerIndex].getCallAmount(gameRef);
+
+    if (!gameRef.overlays.isActive('RaiseSlider')) {
+      gameRef.overlays.addEntry(
+        'RaiseSlider',
+        (context, game) => Center(
+          child: Container(
+            width: gameRef.size.x * 0.4,
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF2A2A2A)
+                  .withOpacity(0.95), // Dark border color
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 10,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Select Raise Amount',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFFF1E4C3), // Light title
+                  ),
+                ),
+                const SizedBox(height: 20),
+                RaiseSlider(
+                  minRaise:
+                      gameState.players[playerIndex].getCallAmount(gameRef),
+                  maxRaise: gameState.players[playerIndex].balance,
+                  currentChips: gameState.players[playerIndex].balance,
+                  onChanged: (int value) {
+                    selectedValue = value;
+                  },
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF3B8C2C), // Felt green
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        textStyle: TextStyle(fontSize: 16),
+                        foregroundColor: Color(0xFFF1E4C3), // Text
+                      ),
+                      onPressed: () {
+                        int bet = gameState.players[playerIndex]
+                            .placeBet(selectedValue);
+                        hideRaiseSlider();
+                        completer.complete(bet);
+                      },
+                      child: const Text('Confirm'),
+                    ),
+                    OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: Color(0xFFD48C2D)),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        foregroundColor: Color(0xFFD48C2D),
+                      ),
+                      onPressed: () {
+                        hideRaiseSlider();
+                        completer.complete(0);
+                      },
+                      child: const Text('Cancel'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    gameRef.overlays.add('RaiseSlider');
+    return completer.future;
+  }
+
+  void hideRaiseSlider() {
+    // Remove the overlay when done
+    gameRef.overlays.remove('RaiseSlider');
   }
 }
