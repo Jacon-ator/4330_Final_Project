@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:final_project_flutter_app/components/volume_control.dart';
 import 'package:final_project_flutter_app/screens/chat_viewer_page.dart';
 import 'package:final_project_flutter_app/services/auth_service.dart';
 import 'package:final_project_flutter_app/services/database_service.dart';
@@ -245,12 +244,7 @@ class _ChatListPageState extends State<ChatListPage> {
           ),
         ),
           ),
-          // Volume control in top right corner
-          Positioned(
-            top: 20,
-            right: 20,
-            child: const VolumeControl(),
-          ),
+
         ],
       ),
     );
