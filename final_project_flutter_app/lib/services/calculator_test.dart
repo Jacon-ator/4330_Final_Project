@@ -1,4 +1,5 @@
 /// A test class for verifying that hand evaluation and probability calculation works correctly
+library;
 
 import 'calculator.dart';
 
@@ -21,13 +22,49 @@ class CalculatorTest {
 
     print('\nStarting probability calculation tests...\n');
 
-    testProbabilityCalculationPerformance();
+    testProbabilityPocketAces();
+    testProbabilityTopPairTopKicker();
 
     print('\nAll tests completed!');
   }
 
+  /// tests probability calculation for top pair top kicker on the flop
+  void testProbabilityTopPairTopKicker() {
+    print(
+        'Testing probability calculation for top pair top kicker on the flop...');
+
+    // Player has AK suited and flop comes A-7-2 rainbow
+    final playerHand = <Card>[Card.fromString('AH'), Card.fromString('KH')];
+
+    final communityCards = <Card>[
+      Card.fromString('AS'), // Top pair
+      Card.fromString('7C'),
+      Card.fromString('2D') // Rainbow flop (different suits)
+    ];
+
+    // Test against 1 opponent
+    final stopwatch = Stopwatch()..start();
+
+    final probability = calculateWinProbability(
+        playerHand: playerHand,
+        communityCards: communityCards,
+        numberOfOpponents: 1);
+
+    stopwatch.stop();
+    final executionTime = stopwatch.elapsedMilliseconds;
+
+    print('Calculation completed in $executionTime ms');
+    print('Win probability: ${(probability * 100).toStringAsFixed(2)}%');
+
+    // TPTK against one opponent on this flop should win around 80-90% of the time
+    assert(probability > 0.75 && probability < 0.95,
+        'Top pair top kicker should win 75-95% of the time against one opponent on dry flop');
+
+    print('✓ Top pair top kicker probability test passed');
+  }
+
   /// tests the performance and feasibility of the probability calculation
-  void testProbabilityCalculationPerformance() {
+  void testProbabilityPocketAces() {
     print('Testing probability calculation performance...');
 
     // Standard scenario: Pocket pair of aces pre-flop vs 1 opponent
