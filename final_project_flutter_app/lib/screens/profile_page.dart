@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:final_project_flutter_app/screens/login_page.dart';
 import 'package:final_project_flutter_app/screens/shop_screen.dart';
+import 'package:final_project_flutter_app/screens/signup_page.dart';
 import 'package:final_project_flutter_app/services/auth_service.dart';
 import 'package:final_project_flutter_app/services/database_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 
 class PokerProfilePage extends StatefulWidget {
   final String name;
@@ -246,6 +249,35 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
                     ],
                   ),
                   const SizedBox(height: 20), //temp
+
+                  if (FirebaseAuth.instance.currentUser == null) ...[
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green[600],
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(builder: (_) => const LoginPage(name: "Player")),
+                          );
+                        },
+                        child: const Text("Back to Login", style: TextStyle(color: Colors.white)),
+                      ),
+                      const SizedBox(height: 12),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green[600],
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(builder: (_) => const SignUpPage(name: "Player")),
+                          );
+                        },
+                        child: const Text("Create an Account", style: TextStyle(color: Colors.white)),
+                      ),
+                    ],
+
+
                   ElevatedButton.icon(
                     onPressed: () async {
                       await _authService.signout();
