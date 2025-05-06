@@ -9,7 +9,7 @@ class AudioManager {
 
   bool _isInitialized = false;
   bool _isMuted = false;
-  double _volume = 1.0; // Default volume (0.0 to 1.0)
+  double _volume = 0.5; // Changed from 1.0 to 0.5 (50%)
   final StreamController<double> _volumeController = StreamController<double>.broadcast();
   final StreamController<bool> _muteController = StreamController<bool>.broadcast();
 

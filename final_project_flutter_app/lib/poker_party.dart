@@ -1,4 +1,5 @@
 import 'package:final_project_flutter_app/audio/audio_manager.dart';
+import 'package:final_project_flutter_app/audio/sfx_manager.dart';
 import 'package:final_project_flutter_app/models/player.dart';
 import 'package:final_project_flutter_app/screens/game_screen.dart';
 import 'package:final_project_flutter_app/screens/shop_screen.dart';
@@ -33,6 +34,11 @@ class PokerParty extends FlameGame {
       await audioManager.playMainTheme();
       _audioInitialized = true;
     }
+
+    // Initialize SFX
+    print('[SFX] Initializing SFX in PokerParty...');
+    await SFXManager().initialize();
+    print('[SFX] SFX initialized in PokerParty');
 
     // Setup a fixed resolution viewport
     cameraComponent = CameraComponent.withFixedResolution(

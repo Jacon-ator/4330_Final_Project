@@ -37,6 +37,11 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     await gameRef.audioManager.playInPlayTheme();
     print('[AUDIO] GameScreen: Audio initialized and in-play theme started');
 
+    // Play the riffle shuffle sound
+    print('[SFX] GameScreen: Playing riffle shuffle sound...');
+    await _sfxManager.playRiffleShuffle();
+    print('[SFX] GameScreen: Riffle shuffle sound played');
+
     gameState = gameRef.gameState; // Get the game state from the game reference
 
     await gameRef.images.loadAll([
