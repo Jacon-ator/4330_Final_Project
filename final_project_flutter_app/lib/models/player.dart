@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:final_project_flutter_app/models/card.dart';
 import 'package:final_project_flutter_app/models/card_evaluator.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
@@ -66,28 +68,27 @@ class Player {
   Future<int> makeAIDecision(PokerParty gameRef) async {
     // Placeholder for AI decision-making logic
     // This could be expanded with actual AI strategies
-    // Random random = Random();
-    // int decision = random
-    //     .nextInt(3); // Randomly choose between 0 (fold), 1 (call), or 2 (raise)
-    // switch (decision) {
-    //   case 0:
-    //     fold();
-    //     print("$name folds.");
-    //     return 0; // Fold
-    //   case 1:
-    //     print("$name calls.");
-    //     return call(gameRef); // Call
+    Random random = Random();
+    int decision = random
+        .nextInt(3); // Randomly choose between 0 (fold), 1 (call), or 2 (raise)
+    switch (decision) {
+      case 0:
+        fold();
+        print("$name folds.");
+        return 0; // Fold
+      case 1:
+        print("$name calls.");
+        return call(gameRef); // Call
 
-    //   case 2:
-    //     int raiseAmount =
-    //         random.nextInt(balance ~/ 2) + 1; // Random raise amount
-    //     print("$name raises by $raiseAmount.");
-    //     placeBet(raiseAmount);
-    //     return raiseAmount; // Raise
-    //   default:
-    //     return 0; // Default to fold if something goes wrong
-    // }
-    return call(gameRef);
+      case 2:
+        int raiseAmount = 50;
+        //     random.nextInt(balance ~/ 2) + 1; // Random raise amount
+        // print("$name raises by $raiseAmount.");
+        placeBet(raiseAmount);
+        return raiseAmount; // Raise
+      default:
+        return 0; // Default to fold if something goes wrong
+    }
   }
 
   int getCallAmount(PokerParty gameRef) {

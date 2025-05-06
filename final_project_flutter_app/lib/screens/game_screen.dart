@@ -182,26 +182,26 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
         'Current player: ${gameState.players[playerIndex].name}, amount to call: ${player.getCallAmount(gameRef)}');
 
     // Set the base position for the first button
+    children.whereType<ActionButton>().forEach((button) {
+      remove(button); // Remove any existing action buttons
+    });
     Vector2 basePosition = Vector2(50, gameRef.size.y - 140);
 
     final double exportScale = 5; // your export scale factor
 
-    final checkButton = ActionButton(
-      'Check',
-      () async {
-        if (!gameState.isGameOver && player.isCurrentTurn) {
-          print('${player.name} checked!');
-          player.isCurrentTurn = false;
-          await nextPlayer();
-        } else {
-          print('It is not your turn!');
-        }
-      },
-      // Using exported coordinates for Check button:
-      spriteSrcPosition: Vector2(0 * exportScale, 0 * exportScale),
-      spriteSrcSize: Vector2(23 * exportScale, 23 * exportScale),
-      position: basePosition + Vector2(150, 0),
-    );
+    final checkButton = ActionButton('Check', () async {
+      if (!gameState.isGameOver && player.isCurrentTurn) {
+        print('${player.name} checked!');
+        player.isCurrentTurn = false;
+        await nextPlayer();
+      } else {
+        print('It is not your turn!');
+      }
+    },
+        // Using exported coordinates for Check button:
+        spriteSrcPosition: Vector2(71 * exportScale, 0 * exportScale),
+        spriteSrcSize: Vector2(24 * exportScale, 23 * exportScale),
+        position: basePosition);
     // First button - Call button region from the spritesheet.
     final callButton = ActionButton(
       'Call',
@@ -396,8 +396,12 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
         Player winner = determineWinner();
         winner.balance += gameState.pot; // Add the pot to the winner's balance
         gameState.isGameOver = true; // Set the game state to over
-        print(
-            '${winner.name} wins the game with a ${winner.handRank.toString()}!');
+        if (checkFolds() == gameState.players.length - 1) {
+          print('${winner.name} wins by default!');
+        } else {
+          print(
+              '${winner.name} wins the game with a ${winner.handRank.toString()}!');
+        }
 
         // Show the play again button
         showPlayAgainButton = true;
