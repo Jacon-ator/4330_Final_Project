@@ -112,7 +112,11 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
     return Scaffold(
         backgroundColor: Colors.grey[900],
         appBar: AppBar(
-          title: Text("${email?.split('@').first}'s Profile"),
+          title: Text(
+            FirebaseAuth.instance.currentUser != null
+                ? "${email?.split('@').first}'s Profile"
+                : "Guest's Profile", // This handles the guest profile case
+          ),
           backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         ),
         body: Center(
