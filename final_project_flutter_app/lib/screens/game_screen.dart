@@ -123,26 +123,25 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
 
   Future<void> nextPlayer() async {
     // move to next player
-    bool potRight = false; // Flag to check if the pot is right
-    playerIndex = (playerIndex + 1) % gameState.players.length;
-    if (playerIndex == dealerIndex) {
-      potRight = checkPotIsRight(gameState.players);
-    }
+
+    bool potRight = checkPotIsRight(gameState.players);
+
     if (potRight) {
       gameState.round++;
       await roundBasedDealing(gameState.round);
+      playerIndex = (playerIndex + 1) % gameState.players.length;
+      gameState.players[playerIndex].isCurrentTurn = true;
+    } else {
+      playerIndex = (playerIndex + 1) % gameState.players.length;
+      gameState.players[playerIndex].isCurrentTurn = true;
     }
-    gameState.players[playerIndex].isCurrentTurn = true;
-
-    await playerTurn();
     print('Next player is ${gameState.players[playerIndex].name}');
+    await playerTurn();
   }
 
   Future<void> playerTurn() async {
-    List<Player> playerList = gameRef.gameState.players;
-
     // Set the first player as current turn
-    Player currentPlayer = playerList[playerIndex];
+    Player currentPlayer = gameRef.gameState.players[playerIndex];
 
     // This method will be called to start the player's turn.
     // It will show the action buttons and wait for player input.
@@ -163,7 +162,11 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       // If it's an AI player's turn, handle AI logic here
       print('AI Player ${currentPlayer.name}\'s turn.');
       endRoundIfFolded(currentPlayer);
+      int amountToCall = currentPlayer.getCallAmount(gameRef);
       int amount = await currentPlayer.makeAIDecision(gameRef);
+      if (amount > amountToCall) {
+        resetTurnsOnRaise(currentPlayer);
+      }
       gameRef.gameState.pot += amount; // Add the bet to the pot
       currentPlayer.isCurrentTurn = false; // End AI turn after decision
       endRoundIfFolded(currentPlayer);
@@ -192,6 +195,8 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     final checkButton = ActionButton('Check', () async {
       if (!gameState.isGameOver && player.isCurrentTurn) {
         print('${player.name} checked!');
+        player.hasPlayedThisRound = true; // Mark as played this round
+
         player.isCurrentTurn = false;
         await nextPlayer();
       } else {
@@ -210,6 +215,8 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
           print('${player.name} called!');
           int bet = player.call(gameRef);
           gameState.pot += bet; // Add the bet to the pot
+          player.hasPlayedThisRound = true; // Mark as played this round
+
           player.isCurrentTurn = false;
           await nextPlayer();
         } else {
@@ -235,6 +242,8 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
         if (!gameState.isGameOver && player.isCurrentTurn) {
           print('${player.name} folded!');
           player.fold();
+          player.hasPlayedThisRound = true; // Mark as played this round
+
           player.isCurrentTurn = false;
           await nextPlayer();
         } else {
@@ -259,6 +268,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
           int bet = await showSlider();
           print('${player.name} raised to $bet!');
           gameState.pot += bet; // Add the bet to the pot
+          resetTurnsOnRaise(player);
           hideRaiseSlider();
           player.isCurrentTurn = false;
           await nextPlayer();
@@ -274,6 +284,14 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       position: basePosition + Vector2(300, 0),
     );
     add(raiseButton);
+  }
+
+  void resetTurnsOnRaise(Player player) {
+    player.hasPlayedThisRound = true; // Mark as played this round
+    for (var p in gameState.players.where((p) => p != player)) {
+      p.hasPlayedThisRound =
+          false; // reset for all other players since the raise allows them to decide to raise again or
+    }
   }
 
   void blinds() {
@@ -341,6 +359,10 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
   bool checkPotIsRight(List<Player> players) {
     List<Player> activePlayers = players.where((p) => !p.isFolded).toList();
     for (var player in activePlayers) {
+      if (player.hasPlayedThisRound == false) {
+        print('${player.name} has not played this round. Pot is not right.');
+        return false; // If any player has not played this round, pot is not right
+      }
       if (player.getCallAmount(gameRef) != 0) {
         print('${player.name} has not called yet. Pot is not right.');
         return false; // If any player has not called, pot is not right
@@ -354,6 +376,10 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     //find the community card area component
     final communityCardArea =
         children.whereType<CommunityCardArea>().firstOrNull;
+    for (var player in gameState.players) {
+      player.hasPlayedThisRound =
+          false; // Reset the played status for all players
+    }
 
     switch (round) {
       case 0: // Pre-flop

@@ -14,6 +14,7 @@ class Player {
   bool isFolded = false; // Flag to indicate if the player has folded
   HandRank? handRank;
   bool isAllIn = false; // Flag to indicate if the player is all-in
+  bool hasPlayedThisRound = false;
 
   Player(String name, int balance, {this.isAI = false})
       : name = name.isEmpty ? "Player" : name,
@@ -71,6 +72,7 @@ class Player {
     Random random = Random();
     int decision = random
         .nextInt(3); // Randomly choose between 0 (fold), 1 (call), or 2 (raise)
+    hasPlayedThisRound = true; // Mark that the player has played this round
     switch (decision) {
       case 0:
         fold();
@@ -82,10 +84,13 @@ class Player {
 
       case 2:
         int raiseAmount = 50;
+        int betAmount = getCallAmount(gameRef) + raiseAmount;
         //     random.nextInt(balance ~/ 2) + 1; // Random raise amount
         // print("$name raises by $raiseAmount.");
-        placeBet(raiseAmount);
-        return raiseAmount; // Raise
+        print("$name raises 50.");
+        placeBet(betAmount);
+
+        return betAmount; // Raise
       default:
         return 0; // Default to fold if something goes wrong
     }
