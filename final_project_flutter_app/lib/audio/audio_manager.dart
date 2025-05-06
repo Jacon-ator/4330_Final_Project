@@ -12,13 +12,6 @@ class AudioManager {
   double _volume = 1.0; // Default volume (0.0 to 1.0)
   final StreamController<double> _volumeController = StreamController<double>.broadcast();
   final StreamController<bool> _muteController = StreamController<bool>.broadcast();
-  Timer? _themeTransitionTimer;
-  final List<String> _inPlayThemes = [
-    'music/Poker_Party_In_Play_Theme_1.ogg',
-    'music/Poker_Party_In_Play_Theme_2.ogg',
-    'music/Poker_Party_In_Play_Theme_3.ogg',
-  ];
-  int _currentThemeIndex = 0;
 
   // Streams to listen for volume and mute state changes
   Stream<double> get volumeStream => _volumeController.stream;
@@ -29,27 +22,45 @@ class AudioManager {
   double get volume => _volume;
 
   Future<void> initialize() async {
-    if (_isInitialized) return;
+    if (_isInitialized) {
+      print('[AUDIO] Audio manager already initialized');
+      return;
+    }
 
     try {
-      print('Initializing audio manager...');
+      print('[AUDIO] ===== Starting Audio Initialization =====');
+      print('[AUDIO] Initializing BGM...');
       await FlameAudio.bgm.initialize();
-      print('Loading main theme...');
+      print('[AUDIO] BGM initialized successfully');
+      
+      print('[AUDIO] Loading main theme...');
       await FlameAudio.audioCache.load('music/Poker_Party_Main_Theme.mp3');
-      print('Loading shop theme...');
+      print('[AUDIO] Main theme loaded successfully');
+      
+      print('[AUDIO] Loading shop theme...');
       await FlameAudio.audioCache.load('music/Poker_Party_Shop_Theme.ogg');
-      print('Loading in-play themes...');
-      for (final theme in _inPlayThemes) {
-        print('Loading $theme...');
-        await FlameAudio.audioCache.load(theme);
-      }
-      print('Audio files loaded successfully');
+      print('[AUDIO] Shop theme loaded successfully');
+      
+      print('[AUDIO] Loading in-play theme...');
+      await FlameAudio.audioCache.load('music/Poker_Party_In_Play_Cycle.mp3');
+      print('[AUDIO] In-play theme loaded successfully');
+      
+      print('[AUDIO] All audio files loaded successfully');
       _isInitialized = true;
       
       // Set initial volume
+      print('[AUDIO] Setting initial volume: $_volume');
       await setVolume(_volume);
+      print('[AUDIO] Initial volume set successfully');
+      print('[AUDIO] ===== Audio Initialization Complete =====');
     } catch (e) {
-      print('Error initializing audio: $e');
+      print('[AUDIO] ERROR: Failed to initialize audio');
+      print('[AUDIO] Error details: $e');
+      print('[AUDIO] Stack trace: ${StackTrace.current}');
+      if (e is Exception) {
+        print('[AUDIO] Exception type: ${e.runtimeType}');
+        print('[AUDIO] Exception message: ${e.toString()}');
+      }
     }
   }
 
@@ -96,73 +107,49 @@ class AudioManager {
   }
 
   Future<void> playInPlayTheme() async {
+    print('[AUDIO] ===== Starting In-Play Theme Playback =====');
     if (!_isInitialized) {
-      print('Audio not initialized, initializing now...');
+      print('[AUDIO] Audio not initialized, initializing now...');
       await initialize();
     }
 
     try {
-      print('Starting in-play theme sequence...');
-      // Cancel any existing transition timer
-      _themeTransitionTimer?.cancel();
-      print('Previous transition timer cancelled');
+      print('[AUDIO] Current state:');
+      print('[AUDIO] - Mute state: $_isMuted');
+      print('[AUDIO] - Volume: $_volume');
+      print('[AUDIO] - Initialized: $_isInitialized');
       
-      // Play the current theme
-      print('Attempting to play theme: ${_inPlayThemes[_currentThemeIndex]}');
-      await FlameAudio.bgm.play(_inPlayThemes[_currentThemeIndex]);
-      print('In-play theme playback started successfully');
-      
-      // Apply current volume settings
-      if (_isMuted) {
-        print('Audio is muted, setting volume to 0');
-        await FlameAudio.bgm.audioPlayer.setVolume(0);
-      } else {
-        print('Setting volume to $_volume');
-        await FlameAudio.bgm.audioPlayer.setVolume(_volume);
-      }
-
-      // Set up the transition timer
-      print('Setting up theme transition timer (2 minutes)');
-      _themeTransitionTimer = Timer.periodic(const Duration(minutes: 2), (timer) {
-        print('Theme transition timer triggered');
-        _transitionToNextTheme();
-      });
-    } catch (e) {
-      print('Error playing in-play theme: $e');
-      print('Stack trace: ${StackTrace.current}');
-    }
-  }
-
-  Future<void> _transitionToNextTheme() async {
-    try {
-      print('Starting theme transition...');
-      // Stop current theme
+      // Stop any currently playing audio
+      print('[AUDIO] Stopping any current audio...');
       await FlameAudio.bgm.stop();
-      print('Current theme stopped');
+      print('[AUDIO] Current audio stopped');
       
-      // Select a new random theme (different from current)
-      int newIndex;
-      do {
-        newIndex = DateTime.now().millisecondsSinceEpoch % _inPlayThemes.length;
-      } while (newIndex == _currentThemeIndex);
+      print('[AUDIO] Loading in-play theme file...');
+      await FlameAudio.audioCache.load('music/Poker_Party_In_Play_Cycle.mp3');
+      print('[AUDIO] In-play theme file loaded successfully');
       
-      _currentThemeIndex = newIndex;
-      print('Selected new theme index: $_currentThemeIndex');
-      
-      // Play the new theme
-      print('Attempting to play new theme: ${_inPlayThemes[_currentThemeIndex]}');
-      await FlameAudio.bgm.play(_inPlayThemes[_currentThemeIndex]);
-      print('New theme playback started');
+      print('[AUDIO] Starting playback...');
+      await FlameAudio.bgm.play('music/Poker_Party_In_Play_Cycle.mp3');
+      print('[AUDIO] In-play theme playback started');
       
       // Apply current volume settings
       if (_isMuted) {
+        print('[AUDIO] Audio is muted, setting volume to 0');
         await FlameAudio.bgm.audioPlayer.setVolume(0);
       } else {
+        print('[AUDIO] Setting volume to $_volume');
         await FlameAudio.bgm.audioPlayer.setVolume(_volume);
       }
+      print('[AUDIO] Volume settings applied successfully');
+      print('[AUDIO] ===== In-Play Theme Playback Complete =====');
     } catch (e) {
-      print('Error transitioning themes: $e');
-      print('Stack trace: ${StackTrace.current}');
+      print('[AUDIO] ERROR: Failed to play in-play theme');
+      print('[AUDIO] Error details: $e');
+      print('[AUDIO] Stack trace: ${StackTrace.current}');
+      if (e is Exception) {
+        print('[AUDIO] Exception type: ${e.runtimeType}');
+        print('[AUDIO] Exception message: ${e.toString()}');
+      }
     }
   }
 
@@ -218,8 +205,6 @@ class AudioManager {
 
   Future<void> stopAll() async {
     try {
-      _themeTransitionTimer?.cancel();
-      _themeTransitionTimer = null;
       await FlameAudio.bgm.stop();
       await FlameAudio.audioCache.clearAll();
       await FlameAudio.bgm.dispose();

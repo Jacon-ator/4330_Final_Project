@@ -1,12 +1,14 @@
+import 'package:final_project_flutter_app/audio/sfx_manager.dart';
+import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
-import 'package:final_project_flutter_app/poker_party.dart';
 
 class ActionButton extends PositionComponent
     with TapCallbacks, HasGameRef<PokerParty> {
   final String label;
   final VoidCallback onPressed;
+  final SFXManager _sfxManager = SFXManager();
 
   // These parameters tell the button where to extract its sprite from the spritesheet.
   final Vector2 spriteSrcPosition;
@@ -48,6 +50,7 @@ class ActionButton extends PositionComponent
   @override
   void onTapDown(TapDownEvent event) {
     super.onTapDown(event);
+    _sfxManager.playButtonSelect();
     onPressed();
   }
 }

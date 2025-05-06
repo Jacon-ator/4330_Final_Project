@@ -1,3 +1,4 @@
+import 'package:final_project_flutter_app/audio/sfx_manager.dart';
 import 'package:flutter/material.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -10,6 +11,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  final SFXManager _sfxManager = SFXManager();
   bool musicEnabled = true;
   bool soundEffectsEnabled = true;
 
@@ -72,7 +74,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 const SizedBox(height: 30),
                 ElevatedButton(
-                  onPressed: widget.onClose,
+                  onPressed: () {
+                    _sfxManager.playButtonSelect();
+                    widget.onClose();
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green[700],
                     padding: const EdgeInsets.symmetric(

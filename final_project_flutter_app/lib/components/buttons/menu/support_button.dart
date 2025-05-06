@@ -1,3 +1,4 @@
+import 'package:final_project_flutter_app/audio/sfx_manager.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
@@ -7,6 +8,7 @@ class SupportButton extends PositionComponent
     with TapCallbacks, HasGameRef<PokerParty> {
   Sprite? sprite;
   final String label = 'Single';
+  final SFXManager _sfxManager = SFXManager();
 
   SupportButton({label});
 
@@ -47,6 +49,7 @@ class SupportButton extends PositionComponent
   @override
   void onTapDown(TapDownEvent event) {
     super.onTapDown(event);
+    _sfxManager.playButtonSelect();
     // Navigate to the main menu screen when the button is tapped
     gameRef.router.pushNamed('support');
   }

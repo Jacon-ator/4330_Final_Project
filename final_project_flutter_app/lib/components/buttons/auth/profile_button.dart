@@ -1,15 +1,18 @@
+import 'package:final_project_flutter_app/audio/sfx_manager.dart';
 import 'package:final_project_flutter_app/screens/profile_page.dart';
 import 'package:flutter/material.dart';
 
 class ProfileButton extends StatelessWidget {
   final String name;
+  final SFXManager _sfxManager = SFXManager();
 
-  const ProfileButton({super.key, required this.name});
+  ProfileButton({super.key, required this.name});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
+        _sfxManager.playButtonSelect();
         Navigator.push(
           context,
           MaterialPageRoute(

@@ -64,20 +64,34 @@ class PokerParty extends FlameGame {
     add(router);
   }
 
-  void goTo(String route) {
+  void goTo(String route) async {
     print('Navigating to route: $route');
-    router.pushNamed(route);
+    
     // Handle theme switching based on route
-    if (route == 'shop') {
-      print('Switching to shop theme');
-      audioManager.playShopTheme();
-    } else if (route == 'menu') {
-      print('Switching to main theme');
-      audioManager.playMainTheme();
-    } else if (route == 'game') {
-      print('Switching to in-play theme');
-      audioManager.playInPlayTheme();
+    switch (route) {
+      case 'shop':
+        print('Switching to shop theme');
+        await audioManager.playShopTheme();
+        print('Shop theme started successfully');
+        break;
+      case 'menu':
+        print('Switching to main theme');
+        await audioManager.playMainTheme();
+        print('Main theme started successfully');
+        break;
+      case 'game':
+        print('Switching to in-play theme');
+        await audioManager.playInPlayTheme();
+        print('In-play theme started successfully');
+        break;
+      default:
+        // For other routes (rules, support), keep the current theme
+        print('No theme change for route: $route');
+        break;
     }
+    
+    // Only change route after audio is set up
+    router.pushNamed(route);
   }
 
   @override
