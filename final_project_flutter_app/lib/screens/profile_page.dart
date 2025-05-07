@@ -281,7 +281,8 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
                       ),
                     ],
 
-
+                  const SizedBox(height: 12), // Adding consistent spacing before the Sign Out button
+                  
                   ElevatedButton.icon(
                     onPressed: () async {
                       await _authService.signout();
