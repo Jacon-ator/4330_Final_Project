@@ -5,7 +5,6 @@ import 'package:final_project_flutter_app/services/database_service.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 
-
 class ShopScreen extends Component with HasGameRef<PokerParty> {
   late Vector2 size;
   static bool ownsCardSkin = false;
@@ -18,7 +17,16 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
     super.onLoad();
     size = gameRef.size;
 
-    // Load user data 
+    // Load the background image (replace 'art/Shop_Background.png' with your actual image path)
+    final shopBackgroundSprite = await Sprite.load('art/Shop Screen.png');
+    final shopBackground = SpriteComponent(
+      sprite: shopBackgroundSprite,
+      size: size, // Make the image fill the screen
+      position: Vector2(0, 0),
+    );
+    add(shopBackground);
+
+    // Load user data
     final db = DatabaseService();
     currentUser = await db.getUserData();
     ShopScreen.coinBalance = currentUser?.coins ?? 0;
@@ -28,7 +36,6 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
     print("User coins: ${ShopScreen.coinBalance}");
     print("Owns Card Skin: ${ShopScreen.ownsCardSkin}");
     print("Owns Table Skin: ${ShopScreen.ownsTableSkin}");
-    
 
     final MainMenuButton mainMenuButton = MainMenuButton()
       ..size = Vector2(size.x / 6, size.y / 6)
@@ -59,12 +66,9 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
 
       // Update Firestore
       FirebaseFirestore.instance
-        .collection('users')
-        .doc(currentUser?.email) // use the email from currentUser
-        .update({
-          "Coins": coinBalance,
-          "ownTableSkin": true
-        });
+          .collection('users')
+          .doc(currentUser?.email) // use the email from currentUser
+          .update({"Coins": coinBalance, "ownTableSkin": true});
 
       print("Table skin purchased!");
     } else {
@@ -79,12 +83,9 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
 
       // Update Firestore
       FirebaseFirestore.instance
-        .collection('users')
-        .doc(currentUser?.email)
-        .update({
-          "Coins": coinBalance,
-          "ownCardSkin": true
-        });
+          .collection('users')
+          .doc(currentUser?.email)
+          .update({"Coins": coinBalance, "ownCardSkin": true});
 
       print("Card skin purchased!");
     } else {
@@ -139,7 +140,6 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
     tableSkinText.layout();
     coinText.layout();
 
-
     // Title
     titleText.paint(
       canvas,
@@ -165,9 +165,6 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
       ),
     );
 
-    coinText.paint(
-      canvas,
-      const Offset(20, 20));
-
+    coinText.paint(canvas, const Offset(20, 20));
   }
 }

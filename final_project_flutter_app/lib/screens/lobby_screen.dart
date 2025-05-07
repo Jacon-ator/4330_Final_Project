@@ -82,8 +82,8 @@ class LobbyScreen extends Component with HasGameRef<PokerParty> {
   @override
   void onRemove() {
     // Clean up the subscription when the component is removed
-    _playerCountSubscription?.cancel();
     super.onRemove();
+    updatePlayerCount();
   }
 
   // Also add a method to unsubscribe when leaving the lobby
