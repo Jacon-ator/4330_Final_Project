@@ -19,12 +19,10 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
   // and render the game UI.
 
   List<ActionButton>? actionButtons;
-  int playerIndex = 0;
-  int dealerIndex = -1;
+
   late GameState gameState = gameRef.gameState; // Reference to the game state
   CardEvaluator cardEvaluator = CardEvaluator();
   bool showPlayAgainButton = false;
-  int potRightCount = 0;
   final SFXManager _sfxManager = SFXManager();
 
   @override
@@ -101,8 +99,8 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
 
   Future<void> startGame() async {
     gameState.resetGame();
-    dealerIndex =
-        (dealerIndex + 1) % gameState.players.length; // Move to the next dealer
+    gameState.dealerIndex = (gameState.dealerIndex + 1) %
+        gameState.players.length; // Move to the next dealer
 
     HandArea? handArea = children.whereType<HandArea>().firstOrNull;
     CommunityCardArea? ccardArea =
@@ -117,7 +115,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     await dealCards();
     blinds(); // Place the blinds for the game
 
-    playerIndex = dealerIndex;
+    gameState.playerIndex = gameState.dealerIndex;
     await playerTurn();
   }
 
@@ -142,22 +140,24 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     if (potRight) {
       gameState.round++;
       await roundBasedDealing(gameState.round);
-      playerIndex = (playerIndex + 1) % gameState.players.length;
-      gameState.players[playerIndex].isCurrentTurn = true;
+      gameState.playerIndex =
+          (gameState.playerIndex + 1) % gameState.players.length;
+      gameState.players[gameState.playerIndex].isCurrentTurn = true;
     } else {
-      playerIndex = (playerIndex + 1) % gameState.players.length;
-      gameState.players[playerIndex].isCurrentTurn = true;
+      gameState.playerIndex =
+          (gameState.playerIndex + 1) % gameState.players.length;
+      gameState.players[gameState.playerIndex].isCurrentTurn = true;
     }
     if (gameState.isGameOver) {
       return;
     }
-    print('Next player is ${gameState.players[playerIndex].name}');
+    print('Next player is ${gameState.players[gameState.playerIndex].name}');
     await playerTurn();
   }
 
   Future<void> playerTurn() async {
     // Set the first player as current turn
-    Player currentPlayer = gameRef.gameState.players[playerIndex];
+    Player currentPlayer = gameRef.gameState.players[gameState.playerIndex];
 
     // This method will be called to start the player's turn.
     // It will show the action buttons and wait for player input.
@@ -198,7 +198,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     updateHandUI(player, 1); // Update the hand UI for the second card
     print('Showing player actions...');
     print(
-        'Current player: ${gameState.players[playerIndex].name}, amount to call: ${player.getCallAmount(gameRef)}');
+        'Current player: ${gameState.players[gameState.playerIndex].name}, amount to call: ${player.getCallAmount(gameRef)}');
 
     // Set the base position for the first button
     children.whereType<ActionButton>().forEach((button) {
@@ -318,10 +318,10 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       return;
     }
 
-    Player smallBlindPlayer =
-        gameState.players[(dealerIndex + 1) % gameState.players.length];
-    Player bigBlindPlayer =
-        gameState.players[(dealerIndex + 2) % gameState.players.length];
+    Player smallBlindPlayer = gameState
+        .players[(gameState.dealerIndex + 1) % gameState.players.length];
+    Player bigBlindPlayer = gameState
+        .players[(gameState.dealerIndex + 2) % gameState.players.length];
 
     smallBlindPlayer.placeBet(gameState.smallBlind);
     bigBlindPlayer.placeBet(gameState.bigBlind);
@@ -509,7 +509,8 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
 
   Future<int> showSlider() async {
     final completer = Completer<int>();
-    int selectedValue = gameState.players[playerIndex].getCallAmount(gameRef);
+    int selectedValue =
+        gameState.players[gameState.playerIndex].getCallAmount(gameRef);
 
     if (!gameRef.overlays.isActive('RaiseSlider')) {
       gameRef.overlays.addEntry(
@@ -544,10 +545,11 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
                 ),
                 const SizedBox(height: 20),
                 RaiseSlider(
-                  minRaise:
-                      gameState.players[playerIndex].getCallAmount(gameRef),
-                  maxRaise: gameState.players[playerIndex].balance,
-                  currentChips: gameState.players[playerIndex].balance,
+                  minRaise: gameState.players[gameState.playerIndex]
+                      .getCallAmount(gameRef),
+                  maxRaise: gameState.players[gameState.playerIndex].balance,
+                  currentChips:
+                      gameState.players[gameState.playerIndex].balance,
                   onChanged: (int value) {
                     selectedValue = value;
                   },
@@ -566,7 +568,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
                       ),
                       onPressed: () {
                         _sfxManager.playButtonSelect();
-                        int bet = gameState.players[playerIndex]
+                        int bet = gameState.players[gameState.playerIndex]
                             .placeBet(selectedValue);
                         hideRaiseSlider();
                         completer.complete(bet);
