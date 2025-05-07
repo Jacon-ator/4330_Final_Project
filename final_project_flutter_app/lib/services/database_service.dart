@@ -74,18 +74,24 @@ class DatabaseService {
   }
 
   Future writeToChat(DocumentReference docRef, String message) async {
-    //gets a snapshot of the document
+    //gets a snapshot of the document and its data
     final docSnap = await docRef.get();
+    final data = docSnap.data() as Map<String, dynamic>;
 
-    //gets the length of the keys in the document to know what the index of the next message will be
-    int doclength =
-        (docSnap.data() as Map<String, dynamic>).keys.toList().length;
+    //gets the highest key value in the data and goes one higher
+    int nextIndex = 0;
+    for (String key in data.keys){
+      if (int.parse(key) > nextIndex){
+        nextIndex = int.parse(key);
+      }
+    }
+    nextIndex++;
 
     //creates a header for the message with the user's email and appends the message to it
     String messageheader = "${_auth.currentUser?.email}: ";
     String fullmessage = messageheader + message;
 
-    String newIndex = doclength.toString();
+    String newIndex = nextIndex.toString();
     docRef.update({newIndex: fullmessage});
   }
 
