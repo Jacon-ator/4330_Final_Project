@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:final_project_flutter_app/audio/sfx_manager.dart';
 import 'package:final_project_flutter_app/components/buttons/gameplay/play_next_round_button.dart';
 import 'package:final_project_flutter_app/components/buttons/gameplay/raise_slider.dart';
 import 'package:final_project_flutter_app/components/components.dart';
@@ -24,10 +25,22 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
   CardEvaluator cardEvaluator = CardEvaluator();
   bool showPlayAgainButton = false;
   int potRightCount = 0;
+  final SFXManager _sfxManager = SFXManager();
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+
+    // Initialize and play the in-play theme
+    print('[AUDIO] GameScreen: Initializing audio...');
+    await gameRef.audioManager.initialize();
+    await gameRef.audioManager.playInPlayTheme();
+    print('[AUDIO] GameScreen: Audio initialized and in-play theme started');
+
+    // Play the riffle shuffle sound
+    print('[SFX] GameScreen: Playing riffle shuffle sound...');
+    await _sfxManager.playRiffleShuffle();
+    print('[SFX] GameScreen: Riffle shuffle sound played');
 
     gameState = gameRef.gameState; // Get the game state from the game reference
 
@@ -258,7 +271,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
           Vector2(24 * exportScale, 0 * exportScale), // change as needed
       spriteSrcSize:
           Vector2(23 * exportScale, 23 * exportScale), // change as needed
-      // Optionally use the previous button’s position to auto-layout.
+      // Optionally use the previous button's position to auto-layout.
       position: basePosition + Vector2(150, 0),
     );
     add(foldButton);
@@ -551,6 +564,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
                         foregroundColor: Color(0xFFF1E4C3), // Text
                       ),
                       onPressed: () {
+                        _sfxManager.playButtonSelect();
                         int bet = gameState.players[playerIndex]
                             .placeBet(selectedValue);
                         hideRaiseSlider();
@@ -566,6 +580,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
                         foregroundColor: Color(0xFFD48C2D),
                       ),
                       onPressed: () {
+                        _sfxManager.playButtonSelect();
                         hideRaiseSlider();
                         completer.complete(0);
                       },

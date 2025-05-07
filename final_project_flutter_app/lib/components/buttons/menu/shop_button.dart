@@ -43,6 +43,6 @@ class ShopButton extends PositionComponent
 
   @override
   void onTapDown(TapDownEvent event) {
-    gameRef.router.pushNamed('shop');
+    gameRef.goTo('shop');
   }
 }

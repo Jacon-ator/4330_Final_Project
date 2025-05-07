@@ -1,3 +1,4 @@
+import 'package:final_project_flutter_app/audio/sfx_manager.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:final_project_flutter_app/screens/settings_screen.dart';
 import 'package:flame/components.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/material.dart';
 class SettingsButton extends PositionComponent
     with TapCallbacks, HasGameRef<PokerParty> {
   Sprite? sprite;
+  final SFXManager _sfxManager = SFXManager();
 
   @override
   Future<void> onLoad() async {
@@ -38,6 +40,7 @@ class SettingsButton extends PositionComponent
 
   @override
   void onTapDown(TapDownEvent event) {
+    _sfxManager.playButtonSelect();
     Navigator.of(gameRef.buildContext!).push(
       MaterialPageRoute(builder: (context) => const SettingsScreen()),
     );

@@ -1,4 +1,5 @@
 import 'package:final_project_flutter_app/audio/audio_manager.dart';
+import 'package:final_project_flutter_app/audio/sfx_manager.dart';
 import 'package:final_project_flutter_app/components/volume_control.dart';
 import 'package:final_project_flutter_app/screens/login_page.dart';
 import 'package:final_project_flutter_app/services/auth_service.dart';
@@ -19,6 +20,7 @@ class _SignUpPageState extends State<SignUpPage> {
   String password = '';
   AuthService authservice = AuthService();
   final AudioManager _audioManager = AudioManager();
+  final SFXManager _sfxManager = SFXManager();
 
   // Track if there's an error message to display
   String? errorMessage;
@@ -214,7 +216,10 @@ class _SignUpPageState extends State<SignUpPage> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        onPressed: _signup,
+                        onPressed: () {
+                          _sfxManager.playButtonSelect();
+                          _signup();
+                        },
                         child: const Text(
                           'SIGN UP',
                           style: TextStyle(
@@ -228,6 +233,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     const SizedBox(height: 16),
                     TextButton(
                       onPressed: () {
+                        _sfxManager.playButtonSelect();
                         // Go directly to the game screen as a guest
                         Navigator.of(context).pushReplacementNamed('/game');
                       },

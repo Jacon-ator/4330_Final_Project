@@ -1,4 +1,5 @@
 import 'package:final_project_flutter_app/audio/audio_manager.dart';
+import 'package:final_project_flutter_app/audio/sfx_manager.dart';
 import 'package:final_project_flutter_app/models/player.dart';
 import 'package:final_project_flutter_app/screens/game_screen.dart';
 import 'package:final_project_flutter_app/screens/shop_screen.dart';
@@ -16,6 +17,7 @@ class PokerParty extends FlameGame {
   late SpriteComponent background;
 
   final AudioManager audioManager = AudioManager();
+  bool _audioInitialized = false;
 
   final GameState gameState = GameState();
 
@@ -26,8 +28,17 @@ class PokerParty extends FlameGame {
   Future<void> onLoad() async {
     super.onLoad();
 
-    await audioManager.initialize();
-    await audioManager.playMainTheme();
+    // Initialize audio only if not already initialized
+    if (!_audioInitialized) {
+      await audioManager.initialize();
+      await audioManager.playMainTheme();
+      _audioInitialized = true;
+    }
+
+    // Initialize SFX
+    print('[SFX] Initializing SFX in PokerParty...');
+    await SFXManager().initialize();
+    print('[SFX] SFX initialized in PokerParty');
 
     // Setup a fixed resolution viewport
     cameraComponent = CameraComponent.withFixedResolution(
@@ -57,10 +68,36 @@ class PokerParty extends FlameGame {
     );
 
     add(router);
+  }
 
-    void goTo(String route) {
-      router.pushNamed(route);
+  void goTo(String route) async {
+    print('Navigating to route: $route');
+    
+    // Handle theme switching based on route
+    switch (route) {
+      case 'shop':
+        print('Switching to shop theme');
+        await audioManager.playShopTheme();
+        print('Shop theme started successfully');
+        break;
+      case 'menu':
+        print('Switching to main theme');
+        await audioManager.playMainTheme();
+        print('Main theme started successfully');
+        break;
+      case 'game':
+        print('Switching to in-play theme');
+        await audioManager.playInPlayTheme();
+        print('In-play theme started successfully');
+        break;
+      default:
+        // For other routes (rules, support), keep the current theme
+        print('No theme change for route: $route');
+        break;
     }
+    
+    // Only change route after audio is set up
+    router.pushNamed(route);
   }
 
   @override

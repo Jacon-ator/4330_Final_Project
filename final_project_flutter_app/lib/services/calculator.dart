@@ -83,8 +83,9 @@ class Card {
 
   /// creates a card from a standard string representation (e.g., "AS" for Ace of Spades)
   factory Card.fromString(String str) {
-    if (str.length != 2)
+    if (str.length != 2) {
       throw FormatException('Card string must be 2 characters');
+    }
 
     CardRank rank;
     switch (str[0]) {
@@ -105,8 +106,9 @@ class Card {
         break;
       default:
         final rankValue = int.tryParse(str[0]);
-        if (rankValue == null || rankValue < 2 || rankValue > 9)
+        if (rankValue == null || rankValue < 2 || rankValue > 9) {
           throw FormatException('Invalid rank: ${str[0]}');
+        }
         rank = CardRank.values[rankValue - 2];
     }
 

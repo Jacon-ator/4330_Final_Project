@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:final_project_flutter_app/audio/sfx_manager.dart';
 import 'package:final_project_flutter_app/screens/login_page.dart';
 import 'package:final_project_flutter_app/screens/shop_screen.dart';
 import 'package:final_project_flutter_app/screens/signup_page.dart';
@@ -20,6 +21,7 @@ class PokerProfilePage extends StatefulWidget {
 class _PokerProfilePageState extends State<PokerProfilePage> {
   final AuthService _authService = AuthService();
   final DatabaseService _databaseService = DatabaseService();
+  final SFXManager _sfxManager = SFXManager();
 
   userData? currentUserData;
   String? email = '';
@@ -257,6 +259,7 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
                           backgroundColor: Colors.green[600],
                         ),
                         onPressed: () {
+                          _sfxManager.playButtonSelect();
                           Navigator.of(context).pushReplacement(
                             MaterialPageRoute(builder: (_) => const LoginPage(name: "Player")),
                           );
@@ -269,6 +272,7 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
                           backgroundColor: Colors.green[600],
                         ),
                         onPressed: () {
+                          _sfxManager.playButtonSelect();
                           Navigator.of(context).pushReplacement(
                             MaterialPageRoute(builder: (_) => const SignUpPage(name: "Player")),
                           );

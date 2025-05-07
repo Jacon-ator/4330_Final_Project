@@ -5,9 +5,11 @@ import 'package:flame/components.dart';
 class MainMenuScreen extends Component with HasGameRef<PokerParty> {
   late Vector2 size;
   late SpriteComponent background;
+
   @override
   Future<void> onLoad() async {
     super.onLoad();
+    
     // Set the size of the main menu screen to fill the game window
     size = gameRef.size;
 

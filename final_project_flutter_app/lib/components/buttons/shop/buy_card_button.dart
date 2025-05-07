@@ -1,3 +1,4 @@
+import 'package:final_project_flutter_app/audio/sfx_manager.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:final_project_flutter_app/screens/shop_screen.dart';
 import 'package:flame/components.dart';
@@ -5,6 +6,8 @@ import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 
 class BuyCardButton extends PositionComponent with TapCallbacks, HasGameRef<PokerParty> {
+  final SFXManager _sfxManager = SFXManager();
+
   @override
   void render(Canvas canvas) {
     super.render(canvas);
@@ -30,7 +33,7 @@ class BuyCardButton extends PositionComponent with TapCallbacks, HasGameRef<Poke
   @override
   void onTapDown(TapDownEvent event) {
     super.onTapDown(event);
-
+    _sfxManager.playButtonSelect();
     final shop = parent as ShopScreen;
     shop.buyCardSkin();
   }
