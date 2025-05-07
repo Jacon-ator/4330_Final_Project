@@ -1,23 +1,35 @@
+import 'dart:async';
+
 import 'package:final_project_flutter_app/components/buttons/menu/back_button.dart'
     as backbutton;
 import 'package:final_project_flutter_app/components/buttons/menu/start_match_button.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
+import 'package:final_project_flutter_app/services/lobby_screen_service.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 
 class LobbyScreen extends Component with HasGameRef<PokerParty> {
   late TextComponent titleComponent;
   late TextComponent playersComponent;
-  int playerCount = 1; // Start with 1 player (the human player)
+  int playerCount = 0;
+
+  final LobbyScreenService _lobbyService = LobbyScreenService();
+  StreamSubscription<int>? _playerCountSubscription;
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
 
+    // Setup stream subscription for player count
+    _playerCountSubscription =
+        _lobbyService.streamPlayerCount().listen((count) {
+      playerCount = count;
+      updatePlayerCount();
+    });
+
     // Load background
     final background = RectangleComponent(
         size: gameRef.size, paint: Paint()..color = const Color(0xFF1E6C3C));
-
     add(background);
 
     // Add title
@@ -65,6 +77,19 @@ class LobbyScreen extends Component with HasGameRef<PokerParty> {
       position: Vector2(50, gameRef.size.y - 50),
     );
     add(backButton);
+  }
+
+  @override
+  void onRemove() {
+    // Clean up the subscription when the component is removed
+    _playerCountSubscription?.cancel();
+    super.onRemove();
+  }
+
+  // Also add a method to unsubscribe when leaving the lobby
+  Future<void> leaveLobby() async {
+    await _lobbyService.removeFromLobby();
+    _playerCountSubscription?.cancel();
   }
 
   void updatePlayerCount() {

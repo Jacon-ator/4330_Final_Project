@@ -132,4 +132,18 @@ class GameState {
       'dealerIndex': dealerIndex,
     };
   }
+
+  bool addPlayer(Player player) {
+    if (players.length >= table.totalCapacity) {
+      print("Cannot add more players. Table is full.");
+      return false;
+    }
+
+    players.add(player);
+    return true;
+  }
+
+  void removePlayer(String s) {
+    players.removeWhere((player) => player.id == s);
+  }
 }

@@ -1,10 +1,13 @@
 import 'package:final_project_flutter_app/poker_party.dart';
+import 'package:final_project_flutter_app/services/lobby_screen_service.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 
 class BackButton extends PositionComponent
     with TapCallbacks, HasGameRef<PokerParty> {
+  final LobbyScreenService lobbyScreenService = LobbyScreenService();
+
   BackButton({
     required Vector2 position,
   }) : super(position: position, size: Vector2(100, 40));
@@ -36,9 +39,9 @@ class BackButton extends PositionComponent
   }
 
   @override
-  void onTapDown(TapDownEvent event) {
+  Future<void> onTapDown(TapDownEvent event) async {
     super.onTapDown(event);
-    // Navigate back to the main menu
+    await lobbyScreenService.removeFromLobby();
     gameRef.router.pop();
   }
 }

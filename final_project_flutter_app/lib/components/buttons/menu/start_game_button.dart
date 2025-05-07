@@ -1,6 +1,7 @@
 import 'package:final_project_flutter_app/audio/sfx_manager.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:final_project_flutter_app/services/database_service.dart';
+import 'package:final_project_flutter_app/services/lobby_screen_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
@@ -10,6 +11,7 @@ class StartGameButton extends PositionComponent
     with TapCallbacks, HasGameRef<PokerParty> {
   final String label = 'Single';
   final SFXManager _sfxManager = SFXManager();
+  final LobbyScreenService lobbyScreenService = LobbyScreenService();
 
   StartGameButton({label});
   Sprite? sprite;
@@ -56,7 +58,12 @@ class StartGameButton extends PositionComponent
       super.onTapDown(event);
       _sfxManager.playButtonSelect();
       // Navigate to the lobby screen when the button is tapped
-      gameRef.router.pushNamed('lobby');
+      bool success = await lobbyScreenService.addToLobby();
+      if (success) {
+        gameRef.router.pushNamed('lobby');
+      } else {
+        print("Failed to add player to lobby.");
+      }
     } else {
       print("User data is null. Cannot start game.");
     }
