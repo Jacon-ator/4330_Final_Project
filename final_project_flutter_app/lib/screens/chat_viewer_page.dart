@@ -17,7 +17,7 @@ class _ChatViewerPageState extends State<ChatViewerPage> {
 
   final AuthService _authService = AuthService();
   final DatabaseService _databaseService = DatabaseService();
-
+  
   String message = "";
   List<String> messagehistory = ["Loading messages..."];
   String? errorMessage;
@@ -54,7 +54,7 @@ class _ChatViewerPageState extends State<ChatViewerPage> {
 
   @override
   Widget build(BuildContext context) {
-    
+    final Stream<DocumentSnapshot> chatstream = widget.docRef.snapshots();
     return Scaffold(
       backgroundColor: const Color(0xFF468232),
       appBar: AppBar(
@@ -121,32 +121,44 @@ class _ChatViewerPageState extends State<ChatViewerPage> {
                     SizedBox(
                       height: 200,
                       width: double.infinity,
-                      child: ListView.builder(
-                        padding: const EdgeInsets.all(8),
-                        reverse: true,
-                        itemCount: messagehistory.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Container(
-                            alignment: messagehistory[index].startsWith("Support:") 
-                                ? Alignment.centerLeft 
-                                : Alignment.centerRight,
-                            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: messagehistory[index].startsWith("Support:") 
-                                    ? Colors.green[200] 
-                                    : Colors.blue[200],
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                              child: Text(
-                                messagehistory[index],
-                                style: const TextStyle(fontSize: 18),
-                              ),  
-                            ),
-                          );
+                      child: StreamBuilder(
+                        stream: chatstream, 
+                        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot){
+                          if (snapshot.hasError) {
+                            return const Text("Error loading.");
+                          }
+                          if (snapshot.connectionState == ConnectionState.waiting){
+                            return const Text("Waiting for chat to load...");
+                          }
+                          Map<String, dynamic> data = snapshot.data?.data() as Map<String, dynamic>;
+                          return ListView.builder(
+                            padding: const EdgeInsets.all(8),
+                            reverse: true,
+                            itemCount: data.length,
+                            itemBuilder: (BuildContext context, int index){
+                              return Container(
+                                alignment: data[index.toString()].startsWith("Support:") 
+                                  ? Alignment.centerLeft 
+                                  : Alignment.centerRight,
+                              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: data[index.toString()].startsWith("Support:") 
+                                      ? Colors.green[200] 
+                                      : Colors.blue[200],
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                                child: Text(
+                                  data[index.toString()],
+                                  style: const TextStyle(fontSize: 18),
+                                ),
+                                )  
+                              );
+                            }
+                            );
                         }
-                      ),
+                        ),
                     ),
                     
                     // Text input
