@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project_flutter_app/services/auth_service.dart';
 import 'package:final_project_flutter_app/services/database_service.dart';
+import 'package:flame/extensions.dart';
 import 'package:flutter/material.dart';
 
 
@@ -26,7 +27,7 @@ class _ChatViewerPageState extends State<ChatViewerPage> {
   @override
   void initState() {        
     super.initState();
-    loadMessages();
+    //loadMessages();
   }
 
   //loads the user's chats
@@ -49,7 +50,7 @@ class _ChatViewerPageState extends State<ChatViewerPage> {
       message = "";
     });
     //calls loadMessages to update the visible history
-    loadMessages();
+    //loadMessages();
   }
 
   @override
@@ -131,26 +132,31 @@ class _ChatViewerPageState extends State<ChatViewerPage> {
                             return const Text("Waiting for chat to load...");
                           }
                           Map<String, dynamic> data = snapshot.data?.data() as Map<String, dynamic>;
+                          List<String> messagehistory = [];
+                          for (String key in data.keys){
+                            messagehistory.add(data[key]);
+                          }
+                          messagehistory.reverse();
                           return ListView.builder(
                             padding: const EdgeInsets.all(8),
                             reverse: true,
-                            itemCount: data.length,
+                            itemCount: messagehistory.length,
                             itemBuilder: (BuildContext context, int index){
                               return Container(
-                                alignment: data[index.toString()].startsWith("Support:") 
+                                alignment: messagehistory[index].startsWith("Support:") 
                                   ? Alignment.centerLeft 
                                   : Alignment.centerRight,
                               padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: data[index.toString()].startsWith("Support:") 
+                                  color: messagehistory[index].startsWith("Support:") 
                                       ? Colors.green[200] 
                                       : Colors.blue[200],
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                                 child: Text(
-                                  data[index.toString()],
+                                  messagehistory[index],
                                   style: const TextStyle(fontSize: 18),
                                 ),
                                 )  
@@ -164,9 +170,9 @@ class _ChatViewerPageState extends State<ChatViewerPage> {
                     // Text input
                     TextField(
                       onChanged: (value) {
-                        setState(() {
+                        //setState(() {
                           message = value;
-                        });
+                        //});
                       },
                       decoration: const InputDecoration(
                         hintText: 'Type your message...',
