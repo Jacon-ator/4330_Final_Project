@@ -135,6 +135,9 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       playerIndex = (playerIndex + 1) % gameState.players.length;
       gameState.players[playerIndex].isCurrentTurn = true;
     }
+    if (gameState.isGameOver) {
+      return;
+    }
     print('Next player is ${gameState.players[playerIndex].name}');
     await playerTurn();
   }
@@ -358,6 +361,9 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
 
   bool checkPotIsRight(List<Player> players) {
     List<Player> activePlayers = players.where((p) => !p.isFolded).toList();
+    if (activePlayers.length == 1) {
+      return true;
+    }
     for (var player in activePlayers) {
       if (player.hasPlayedThisRound == false) {
         print('${player.name} has not played this round. Pot is not right.');
