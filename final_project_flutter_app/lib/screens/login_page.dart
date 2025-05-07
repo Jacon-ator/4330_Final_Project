@@ -2,6 +2,7 @@ import 'package:final_project_flutter_app/audio/audio_manager.dart';
 import 'package:final_project_flutter_app/audio/sfx_manager.dart';
 import 'package:final_project_flutter_app/screens/signup_page.dart';
 import 'package:final_project_flutter_app/services/auth_service.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -32,8 +33,21 @@ class _LoginPageState extends State<LoginPage> {
   }
   
   Future<void> _initAudio() async {
-    await _audioManager.initialize();
-    await _audioManager.playMainTheme();
+    print('[LOGIN PAGE] Starting audio initialization');
+    try {
+      // First stop any currently playing audio to ensure a clean start
+      await FlameAudio.bgm.stop();
+      
+      // Initialize audio manager
+      await _audioManager.initialize();
+      
+      // Play the main theme
+      print('[LOGIN PAGE] Playing main theme');
+      await _audioManager.playMainTheme();
+      print('[LOGIN PAGE] Main theme started successfully');
+    } catch (e) {
+      print('[LOGIN PAGE] Error initializing audio: $e');
+    }
   }
 
   void _login() async {

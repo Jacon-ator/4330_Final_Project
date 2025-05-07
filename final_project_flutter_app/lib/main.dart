@@ -1,6 +1,7 @@
 import 'package:final_project_flutter_app/components/buttons/auth/profile_button.dart';
 import 'package:final_project_flutter_app/components/buttons/menu/chat_button.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
+import 'package:final_project_flutter_app/audio/audio_manager.dart';
 import 'package:final_project_flutter_app/screens/login_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -14,6 +15,12 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Flame.device.fullScreen();
   Flame.device.setLandscape();
+
+  // Initialize audio and play main theme at app startup
+  final audioManager = AudioManager();
+  await audioManager.initialize();
+  await audioManager.playMainTheme();
+  print('[AUDIO] Main theme started playing at app startup');
 
   // Firebase initialization
   await Firebase.initializeApp(
