@@ -55,8 +55,8 @@ class StartGameButton extends PositionComponent
     if (userData != null || FirebaseAuth.instance.currentUser == null) {
       super.onTapDown(event);
       _sfxManager.playButtonSelect();
-      // Navigate to the main menu screen when the button is tapped
-      gameRef.router.pushNamed('game');
+      // Navigate to the lobby screen when the button is tapped
+      gameRef.router.pushNamed('lobby');
     } else {
       print("User data is null. Cannot start game.");
     }

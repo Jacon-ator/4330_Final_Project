@@ -9,7 +9,15 @@ enum HandRank {
   flush,
   fullHouse,
   fourOfAKind,
-  straightFlush,
+  straightFlush;
+
+  static HandRank? fromString(String? value) {
+    if (value == null) return null;
+    return HandRank.values.firstWhere(
+      (rank) => rank.toString() == 'HandRank.$value',
+      orElse: () => HandRank.highCard,
+    );
+  }
 }
 //use the poker package to evaluate the hand
 

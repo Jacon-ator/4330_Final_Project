@@ -46,4 +46,21 @@ class PlayingCard {
         rank: poker.Rank.fromIndex(rank - 2),
         suit: poker.Suit.parse(suitMap[suit]!));
   }
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> placeHolder = {
+      "": "",
+    };
+    return placeHolder;
+  }
+
+  factory PlayingCard.fromJson(Map<String, dynamic> json) {
+    return PlayingCard(
+      suit: json['suit'] as String,
+      rank: json['rank'] as int,
+      position:
+          Vector2(json['position'][0] as double, json['position'][1] as double),
+      isFlipped: json['isFlipped'] as bool,
+    );
+  }
 }

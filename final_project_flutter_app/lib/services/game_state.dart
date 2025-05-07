@@ -6,9 +6,6 @@ import 'package:final_project_flutter_app/models/table.dart';
 class GameState {
   List<Player> players = [];
 
-  // not used
-  // int currentPlayerIndex = 0;
-
   List<PlayingCard> communityCards = [];
   Deck deck = Deck(name: "Standard Deck", cards: []);
 
@@ -21,7 +18,6 @@ class GameState {
 
   // (pre-flop: 0, flop: 1, turn: 2, river: 3)
   int round = 0;
-
   int pot = 0;
   int bigBlind = 25;
   int smallBlind = 10;
@@ -29,8 +25,21 @@ class GameState {
 
   bool isGameOver = false;
 
-  GameState();
-  bool initializePlayer(String playerName, bool isAI) {
+  GameState({
+    List<Player>? players,
+    List<PlayingCard>? communityCards,
+    this.round = 0,
+    this.pot = 0,
+    this.bigBlind = 25,
+    this.smallBlind = 10,
+    this.potIsRight = false,
+    this.isGameOver = false,
+  }) {
+    this.players = players ?? [];
+    this.communityCards = communityCards ?? [];
+  }
+
+  bool initializePlayer(String playerName, bool isAI, {String id = "0"}) {
     if (players.length >= table.totalCapacity) {
       print("Cannot add more players. Table is full.");
       return false;
@@ -38,8 +47,9 @@ class GameState {
 
     players.add(
       Player(
-        playerName,
-        1000,
+        id: id,
+        name: playerName,
+        balance: 1000,
         isAI: isAI,
       ),
     ); // Default balance of 1000
@@ -79,12 +89,8 @@ class GameState {
     }
   }
 
-  void rotateBlinds() {
-    players.add(players.removeAt(0)); // Move the first player to the end
-  }
-
   Player getCurrentPlayer() {
-    return players.firstWhere((player) => player.isCurrentTurn,
+    return players.firstWhere((player) => player.isCurrentTurn!,
         orElse: () => throw Exception("No current player found"));
   }
 }

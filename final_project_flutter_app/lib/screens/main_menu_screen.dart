@@ -9,7 +9,7 @@ class MainMenuScreen extends Component with HasGameRef<PokerParty> {
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    
+
     // Set the size of the main menu screen to fill the game window
     size = gameRef.size;
 

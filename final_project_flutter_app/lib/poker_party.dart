@@ -7,6 +7,7 @@ import 'package:final_project_flutter_app/services/game_state.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 
+import 'screens/lobby_screen.dart';
 import 'screens/main_menu_screen.dart';
 import 'screens/rules_screen.dart';
 import 'screens/support_screen.dart';
@@ -60,6 +61,7 @@ class PokerParty extends FlameGame {
       initialRoute: 'menu',
       routes: {
         'menu': Route(MainMenuScreen.new),
+        'lobby': Route(LobbyScreen.new),
         'rules': Route(RulesScreen.new),
         'game': Route(GameScreen.new),
         'support': Route(SupportScreen.new),
@@ -72,7 +74,7 @@ class PokerParty extends FlameGame {
 
   void goTo(String route) async {
     print('Navigating to route: $route');
-    
+
     // Handle theme switching based on route
     switch (route) {
       case 'shop':
@@ -95,7 +97,7 @@ class PokerParty extends FlameGame {
         print('No theme change for route: $route');
         break;
     }
-    
+
     // Only change route after audio is set up
     router.pushNamed(route);
   }

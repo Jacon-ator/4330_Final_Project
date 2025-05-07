@@ -130,7 +130,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
 
       print("Community cards dealt: ${gameState.communityCards.toString()}");
       print(
-          '${player.name} received cards: ${player.hand[0].toString()} and ${player.hand[1].toString()}');
+          '${player.name} received cards: ${player.hand![0].toString()} and ${player.hand![1].toString()}');
     }
   }
 
@@ -161,7 +161,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
 
     // This method will be called to start the player's turn.
     // It will show the action buttons and wait for player input.
-    if (currentPlayer.isFolded || currentPlayer.isAllIn) {
+    if (currentPlayer.isFolded! || currentPlayer.isAllIn!) {
       print(
           '${currentPlayer.name} has folded or cannot bet any more money. Skipping turn.');
       currentPlayer.isCurrentTurn = false; // End the current player's turn
@@ -174,7 +174,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     print(
         'Current player: ${currentPlayer.name} balance: ${currentPlayer.balance},amount to call: ${currentPlayer.getCallAmount(gameRef)}');
 
-    if (currentPlayer.isAI) {
+    if (currentPlayer.isAI!) {
       // If it's an AI player's turn, handle AI logic here
       print('AI Player ${currentPlayer.name}\'s turn.');
       endRoundIfFolded(currentPlayer);
@@ -209,7 +209,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     final double exportScale = 5; // your export scale factor
 
     final checkButton = ActionButton('Check', () async {
-      if (!gameState.isGameOver && player.isCurrentTurn) {
+      if (!gameState.isGameOver && player.isCurrentTurn!) {
         print('${player.name} checked!');
         player.hasPlayedThisRound = true; // Mark as played this round
 
@@ -227,7 +227,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     final callButton = ActionButton(
       'Call',
       () async {
-        if (!gameState.isGameOver && player.isCurrentTurn) {
+        if (!gameState.isGameOver && player.isCurrentTurn!) {
           print('${player.name} called!');
           int bet = player.call(gameRef);
           gameState.pot += bet; // Add the bet to the pot
@@ -255,7 +255,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     final foldButton = ActionButton(
       'Fold',
       () async {
-        if (!gameState.isGameOver && player.isCurrentTurn) {
+        if (!gameState.isGameOver && player.isCurrentTurn!) {
           print('${player.name} folded!');
           player.fold();
           player.hasPlayedThisRound = true; // Mark as played this round
@@ -280,7 +280,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     final raiseButton = ActionButton(
       'Raise',
       () async {
-        if (!gameState.isGameOver && player.isCurrentTurn) {
+        if (!gameState.isGameOver && player.isCurrentTurn!) {
           int bet = await showSlider();
           print('${player.name} raised to $bet!');
           gameState.pot += bet; // Add the bet to the pot
@@ -332,7 +332,8 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
   }
 
   void updateHandUI(Player player, int index) {
-    if (index >= player.hand.length) {
+    print('Updating hand UI for player: ${player.name}, card index: $index');
+    if (index >= player.hand!.length) {
       print('Error: Card index out of bounds');
       return;
     }
@@ -346,7 +347,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
 
     // Create the card component
     final cardComponent = CardComponent(
-      card: player.hand[index],
+      card: player.hand![index],
     );
 
     // Add the card to the HandArea instead of directly to the screen
@@ -356,7 +357,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
   int checkFolds() {
     int foldCount = 0;
     for (Player player in gameState.players) {
-      if (player.isFolded) {
+      if (player.isFolded!) {
         foldCount++;
       }
     }
@@ -373,7 +374,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
   }
 
   bool checkPotIsRight(List<Player> players) {
-    List<Player> activePlayers = players.where((p) => !p.isFolded).toList();
+    List<Player> activePlayers = players.where((p) => !p.isFolded!).toList();
     if (activePlayers.length == 1) {
       return true;
     }
@@ -437,7 +438,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
               .addCard(card, i, gameRef); // Add the card to the community area
         }
         break;
-      case 4: // End of game
+      default: // End of game
         Player winner = determineWinner();
         winner.balance += gameState.pot; // Add the pot to the winner's balance
         gameState.isGameOver = true; // Set the game state to over
@@ -464,9 +465,9 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
         add(playAgainButton);
 
         break;
-      default:
-        print('Invalid round number: $round');
-        break;
+      // default:
+      //   print('Invalid round number: $round');
+      //   break;
     }
   }
 
@@ -483,7 +484,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       HandRank.straightFlush: 9,
     };
     List<Player> contenders =
-        gameState.players.where((p) => !p.isFolded).toList();
+        gameState.players.where((p) => !p.isFolded!).toList();
 
     if (contenders.length == 1) {
       print(
@@ -493,7 +494,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
 
     for (Player contender in contenders) {
       contender.handRank = cardEvaluator
-          .bestOfSeven([...contender.hand, ...gameState.communityCards]);
+          .bestOfSeven([...contender.hand!, ...gameState.communityCards]);
       print(
           '${contender.name} has a ${contender.handRank.toString()} with hand: ${contender.hand}');
     }
