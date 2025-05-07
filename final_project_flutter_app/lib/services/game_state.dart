@@ -35,6 +35,8 @@ class GameState {
     this.smallBlind = 10,
     this.potIsRight = false,
     this.isGameOver = false,
+    this.playerIndex = 0,
+    this.dealerIndex = -1,
   }) {
     this.players = players ?? [];
     this.communityCards = communityCards ?? [];
@@ -93,5 +95,41 @@ class GameState {
   Player getCurrentPlayer() {
     return players.firstWhere((player) => player.isCurrentTurn!,
         orElse: () => throw Exception("No current player found"));
+  }
+
+  // FIREBASE FUNCTIONS
+
+  factory GameState.fromJson(Map<String, dynamic> json) {
+    return GameState(
+      players: (json['players'] as List<dynamic>)
+          .map((playerJson) => Player.fromJson(playerJson))
+          .toList(),
+      communityCards: (json['communityCards'] as List<dynamic>)
+          .map((cardJson) => PlayingCard.fromJson(cardJson))
+          .toList(),
+      round: json['round'] ?? 0,
+      pot: json['pot'] ?? 0,
+      bigBlind: json['bigBlind'] ?? 25,
+      smallBlind: json['smallBlind'] ?? 10,
+      potIsRight: json['potIsRight'] ?? false,
+      isGameOver: json['isGameOver'] ?? false,
+      playerIndex: json['playerIndex'] ?? 0,
+      dealerIndex: json['dealerIndex'] ?? -1,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'players': players.map((player) => player.toJson()).toList(),
+      'communityCards': communityCards.map((card) => card.toJson()).toList(),
+      'round': round,
+      'pot': pot,
+      'bigBlind': bigBlind,
+      'smallBlind': smallBlind,
+      'potIsRight': potIsRight,
+      'isGameOver': isGameOver,
+      'playerIndex': playerIndex,
+      'dealerIndex': dealerIndex,
+    };
   }
 }
