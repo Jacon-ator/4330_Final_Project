@@ -100,6 +100,11 @@ class LobbyScreenService {
           return true;
         }
 
+        if (gameState.isLobbyActive) {
+          print("The game is currently playing. Please wait.");
+          return false;
+        }
+
         gameState.addPlayer(player);
         await _firestore
             .collection("games")
@@ -138,5 +143,27 @@ class LobbyScreenService {
       print("Error removing player from lobby: $e");
     }
     return -1;
+  }
+
+  Future<void> startLobby() async {
+    try {
+      final gameRef =
+          await _firestore.collection("games").doc("primary_game").get();
+
+      if (gameRef.exists) {
+        GameState gameState = GameState.fromJson(gameRef.data()!);
+
+        gameState.isLobbyActive = true;
+
+        await _firestore
+            .collection("games")
+            .doc("primary_game")
+            .set(gameState.toJson());
+      } else {
+        print("Game does not exist.");
+      }
+    } catch (e) {
+      print("Error starting lobby: $e");
+    }
   }
 }

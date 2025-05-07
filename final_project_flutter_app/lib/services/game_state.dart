@@ -23,7 +23,7 @@ class GameState {
   int bigBlind = 25;
   int smallBlind = 10;
   bool potIsRight = false;
-
+  bool isLobbyActive = false;
   bool isGameOver = false;
 
   GameState({
@@ -34,6 +34,7 @@ class GameState {
     this.bigBlind = 25,
     this.smallBlind = 10,
     this.potIsRight = false,
+    this.isLobbyActive = false,
     this.isGameOver = false,
     this.playerIndex = 0,
     this.dealerIndex = -1,
