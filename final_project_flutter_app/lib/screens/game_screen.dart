@@ -89,9 +89,8 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
 
     // Adds the player profile icon
     final ProfilePicture profilePicture = ProfilePicture()
-      ..size = Vector2(gameRef.size.x / 6, gameRef.size.y / 6)
-      ..position = Vector2(
-          gameRef.size.x / 2 - gameRef.size.x / 12, gameRef.size.y * 0.8);
+      ..size = Vector2(20 * 5.2, 27 * 5.76)
+      ..position = Vector2(1150, 523);
 
     // Add the components
     add(pokerTable);

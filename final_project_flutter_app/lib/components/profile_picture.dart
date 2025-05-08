@@ -10,7 +10,7 @@ class ProfilePicture extends PositionComponent
   Sprite? sprite;
   @override
   Future<void> onLoad() async {
-    double exportScale = 5;
+    double exportScale = 6;
     await super.onLoad();
     final image = await gameRef.images.load("art/Player Cards.png");
     sprite = Sprite(
@@ -20,10 +20,6 @@ class ProfilePicture extends PositionComponent
       srcSize: Vector2(20 * exportScale,
           27 * exportScale), // change width and height as needed
     );
-
-    if (sprite != null) {
-      size = sprite!.srcSize;
-    }
   }
 
   @override
