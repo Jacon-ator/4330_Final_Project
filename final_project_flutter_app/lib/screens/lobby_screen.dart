@@ -1,8 +1,7 @@
 import 'dart:async';
 
-import 'package:final_project_flutter_app/components/buttons/menu/back_button.dart'
-    as backbutton;
 import 'package:final_project_flutter_app/components/buttons/menu/start_match_button.dart';
+import 'package:final_project_flutter_app/components/components.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:final_project_flutter_app/services/lobby_screen_service.dart';
 import 'package:flame/components.dart';
@@ -72,11 +71,12 @@ class LobbyScreen extends Component with HasGameRef<PokerParty> {
     );
     add(startMatchButton);
 
-    // Add back button
-    final backButton = backbutton.BackButton(
-      position: Vector2(50, gameRef.size.y - 50),
-    );
-    add(backButton);
+    final MainMenuButton mainMenuButton = MainMenuButton()
+      ..size = Vector2(gameRef.size.x / 6, gameRef.size.y / 6)
+      ..position = Vector2(
+          gameRef.size.x / 2 - gameRef.size.x / 12, gameRef.size.y * 0.65);
+
+    add(mainMenuButton);
   }
 
   @override
