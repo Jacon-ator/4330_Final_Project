@@ -135,6 +135,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
           }
         }
       });
+
       _updateGameStateInFirebase();
     }
   }
