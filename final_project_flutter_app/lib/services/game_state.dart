@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project_flutter_app/models/card.dart';
 import 'package:final_project_flutter_app/models/deck.dart';
 import 'package:final_project_flutter_app/models/player.dart';
@@ -43,6 +44,70 @@ class GameState {
     this.communityCards = communityCards ?? [];
   }
 
+  // Add this to your GameState class
+  Future<bool> initializePlayersFromLobby(FirebaseFirestore firestore) async {
+    try {
+      // Get the primary game document from Firestore
+      final gameRef =
+          await firestore.collection("games").doc("primary_game").get();
+
+      if (!gameRef.exists) {
+        print("No lobby found to initialize players from.");
+        return false;
+      }
+
+      // Parse the lobby data
+      final lobbyData = gameRef.data()!;
+
+      // Check if we have players in the lobby
+      if (!lobbyData.containsKey('players') ||
+          (lobbyData['players'] as List).isEmpty) {
+        print("No players found in the lobby.");
+        return false;
+      }
+
+      // Clear existing players
+      players.clear();
+
+      // Convert and add each player from the lobby
+      List<dynamic> lobbyPlayers = lobbyData['players'];
+      for (var playerData in lobbyPlayers) {
+        Player player = Player.fromJson(playerData);
+        players.add(player);
+
+        print(
+            "Initialized player: ${player.name} with balance: ${player.balance}");
+      }
+
+      // If we need AI players to fill the table
+      if (players.length < table.totalCapacity) {
+        int aiCount = table.totalCapacity - players.length;
+        print("Adding $aiCount AI players to fill the table");
+
+        for (int i = 0; i < aiCount; i++) {
+          initializePlayer("AI_Player_${i + 1}", true, id: "ai_${i + 1}");
+        }
+      }
+
+      // Reset all player states for game start
+      for (var player in players) {
+        player.resetHand();
+        player.isCurrentTurn = false;
+        player.hasPlayedThisRound = false;
+      }
+
+      // Set the first player's turn if needed
+      if (players.isNotEmpty) {
+        players[0].isCurrentTurn = true;
+      }
+
+      return true;
+    } catch (e) {
+      print("Error initializing players from lobby: $e");
+      return false;
+    }
+  }
+
   bool initializePlayer(String playerName, bool isAI, {String id = "0"}) {
     if (players.length >= table.totalCapacity) {
       print("Cannot add more players. Table is full.");
@@ -61,6 +126,14 @@ class GameState {
     return true;
   }
 
+  // void initializeAI() {
+  //   int i = 0;
+  //   while (i != table.totalCapacity - players.length) {
+  //     initializePlayer("AI_player_$i+1", isAI);
+  //     i++;
+  //   }
+  // }
+
   void resetGame() {
     print("Resetting game state...");
     // Initialize the game state with default values
@@ -77,14 +150,6 @@ class GameState {
     pot = 0;
     round = 0;
     isGameOver = false;
-  }
-
-  void initializeAI() {
-    for (int i = 0; i < 4; i++) {
-      bool isAI = i == 0 ? false : true; // First player is human, others are
-      initializePlayer("player_$i", isAI);
-    }
-    players[0].isCurrentTurn = true; // Set the first player as current turn
   }
 
   Player getCurrentPlayer() {

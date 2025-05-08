@@ -96,7 +96,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     add(CommunityCardArea());
 
     print("Starting game...");
-    gameState.initializeAI();
+    await gameState.initializePlayersFromLobby(FirebaseFirestore.instance);
     await startGame();
 
     // Listen for game state changes from other players
@@ -118,13 +118,11 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
         // If it's not this player's turn, update the local game state
         if (!currentPlayer.isCurrentTurn!) {
           gameState = remoteGameState;
-          updateUI();
+          // updateUI();
         }
       }
     });
 
-    gameState.players[0].isCurrentTurn =
-        true; // Set the first player as current turn
     _updateGameStateInFirebase();
   }
 
@@ -376,46 +374,46 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     await _updateGameStateInFirebase();
   }
 
-  void updateUI() {
-    // Update the UI based on the current game state
-    // Clear existing UI elements
-    children.whereType<ActionButton>().forEach(remove);
+  // void updateUI() {
+  //   // Update the UI based on the current game state
+  //   // Clear existing UI elements
+  //   children.whereType<ActionButton>().forEach(remove);
 
-    // Update hand display
-    final handArea = children.whereType<HandArea>().firstOrNull;
-    if (handArea != null) {
-      handArea.clearCards();
-      // Display the current player's cards
-      final currentPlayerId = FirebaseAuth.instance.currentUser?.uid;
-      Player? currentPlayer = gameState.players.firstWhere(
-        (p) => p.id == currentPlayerId,
-      );
+  //   // Update hand display
+  //   final handArea = children.whereType<HandArea>().firstOrNull;
+  //   if (handArea != null) {
+  //     handArea.clearCards();
+  //     // Display the current player's cards
+  //     final currentPlayerId = FirebaseAuth.instance.currentUser?.uid;
+  //     Player? currentPlayer = gameState.players.firstWhere(
+  //       (p) => p.id == currentPlayerId,
+  //     );
 
-      if (currentPlayer.hand != null) {
-        updateHandUI(currentPlayer, 0);
-        updateHandUI(currentPlayer, 1);
-      }
-    }
+  //     if (currentPlayer.hand != null) {
+  //       updateHandUI(currentPlayer, 0);
+  //       updateHandUI(currentPlayer, 1);
+  //     }
+  //   }
 
-    // Update community cards
-    final communityCardArea =
-        children.whereType<CommunityCardArea>().firstOrNull;
-    if (communityCardArea != null) {
-      communityCardArea.clearCards();
+  //   // Update community cards
+  //   final communityCardArea =
+  //       children.whereType<CommunityCardArea>().firstOrNull;
+  //   if (communityCardArea != null) {
+  //     communityCardArea.clearCards();
 
-      for (int i = 0; i < gameState.communityCards.length; i++) {
-        communityCardArea.addCard(gameState.communityCards[i], i, gameRef);
-      }
-    }
+  //     for (int i = 0; i < gameState.communityCards.length; i++) {
+  //       communityCardArea.addCard(gameState.communityCards[i], i, gameRef);
+  //     }
+  //   }
 
-    // If it's the current player's turn, show action buttons
-    final currentPlayerId = FirebaseAuth.instance.currentUser?.uid;
-    final currentPlayer = gameState.players.firstWhere(
-      (p) => p.id == currentPlayerId && p.isCurrentTurn!,
-    );
+  //   // If it's the current player's turn, show action buttons
+  //   final currentPlayerId = FirebaseAuth.instance.currentUser?.uid;
+  //   final currentPlayer = gameState.players.firstWhere(
+  //     (p) => p.id == currentPlayerId && p.isCurrentTurn!,
+  //   );
 
-    showPlayerActions(currentPlayer);
-  }
+  //   showPlayerActions(currentPlayer);
+  // }
 
   void updateHandUI(Player player, int index) {
     print('Updating hand UI for player: ${player.name}, card index: $index');

@@ -15,7 +15,7 @@ class Player {
   bool? isFolded = false; // Flag to indicate if the player has folded
   HandRank? handRank = HandRank.none; // Default hand rank
   bool? isAllIn = false; // Flag to indicate if the player is all-in
-  bool hasPlayedThisRound = false;
+  bool? hasPlayedThisRound = false;
 
   Player({
     required this.id,
@@ -25,6 +25,7 @@ class Player {
     this.hand,
     this.isAI,
     this.isCurrentTurn,
+    this.hasPlayedThisRound = false,
     this.isFolded,
     this.handRank,
     this.isAllIn,
@@ -146,6 +147,7 @@ class Player {
           .toList(),
       isAI: json['isAI'] as bool?,
       isCurrentTurn: json['isCurrentTurn'] as bool?,
+      hasPlayedThisRound: json['hasPlayedThisRound'] as bool?,
       isFolded: json['isFolded'] as bool?,
       handRank: HandRank.fromString(json['handRank'] as String?),
       isAllIn: json['isAllIn'] as bool?,
@@ -161,6 +163,7 @@ class Player {
       'hand': hand?.map((card) => card.toJson()).toList(),
       'isAI': isAI,
       'isCurrentTurn': isCurrentTurn,
+      'hasPlayedThisRound': hasPlayedThisRound,
       'isFolded': isFolded,
       'handRank': handRank?.toString() ?? 'none',
       'isAllIn': isAllIn,
