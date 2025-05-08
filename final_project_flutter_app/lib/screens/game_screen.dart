@@ -128,6 +128,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
 
   Future<void> startGame() async {
     gameState.resetGame();
+    await _updateGameStateInFirebase();
     gameState.dealerIndex = (gameState.dealerIndex + 1) %
         gameState.players.length; // Move to the next dealer
 
@@ -147,11 +148,11 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     gameState.playerIndex = gameState.dealerIndex;
 
     await _updateGameStateInFirebase();
-    await playerTurn();
+    await playerTurn(gameState.players[gameState.playerIndex]);
   }
 
   Future<void> dealCards() async {
-    gameState.deck.shuffleDeck();
+    // gameState.deck.shuffleDeck();
 
     for (Player player in gameState.players) {
       player.receiveCard(gameState.deck.dealCard());
@@ -182,16 +183,16 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       gameState.players[gameState.playerIndex].isCurrentTurn = true;
     }
     if (gameState.isGameOver) {
+      await _updateGameStateInFirebase();
       return;
     }
     print('Next player is ${gameState.players[gameState.playerIndex].name}');
     await _updateGameStateInFirebase();
-    await playerTurn();
+    await playerTurn(gameState.players[gameState.playerIndex]);
   }
 
-  Future<void> playerTurn() async {
+  Future<void> playerTurn(Player currentPlayer) async {
     // Set the first player as current turn
-    Player currentPlayer = gameRef.gameState.players[gameState.playerIndex];
 
     // This method will be called to start the player's turn.
     // It will show the action buttons and wait for player input.
@@ -215,13 +216,14 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       await endRoundIfFolded(currentPlayer);
       int amountToCall = currentPlayer.getCallAmount(gameRef);
       int amount = await currentPlayer.makeAIDecision(gameRef);
+      currentPlayer.hasPlayedThisRound = true; // Mark as played this round
       if (amount > amountToCall) {
         await resetTurnsOnRaise(currentPlayer);
       }
       gameRef.gameState.pot += amount; // Add the bet to the pot
       currentPlayer.isCurrentTurn = false; // End AI turn after decision
-      await endRoundIfFolded(currentPlayer);
       await _updateGameStateInFirebase();
+      await endRoundIfFolded(currentPlayer);
 
       await nextPlayer(); // Move to the next player
     } else {
@@ -485,6 +487,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       player.hasPlayedThisRound =
           false; // Reset the played status for all players
     }
+    await _updateGameStateInFirebase();
 
     switch (round) {
       case 0: // Pre-flop

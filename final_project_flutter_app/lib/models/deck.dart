@@ -51,10 +51,29 @@ class Deck {
   }
 
   PlayingCard dealCard() {
+    if (cards.isEmpty) {
+      throw Exception("No cards left in the deck.");
+    }
     if (!isShuffled) {
       shuffleDeck();
     }
     return cards.removeLast();
+  }
+
+  static Deck fromJson(Map<String, dynamic> json) {
+    return Deck(
+      name: json['name'] as String,
+      cards: (json['cards'] as List<dynamic>)
+          .map((card) => PlayingCard.fromJson(card))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'cards': cards.map((card) => card.toJson()).toList(),
+    };
   }
 
   void resetDeck() {

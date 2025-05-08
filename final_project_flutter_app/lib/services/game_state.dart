@@ -30,6 +30,7 @@ class GameState {
   GameState({
     List<Player>? players,
     List<PlayingCard>? communityCards,
+    Deck? deck,
     this.round = 0,
     this.pot = 0,
     this.bigBlind = 25,
@@ -164,6 +165,7 @@ class GameState {
       players: (json['players'] as List<dynamic>)
           .map((playerJson) => Player.fromJson(playerJson))
           .toList(),
+      deck: Deck.fromJson(json['deck']),
       communityCards: (json['communityCards'] as List<dynamic>)
           .map((cardJson) => PlayingCard.fromJson(cardJson))
           .toList(),
@@ -182,6 +184,7 @@ class GameState {
     return {
       'players': players.map((player) => player.toJson()).toList(),
       'communityCards': communityCards.map((card) => card.toJson()).toList(),
+      'deck': deck.toJson(),
       'round': round,
       'pot': pot,
       'bigBlind': bigBlind,

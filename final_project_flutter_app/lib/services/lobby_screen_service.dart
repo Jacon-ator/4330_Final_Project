@@ -65,6 +65,7 @@ class LobbyScreenService {
           balance: 1000,
           isAI: false,
           isCurrentTurn: false,
+          hasPlayedThisRound: false,
           isFolded: false,
           handRank: null,
           isAllIn: false,
