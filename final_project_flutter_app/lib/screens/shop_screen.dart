@@ -10,6 +10,7 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
   static bool ownsCardSkin = false;
   static bool ownsTableSkin = false;
   static int coinBalance = 0;
+  static late TextComponent coinText; //use static for testing add_coins_button (can remove if app is done testing? or just use for demo)
   late userData? currentUser;
 
   @override
@@ -53,15 +54,36 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
       ..size = Vector2(160, 50)
       ..position = Vector2(size.x / 2 - 80, size.y * 0.7);
 
+    coinText = TextComponent(
+      text: 'Coins: ${ShopScreen.coinBalance}',
+      textRenderer: TextPaint(
+        style: const TextStyle(
+          fontFamily: 'RedAlert',    // pixel font
+          fontSize: 24,
+          color: Colors.amber,
+          shadows: [
+            Shadow(
+              offset: Offset(1, 1),  // Slight offset for pixel shadow
+              color: Colors.black,   
+              blurRadius: 0,         
+            ),
+          ],
+        ),
+      ),
+      position: Vector2(size.x - 100, 10), 
+    );
+
     add(mainMenuButton);
     add(buyCardButton);
     add(buyTableSkinButton);
     add(addCoinsButton);
+    add(coinText);
   }
 
   void buyTableSkin() {
     if (!ownsTableSkin && coinBalance >= 1000) {
       coinBalance -= 1000;
+      coinText.text = 'Coins: $coinBalance';
       ownsTableSkin = true;
 
       // Update Firestore
@@ -79,6 +101,7 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
   void buyCardSkin() {
     if (!ownsCardSkin && coinBalance >= 500) {
       coinBalance -= 500;
+      coinText.text = 'Coins: $coinBalance';
       ownsCardSkin = true;
 
       // Update Firestore
@@ -96,8 +119,6 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    final paint = Paint()..color = const Color(0xFF000000);
-    canvas.drawRect(size.toRect(), paint);
 
     // Title
     final titleText = TextPainter(
@@ -127,18 +148,9 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
       textDirection: TextDirection.ltr,
     );
 
-    final coinText = TextPainter(
-      text: TextSpan(
-        text: 'Coins: ${ShopScreen.coinBalance}',
-        style: const TextStyle(color: Colors.yellow, fontSize: 20),
-      ),
-      textDirection: TextDirection.ltr,
-    );
-
     titleText.layout();
     cardSkinText.layout();
     tableSkinText.layout();
-    coinText.layout();
 
     // Title
     titleText.paint(
@@ -164,7 +176,5 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
         size.y * 0.5,
       ),
     );
-
-    coinText.paint(canvas, const Offset(20, 20));
   }
 }

@@ -39,3 +39,8 @@ flutter:
     - assets/audio/music/
     - assets/audio/sfx/
     - assets/audio/sfx/General_SFX/
+
+  fonts:
+    - family: RedAlert
+      fonts:
+        - asset: assets/fonts/C&C Red Alert [INET].ttf
