@@ -10,7 +10,8 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
   static bool ownsCardSkin = false;
   static bool ownsTableSkin = false;
   static int coinBalance = 0;
-  static late TextComponent coinText; //use static for testing add_coins_button (can remove if app is done testing? or just use for demo)
+  static late TextComponent coinTextOutline,
+      coinTextFill; //use static for testing add_coins_button (can remove if app is done testing? or just use for demo)
   late userData? currentUser;
 
   @override
@@ -30,8 +31,8 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
     // Load user data
     final db = DatabaseService();
     currentUser = await db.getUserData();
-    ShopScreen.coinBalance = currentUser?.coins ?? 0;
-    ShopScreen.ownsCardSkin = currentUser?.ownCardSkin ?? false;
+    coinBalance = currentUser?.coins ?? 0;
+    ownsCardSkin = currentUser?.ownCardSkin ?? false;
     ShopScreen.ownsTableSkin = currentUser?.ownTableSkin ?? false;
 
     print("User coins: ${ShopScreen.coinBalance}");
@@ -42,48 +43,72 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
       ..size = Vector2(size.x / 6, size.y / 6)
       ..position = Vector2(size.x / 2 - size.x / 12, size.y * 0.8);
 
-    final BuyCardButton buyCardButton = BuyCardButton()
+    final BuyPokemonCardButton buyPokemonCardButton = BuyPokemonCardButton()
       ..size = Vector2(size.x / 3.5, 60)
-      ..position = Vector2(size.x / 2 - size.x / 3, size.y * 0.55);
+      ..position = Vector2(110, size.y * 0.25);
 
-    final BuyTableSkinButton buyTableSkinButton = BuyTableSkinButton()
+    final BuyMagicCardButton buyMagicCardButton = BuyMagicCardButton()
       ..size = Vector2(size.x / 3.5, 60)
-      ..position = Vector2(size.x / 2 + size.x / 20, size.y * 0.55);
+      ..position = Vector2(250, size.y * 0.25);
+
+    final BuyRedTableSkinButton buyRedTableSkinButton = BuyRedTableSkinButton()
+      ..size = Vector2(size.x / 3.5, 60)
+      ..position = Vector2(935, size.y * 0.25);
+
+    final BuyPurpleTableSkinButton buyPurpleTableSkinButton =
+        BuyPurpleTableSkinButton()
+          ..size = Vector2(size.x / 3.5, 60)
+          ..position = Vector2(1060, size.y * 0.25);
 
     final AddCoinsButton addCoinsButton = AddCoinsButton()
       ..size = Vector2(160, 50)
-      ..position = Vector2(size.x / 2 - 80, size.y * 0.7);
+      ..position = Vector2(145, size.y * 0.825);
 
-    coinText = TextComponent(
+    ShopScreen.coinTextOutline = TextComponent(
+      text: 'Coins: ${ShopScreen.coinBalance}',
+      textRenderer: TextPaint(
+        style: TextStyle(
+          fontFamily: 'RedAlert', // pixel font
+          fontSize: 48,
+          foreground: Paint()
+            ..style = PaintingStyle.stroke // Set to stroke
+            ..strokeWidth = 5 // Adjust outline thickness as needed
+            ..color = const Color.fromARGB(255, 118, 161, 93), // Outline color
+        ),
+      ),
+      position: Vector2(size.x / 2, 10),
+      anchor: Anchor.topCenter,
+    );
+
+    // Initialize Fill Text Component
+    ShopScreen.coinTextFill = TextComponent(
       text: 'Coins: ${ShopScreen.coinBalance}',
       textRenderer: TextPaint(
         style: const TextStyle(
-          fontFamily: 'RedAlert',    // pixel font
-          fontSize: 24,
-          color: Colors.amber,
-          shadows: [
-            Shadow(
-              offset: Offset(1, 1),  // Slight offset for pixel shadow
-              color: Colors.black,   
-              blurRadius: 0,         
-            ),
-          ],
+          fontFamily: 'RedAlert', // pixel font
+          fontSize: 48,
+          color: Color.fromARGB(255, 70, 130, 50), // Fill color
         ),
       ),
-      position: Vector2(size.x - 100, 10), 
+      position: Vector2(size.x / 2, 10),
+      anchor: Anchor.topCenter,
     );
 
     add(mainMenuButton);
-    add(buyCardButton);
-    add(buyTableSkinButton);
+    add(buyPokemonCardButton);
+    add(buyMagicCardButton);
+    add(buyRedTableSkinButton);
+    add(buyPurpleTableSkinButton);
     add(addCoinsButton);
-    add(coinText);
+    add(coinTextOutline);
+    add(coinTextFill);
   }
 
-  void buyTableSkin() {
+  void buyRedTableSkin() {
     if (!ownsTableSkin && coinBalance >= 1000) {
       coinBalance -= 1000;
-      coinText.text = 'Coins: $coinBalance';
+      coinTextOutline.text = 'Coins: $coinBalance';
+      coinTextFill.text = 'Coins: $coinBalance';
       ownsTableSkin = true;
 
       // Update Firestore
@@ -98,10 +123,49 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
     }
   }
 
-  void buyCardSkin() {
+  void buyPurpleTableSkin() {
+    if (!ownsTableSkin && coinBalance >= 1000) {
+      coinBalance -= 1000;
+      coinTextOutline.text = 'Coins: $coinBalance';
+      coinTextFill.text = 'Coins: $coinBalance';
+      ownsTableSkin = true;
+
+      // Update Firestore
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser?.email) // use the email from currentUser
+          .update({"Coins": coinBalance, "ownTableSkin": true});
+
+      print("Table skin purchased!");
+    } else {
+      print("Not enough coins or already owned.");
+    }
+  }
+
+  void buyPokemonCardSkin() {
+    if (!ownsCardSkin && coinBalance >= 200) {
+      coinBalance -= 200;
+      coinTextOutline.text = 'Coins: $coinBalance';
+      coinTextFill.text = 'Coins: $coinBalance';
+      ownsCardSkin = true;
+
+      // Update Firestore
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser?.email)
+          .update({"Coins": coinBalance, "ownCardSkin": true});
+
+      print("Card skin purchased!");
+    } else {
+      print("Not enough coins or already owned.");
+    }
+  }
+
+  void buyMagicCardSkin() {
     if (!ownsCardSkin && coinBalance >= 500) {
       coinBalance -= 500;
-      coinText.text = 'Coins: $coinBalance';
+      coinTextOutline.text = 'Coins: $coinBalance';
+      coinTextFill.text = 'Coins: $coinBalance';
       ownsCardSkin = true;
 
       // Update Firestore

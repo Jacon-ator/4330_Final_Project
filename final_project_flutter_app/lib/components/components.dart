@@ -6,10 +6,12 @@ export 'buttons/menu/shop_button.dart';
 export 'buttons/menu/start_game_button.dart';
 export 'buttons/menu/support_button.dart';
 export 'buttons/shop/add_coins_button.dart';
-export 'buttons/shop/buy_card_button.dart';
-export 'buttons/shop/buy_table_skin_button.dart';
+export 'buttons/shop/buy_magic_card_button.dart';
+export 'buttons/shop/buy_pokemon_card_button.dart';
+export 'buttons/shop/buy_purple_table_skin_button.dart';
+export 'buttons/shop/buy_red_table_skin_button.dart';
 export 'card_component.dart';
 export 'community_card_area.dart';
 export 'hand_area.dart';
 export 'volume_control.dart';
-
+export 'profile_picture.dart';

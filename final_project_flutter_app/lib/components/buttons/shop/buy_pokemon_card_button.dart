@@ -1,12 +1,14 @@
+import 'package:final_project_flutter_app/audio/sfx_manager.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
+import 'package:final_project_flutter_app/screens/shop_screen.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 
-class ShopButton extends PositionComponent
+class BuyPokemonCardButton extends PositionComponent
     with TapCallbacks, HasGameRef<PokerParty> {
+  final SFXManager _sfxManager = SFXManager();
   Sprite? sprite;
-
   @override
   Future<void> onLoad() async {
     double exportScale = 5;
@@ -16,19 +18,14 @@ class ShopButton extends PositionComponent
         await gameRef.images.load("art/buttons/Master Button Sheet.png");
     sprite = Sprite(
       image,
-      srcPosition: Vector2(69 * exportScale,
-          76 * exportScale), // multiplied original coordinates
-      srcSize: Vector2(67 * exportScale,
-          13 * exportScale), // change width and height as needed
+      srcPosition: Vector2(
+          96 * exportScale, 0 * exportScale), // multiplied original coordinates
+      srcSize: Vector2(17 * exportScale,
+          9 * exportScale), // change width and height as needed
     );
 
     if (sprite != null) {
       size = sprite!.srcSize;
-
-      position = Vector2(
-        gameRef.size.x / 2 - size.x / 2,
-        (gameRef.size.y / 2 - size.y / 2) - yPositionOffset * -3,
-      );
     }
   }
 
@@ -42,6 +39,9 @@ class ShopButton extends PositionComponent
 
   @override
   void onTapDown(TapDownEvent event) {
-    gameRef.goTo('shop');
+    super.onTapDown(event);
+    _sfxManager.playButtonSelect();
+    final shop = parent as ShopScreen;
+    shop.buyPokemonCardSkin();
   }
 }
