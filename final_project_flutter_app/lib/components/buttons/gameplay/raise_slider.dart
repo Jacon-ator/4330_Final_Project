@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 class RaiseSlider extends StatefulWidget {
   final int minRaise;
   final int maxRaise;
-  final int currentChips;
+  final int balance;
   final ValueChanged<int> onChanged;
 
   const RaiseSlider({
     super.key,
     required this.minRaise,
     required this.maxRaise,
-    required this.currentChips,
+    required this.balance,
     required this.onChanged,
   });
 
@@ -69,7 +69,7 @@ class _RaiseSliderState extends State<RaiseSlider> {
                 style: TextStyle(color: Color(0xFFF1E4C3))),
             Text('Max: \$${widget.maxRaise}',
                 style: TextStyle(color: Color(0xFFF1E4C3))),
-            Text('You: \$${widget.currentChips}',
+            Text('You: \$${widget.balance}',
                 style: TextStyle(color: Color(0xFFF1E4C3))),
           ],
         ),

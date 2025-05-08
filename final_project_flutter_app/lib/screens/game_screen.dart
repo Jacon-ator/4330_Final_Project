@@ -652,8 +652,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
                   minRaise: gameState.players[gameState.playerIndex]
                       .getCallAmount(gameRef),
                   maxRaise: gameState.players[gameState.playerIndex].balance,
-                  currentChips:
-                      gameState.players[gameState.playerIndex].balance,
+                  balance: gameState.players[gameState.playerIndex].balance,
                   onChanged: (int value) {
                     selectedValue = value;
                   },
