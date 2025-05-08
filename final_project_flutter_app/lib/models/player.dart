@@ -15,7 +15,7 @@ class Player {
   bool? isFolded = false; // Flag to indicate if the player has folded
   HandRank? handRank = HandRank.none; // Default hand rank
   bool? isAllIn = false; // Flag to indicate if the player is all-in
-  bool? hasPlayedThisRound = false;
+  late bool? hasPlayedThisRound;
 
   Player({
     required this.id,
@@ -25,7 +25,7 @@ class Player {
     this.hand,
     this.isAI,
     this.isCurrentTurn,
-    this.hasPlayedThisRound = false,
+    this.hasPlayedThisRound,
     this.isFolded,
     this.handRank,
     this.isAllIn,
@@ -35,6 +35,7 @@ class Player {
     isCurrentTurn ??= false; // Default to false if not provided
     isFolded ??= false; // Default to false if not provided
     isAllIn ??= false; // Default to false if not provided
+    hasPlayedThisRound ??= false; // Default to false if not provided
   }
 
   void resetHand() {

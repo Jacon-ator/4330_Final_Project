@@ -30,6 +30,7 @@ class GameState {
   GameState({
     List<Player>? players,
     List<PlayingCard>? communityCards,
+    Deck? deck,
     this.round = 0,
     this.pot = 0,
     this.bigBlind = 25,
@@ -42,6 +43,7 @@ class GameState {
   }) {
     this.players = players ?? [];
     this.communityCards = communityCards ?? [];
+    this.deck = deck ?? Deck(name: "Standard Deck", cards: []);
   }
 
   // Add this to your GameState class
@@ -126,13 +128,21 @@ class GameState {
     return true;
   }
 
-  // void initializeAI() {
-  //   int i = 0;
-  //   while (i != table.totalCapacity - players.length) {
-  //     initializePlayer("AI_player_$i+1", isAI);
-  //     i++;
-  //   }
-  // }
+  void initializePlayers() {
+    for (int i = 0; i < table.totalCapacity; i++) {
+      bool isAI = i > 0;
+      String playerName = isAI ? "AI_Player_${i + 1}" : "Player_${i + 1}";
+
+      Player player = Player(
+        id: "player_${i + 1}",
+        name: playerName,
+        balance: 1000,
+        isAI: isAI,
+      );
+
+      players.add(player);
+    }
+  }
 
   void resetGame() {
     print("Resetting game state...");
@@ -164,6 +174,7 @@ class GameState {
       players: (json['players'] as List<dynamic>)
           .map((playerJson) => Player.fromJson(playerJson))
           .toList(),
+      deck: Deck.fromJson(json['deck']),
       communityCards: (json['communityCards'] as List<dynamic>)
           .map((cardJson) => PlayingCard.fromJson(cardJson))
           .toList(),
@@ -182,6 +193,7 @@ class GameState {
     return {
       'players': players.map((player) => player.toJson()).toList(),
       'communityCards': communityCards.map((card) => card.toJson()).toList(),
+      'deck': deck.toJson(),
       'round': round,
       'pot': pot,
       'bigBlind': bigBlind,

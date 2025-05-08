@@ -287,7 +287,10 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
                     onPressed: () async {
                       await _authService.signout();
                       if (context.mounted) {
-                        Navigator.of(context).pushReplacementNamed('/');
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (_) => const LoginPage(name: "Player")),
+                          (Route<dynamic> route) => false,
+                        );
                       }
                     },
                     icon: const Icon(Icons.logout, color: Colors.white),

@@ -31,6 +31,7 @@ class AddCoinsButton extends PositionComponent with TapCallbacks, HasGameRef<Pok
   @override
   void onTapDown(TapDownEvent event) async {
     ShopScreen.coinBalance += 100;
+    ShopScreen.coinText.text = 'Coins: ${ShopScreen.coinBalance}';
     print("Added 100 coins. Total: ${ShopScreen.coinBalance}");
 
     final email = FirebaseAuth.instance.currentUser?.email;
