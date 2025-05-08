@@ -41,7 +41,7 @@ class BackButton extends PositionComponent
   @override
   Future<void> onTapDown(TapDownEvent event) async {
     super.onTapDown(event);
-    await lobbyScreenService.removeFromLobby();
+    await lobbyScreenService.removeFromLobby(gameRef);
     gameRef.router.pop();
   }
 }

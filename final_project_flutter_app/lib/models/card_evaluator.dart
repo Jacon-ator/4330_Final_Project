@@ -1,6 +1,7 @@
 import 'package:final_project_flutter_app/models/card.dart';
 
 enum HandRank {
+  none,
   highCard,
   onePair,
   twoPair,

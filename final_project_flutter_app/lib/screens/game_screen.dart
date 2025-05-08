@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project_flutter_app/audio/sfx_manager.dart';
 import 'package:final_project_flutter_app/components/buttons/gameplay/play_next_round_button.dart';
 import 'package:final_project_flutter_app/components/buttons/gameplay/raise_slider.dart';
@@ -10,6 +11,7 @@ import 'package:final_project_flutter_app/models/card_evaluator.dart';
 import 'package:final_project_flutter_app/models/player.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:final_project_flutter_app/services/game_state.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 
@@ -24,6 +26,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
   CardEvaluator cardEvaluator = CardEvaluator();
   bool showPlayAgainButton = false;
   final SFXManager _sfxManager = SFXManager();
+  StreamSubscription<DocumentSnapshot>? _gameStateSubscription;
 
   @override
   Future<void> onLoad() async {
@@ -93,8 +96,36 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     add(CommunityCardArea());
 
     print("Starting game...");
-    gameState.initializePlayers();
+    gameState.initializeAI();
     await startGame();
+
+    // Listen for game state changes from other players
+    _gameStateSubscription = FirebaseFirestore.instance
+        .collection('games')
+        .doc('primary_game')
+        .snapshots()
+        .listen((snapshot) {
+      if (snapshot.exists && snapshot.data() != null) {
+        // Only update if it's not this player's turn
+        final currentPlayerId = FirebaseAuth.instance.currentUser?.uid;
+        final remoteGameState = GameState.fromJson(snapshot.data()!);
+
+        // Find current player in the remote game state
+        final currentPlayer = remoteGameState.players.firstWhere(
+          (p) => p.id == currentPlayerId,
+        );
+
+        // If it's not this player's turn, update the local game state
+        if (!currentPlayer.isCurrentTurn!) {
+          gameState = remoteGameState;
+          updateUI();
+        }
+      }
+    });
+
+    gameState.players[0].isCurrentTurn =
+        true; // Set the first player as current turn
+    _updateGameStateInFirebase();
   }
 
   Future<void> startGame() async {
@@ -113,9 +144,11 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       ccardArea.clearCards();
     }
     await dealCards();
-    blinds(); // Place the blinds for the game
+    await blinds(); // Place the blinds for the game
 
     gameState.playerIndex = gameState.dealerIndex;
+
+    await _updateGameStateInFirebase();
     await playerTurn();
   }
 
@@ -130,6 +163,8 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       print(
           '${player.name} received cards: ${player.hand![0].toString()} and ${player.hand![1].toString()}');
     }
+
+    await _updateGameStateInFirebase();
   }
 
   Future<void> nextPlayer() async {
@@ -152,6 +187,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       return;
     }
     print('Next player is ${gameState.players[gameState.playerIndex].name}');
+    await _updateGameStateInFirebase();
     await playerTurn();
   }
 
@@ -165,6 +201,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       print(
           '${currentPlayer.name} has folded or cannot bet any more money. Skipping turn.');
       currentPlayer.isCurrentTurn = false; // End the current player's turn
+      await _updateGameStateInFirebase();
       await nextPlayer(); // Skip to the next player if current player has folded
       return;
     }
@@ -177,18 +214,20 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     if (currentPlayer.isAI!) {
       // If it's an AI player's turn, handle AI logic here
       print('AI Player ${currentPlayer.name}\'s turn.');
-      endRoundIfFolded(currentPlayer);
+      await endRoundIfFolded(currentPlayer);
       int amountToCall = currentPlayer.getCallAmount(gameRef);
       int amount = await currentPlayer.makeAIDecision(gameRef);
       if (amount > amountToCall) {
-        resetTurnsOnRaise(currentPlayer);
+        await resetTurnsOnRaise(currentPlayer);
       }
       gameRef.gameState.pot += amount; // Add the bet to the pot
       currentPlayer.isCurrentTurn = false; // End AI turn after decision
-      endRoundIfFolded(currentPlayer);
+      await endRoundIfFolded(currentPlayer);
+      await _updateGameStateInFirebase();
 
       await nextPlayer(); // Move to the next player
     } else {
+      await _updateGameStateInFirebase();
       showPlayerActions(currentPlayer);
     }
   }
@@ -214,6 +253,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
         player.hasPlayedThisRound = true; // Mark as played this round
 
         player.isCurrentTurn = false;
+        await _updateGameStateInFirebase();
         await nextPlayer();
       } else {
         print('It is not your turn!');
@@ -234,6 +274,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
           player.hasPlayedThisRound = true; // Mark as played this round
 
           player.isCurrentTurn = false;
+          await _updateGameStateInFirebase();
           await nextPlayer();
         } else {
           print('It is not your turn!');
@@ -261,6 +302,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
           player.hasPlayedThisRound = true; // Mark as played this round
 
           player.isCurrentTurn = false;
+          await _updateGameStateInFirebase();
           await nextPlayer();
         } else {
           print('It is not your turn!');
@@ -284,9 +326,10 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
           int bet = await showSlider();
           print('${player.name} raised to $bet!');
           gameState.pot += bet; // Add the bet to the pot
-          resetTurnsOnRaise(player);
+          await resetTurnsOnRaise(player);
           hideRaiseSlider();
           player.isCurrentTurn = false;
+          await _updateGameStateInFirebase();
           await nextPlayer();
         } else {
           print('It is not your turn!');
@@ -302,15 +345,16 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     add(raiseButton);
   }
 
-  void resetTurnsOnRaise(Player player) {
+  Future<void> resetTurnsOnRaise(Player player) async {
     player.hasPlayedThisRound = true; // Mark as played this round
     for (var p in gameState.players.where((p) => p != player)) {
       p.hasPlayedThisRound =
           false; // reset for all other players since the raise allows them to decide to raise again or
     }
+    await _updateGameStateInFirebase();
   }
 
-  void blinds() {
+  Future<void> blinds() async {
     // This method will handle the blinds for the game.
     // It will deduct the small and big blinds from the players' balances.
     if (gameState.players.length < 2) {
@@ -329,6 +373,48 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     print(
         '${smallBlindPlayer.name} placed small blind of ${gameState.smallBlind}');
     print('${bigBlindPlayer.name} placed big blind of ${gameState.bigBlind}');
+    await _updateGameStateInFirebase();
+  }
+
+  void updateUI() {
+    // Update the UI based on the current game state
+    // Clear existing UI elements
+    children.whereType<ActionButton>().forEach(remove);
+
+    // Update hand display
+    final handArea = children.whereType<HandArea>().firstOrNull;
+    if (handArea != null) {
+      handArea.clearCards();
+      // Display the current player's cards
+      final currentPlayerId = FirebaseAuth.instance.currentUser?.uid;
+      Player? currentPlayer = gameState.players.firstWhere(
+        (p) => p.id == currentPlayerId,
+      );
+
+      if (currentPlayer.hand != null) {
+        updateHandUI(currentPlayer, 0);
+        updateHandUI(currentPlayer, 1);
+      }
+    }
+
+    // Update community cards
+    final communityCardArea =
+        children.whereType<CommunityCardArea>().firstOrNull;
+    if (communityCardArea != null) {
+      communityCardArea.clearCards();
+
+      for (int i = 0; i < gameState.communityCards.length; i++) {
+        communityCardArea.addCard(gameState.communityCards[i], i, gameRef);
+      }
+    }
+
+    // If it's the current player's turn, show action buttons
+    final currentPlayerId = FirebaseAuth.instance.currentUser?.uid;
+    final currentPlayer = gameState.players.firstWhere(
+      (p) => p.id == currentPlayerId && p.isCurrentTurn!,
+    );
+
+    showPlayerActions(currentPlayer);
   }
 
   void updateHandUI(Player player, int index) {
@@ -364,11 +450,12 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     return foldCount;
   }
 
-  void endRoundIfFolded(Player currentPlayer) {
+  Future<void> endRoundIfFolded(Player currentPlayer) async {
     int foldCount = checkFolds();
     if (foldCount == gameState.players.length - 1) {
       print('All other players folded. ${currentPlayer.name} wins by default!');
       roundBasedDealing(4); // skips to the determining of the winner
+      await _updateGameStateInFirebase();
       return; // Exit the turn
     }
   }
@@ -415,6 +502,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
           communityCardArea!
               .addCard(card, i, gameRef); // Add the card to the community area
         }
+        await _updateGameStateInFirebase();
         break;
       case 2: // Turn
         print('Turn round, showing 1 community card.');
@@ -426,6 +514,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
           communityCardArea!
               .addCard(card, i, gameRef); // Add the card to the community area
         }
+        await _updateGameStateInFirebase();
         break;
       case 3: // River
         print('River round, showing 1 community card.');
@@ -437,6 +526,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
           communityCardArea!
               .addCard(card, i, gameRef); // Add the card to the community area
         }
+        await _updateGameStateInFirebase();
         break;
       default: // End of game
         Player winner = determineWinner();
@@ -463,7 +553,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
           },
         );
         add(playAgainButton);
-
+        await _updateGameStateInFirebase();
         break;
       // default:
       //   print('Invalid round number: $round');
@@ -605,5 +695,20 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
   void hideRaiseSlider() {
     // Remove the overlay when done
     gameRef.overlays.remove('RaiseSlider');
+  }
+
+// FIREBASE FUNCTIONS
+
+  Future<void> _updateGameStateInFirebase() async {
+    try {
+      final jsonResult = gameState.toJson();
+      await FirebaseFirestore.instance
+          .collection('games')
+          .doc('primary_game')
+          .set(jsonResult);
+      print("Game state updated in Firebase");
+    } catch (e) {
+      print("Error updating game state: $e");
+    }
   }
 }

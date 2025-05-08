@@ -88,7 +88,7 @@ class LobbyScreen extends Component with HasGameRef<PokerParty> {
 
   // Also add a method to unsubscribe when leaving the lobby
   Future<void> leaveLobby() async {
-    await _lobbyService.removeFromLobby();
+    await _lobbyService.removeFromLobby(gameRef);
     _playerCountSubscription?.cancel();
   }
 

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project_flutter_app/models/player.dart';
+import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:final_project_flutter_app/services/game_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -49,7 +50,7 @@ class LobbyScreenService {
     });
   }
 
-  Future<bool> addToLobby() async {
+  Future<bool> addToLobby(PokerParty pokerGameRef) async {
     try {
       final user = _auth.currentUser;
 
@@ -86,30 +87,33 @@ class LobbyScreenService {
             .collection("games")
             .doc("primary_game")
             .set(gameState.toJson());
-
+        // pokerGameRef.gameState.copy(gameState);
         return true;
       } else {
-        GameState gameState = GameState.fromJson(gameRef.data()!);
+        GameState currentGameState = GameState.fromJson(gameRef.data()!);
 
-        if (gameState.players.length >= gameState.table.totalCapacity) {
+        if (currentGameState.players.length >=
+            currentGameState.table.totalCapacity) {
           print("Cannot add more players. Table is full.");
           return false;
         }
-        if (gameState.players.any((p) => p.id == player?.id)) {
+        if (currentGameState.players.any((p) => p.id == player?.id)) {
           print("Player already exists in the game.");
           return true;
         }
 
-        if (gameState.isLobbyActive) {
+        if (currentGameState.isLobbyActive) {
           print("The game is currently playing. Please wait.");
           return false;
         }
 
-        gameState.addPlayer(player);
+        currentGameState.addPlayer(player);
         await _firestore
             .collection("games")
             .doc("primary_game")
-            .set(gameState.toJson());
+            .set(currentGameState.toJson());
+
+        // pokerGameRef.gameState.copy(currentGameState);
         return true;
       }
     } catch (e) {
@@ -118,7 +122,7 @@ class LobbyScreenService {
     }
   }
 
-  Future<int> removeFromLobby() async {
+  Future<int> removeFromLobby(PokerParty pokerGameRef) async {
     try {
       final user = _auth.currentUser;
 
@@ -130,13 +134,14 @@ class LobbyScreenService {
             await _firestore.collection("games").doc("primary_game").get();
 
         if (gameRef.exists) {
-          GameState gameState = GameState.fromJson(gameRef.data()!);
-          gameState.removePlayer(user?.uid ?? "0");
+          GameState currentGameState = GameState.fromJson(gameRef.data()!);
+          currentGameState.removePlayer(user?.uid ?? "0");
           await _firestore
               .collection("games")
               .doc("primary_game")
-              .set(gameState.toJson());
-          return gameState.players.length;
+              .set(currentGameState.toJson());
+          // pokerGameRef.gameState.copy(currentGameState);
+          return currentGameState.players.length;
         }
       }
     } catch (e) {
@@ -145,20 +150,24 @@ class LobbyScreenService {
     return -1;
   }
 
-  Future<void> startLobby() async {
+  Future<void> startLobby(PokerParty pokerGameRef) async {
     try {
       final gameRef =
           await _firestore.collection("games").doc("primary_game").get();
 
       if (gameRef.exists) {
-        GameState gameState = GameState.fromJson(gameRef.data()!);
+        GameState currentGameState = GameState.fromJson(gameRef.data()!);
 
-        gameState.isLobbyActive = true;
+        currentGameState.isLobbyActive = true;
+        currentGameState.players[0].isCurrentTurn =
+            true; // Set the first player as current turn
 
         await _firestore
             .collection("games")
             .doc("primary_game")
-            .set(gameState.toJson());
+            .set(currentGameState.toJson());
+
+        // pokerGameRef.gameState.copy(currentGameState);
       } else {
         print("Game does not exist.");
       }

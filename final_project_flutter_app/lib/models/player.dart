@@ -13,7 +13,7 @@ class Player {
   bool? isAI = false; // Flag to indicate if the player is an AI
   bool? isCurrentTurn = false; // Flag to indicate if it's the player's turn
   bool? isFolded = false; // Flag to indicate if the player has folded
-  HandRank? handRank;
+  HandRank? handRank = HandRank.none; // Default hand rank
   bool? isAllIn = false; // Flag to indicate if the player is all-in
   bool hasPlayedThisRound = false;
 
@@ -162,7 +162,7 @@ class Player {
       'isAI': isAI,
       'isCurrentTurn': isCurrentTurn,
       'isFolded': isFolded,
-      'handRank': handRank?.toString(),
+      'handRank': handRank?.toString() ?? 'none',
       'isAllIn': isAllIn,
     };
   }

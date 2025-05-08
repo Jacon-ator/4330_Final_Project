@@ -12,7 +12,7 @@ class Deck {
 // pixel size 13x21
   List<PlayingCard> generateDeck() {
     List<PlayingCard> cards = [];
-    List<String> suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
+    List<String> suits = ['Hearts', 'Diamonds', 'Spades', 'Clubs'];
     List<int> ranks = [
       14,
       13,

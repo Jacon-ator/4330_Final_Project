@@ -79,18 +79,12 @@ class GameState {
     isGameOver = false;
   }
 
-  void initializePlayers() {
+  void initializeAI() {
     for (int i = 0; i < 4; i++) {
-      bool isAI = false; // Default to false for human players
-      // Initialize players with default names and reset their states. this is just for testing and will be changed later
-      if (i == 0) {
-        isAI = false; // First player is a human player
-      } else {
-        isAI = true; // Other players are AI players
-      }
-      initializePlayer(
-          "player ${i + 1}", isAI); // Initialize players with default names
+      bool isAI = i == 0 ? false : true; // First player is human, others are
+      initializePlayer("player_$i", isAI);
     }
+    players[0].isCurrentTurn = true; // Set the first player as current turn
   }
 
   Player getCurrentPlayer() {
@@ -146,5 +140,21 @@ class GameState {
 
   void removePlayer(String s) {
     players.removeWhere((player) => player.id == s);
+  }
+
+  void copy(GameState gameState) {
+    players = gameState.players;
+    playerIndex = gameState.playerIndex;
+    dealerIndex = gameState.dealerIndex;
+    communityCards = gameState.communityCards;
+    deck = gameState.deck;
+    table = gameState.table;
+    round = gameState.round;
+    pot = gameState.pot;
+    bigBlind = gameState.bigBlind;
+    smallBlind = gameState.smallBlind;
+    potIsRight = gameState.potIsRight;
+    isLobbyActive = gameState.isLobbyActive;
+    isGameOver = gameState.isGameOver;
   }
 }

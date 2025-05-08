@@ -48,10 +48,12 @@ class PlayingCard {
   }
 
   Map<String, dynamic> toJson() {
-    Map<String, dynamic> placeHolder = {
-      "": "",
+    return {
+      'suit': suit,
+      'rank': rank,
+      'position': [position.x, position.y],
+      'isFlipped': isFlipped,
     };
-    return placeHolder;
   }
 
   factory PlayingCard.fromJson(Map<String, dynamic> json) {
