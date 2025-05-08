@@ -6,39 +6,49 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 
-class AddCoinsButton extends PositionComponent with TapCallbacks, HasGameRef<PokerParty> {
+class AddCoinsButton extends PositionComponent
+    with TapCallbacks, HasGameRef<PokerParty> {
+  Sprite? sprite;
+  @override
+  Future<void> onLoad() async {
+    double exportScale = 5;
+    double yPositionOffset = 75;
+    await super.onLoad();
+    final image =
+        await gameRef.images.load("art/buttons/Master Button Sheet.png");
+    sprite = Sprite(
+      image,
+      srcPosition: Vector2(152 * exportScale,
+          0 * exportScale), // multiplied original coordinates
+      srcSize: Vector2(85, 70), // change width and height as needed
+    );
+
+    if (sprite != null) {
+      size = sprite!.srcSize;
+    }
+  }
+
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-
-    final paint = Paint()..color = const Color(0xFF2196F3);
-    canvas.drawRect(size.toRect(), paint);
-
-    final textPainter = TextPainter(
-      text: const TextSpan(
-        text: 'Add 100 Coins',
-        style: TextStyle(color: Colors.white, fontSize: 16),
-      ),
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout();
-    textPainter.paint(
-      canvas,
-      Offset(size.x / 2 - textPainter.width / 2, size.y / 2 - textPainter.height / 2),
-    );
+    if (sprite != null) {
+      sprite!.renderRect(canvas, size.toRect());
+    }
   }
 
   @override
   void onTapDown(TapDownEvent event) async {
     ShopScreen.coinBalance += 100;
-    ShopScreen.coinText.text = 'Coins: ${ShopScreen.coinBalance}';
+    ShopScreen.coinTextFill.text = 'Coins: ${ShopScreen.coinBalance}';
+    ShopScreen.coinTextOutline.text = 'Coins: ${ShopScreen.coinBalance}';
     print("Added 100 coins. Total: ${ShopScreen.coinBalance}");
 
     final email = FirebaseAuth.instance.currentUser?.email;
     if (email != null) {
-      await FirebaseFirestore.instance.collection("users").doc(email).update({
-        "Coins": ShopScreen.coinBalance
-      }).then((_) {
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(email)
+          .update({"Coins": ShopScreen.coinBalance}).then((_) {
         print("Coins updated successfully");
       }).catchError((e) {
         print("Failed to update coins: $e");
