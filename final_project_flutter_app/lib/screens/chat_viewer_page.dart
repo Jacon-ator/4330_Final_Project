@@ -132,9 +132,21 @@ class _ChatViewerPageState extends State<ChatViewerPage> {
                             return const Text("Waiting for chat to load...");
                           }
                           Map<String, dynamic> data = snapshot.data?.data() as Map<String, dynamic>;
-                          List<String> messagehistory = [];
+                          //gets the highest key value in the data
+                          int highestindex = 0;
                           for (String key in data.keys){
-                            messagehistory.add(data[key]);
+                            if(int.parse(key) > highestindex){
+                              highestindex = int.parse(key);
+                            }
+                          }
+                          List<String> messagehistory = [];
+                          for (int i = 0; i <= highestindex; i++){
+                            if(data.containsKey(i.toString())){
+                              messagehistory.add(data[i.toString()]);
+                            }
+                            else{
+                              messagehistory.add("Error getting this message.");
+                            }
                           }
                           messagehistory.reverse();
                           return ListView.builder(
