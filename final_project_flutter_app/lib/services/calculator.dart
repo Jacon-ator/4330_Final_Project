@@ -197,6 +197,84 @@ class HandResult {
   }
 }
 
+/// This function compares two poker hands using shared community cards and returns:
+/// 1 if hand1 wins
+/// 0 if it's a tie
+/// -1 if hand2 wins
+/// 
+/// This function assumes both hands are using the same community cards
+/// (as is standard in most poker games like Texas Hold'em)
+///
+/// Example:
+///   final result = comparePokerHands(
+///     hand1: [Card(CardRank.ace, Suit.spades), Card(CardRank.ace, Suit.hearts)],
+///     hand2: [Card(CardRank.king, Suit.diamonds), Card(CardRank.king, Suit.clubs)],
+///     communityCards: [
+///       Card(CardRank.seven, Suit.diamonds),
+///       Card(CardRank.eight, Suit.hearts),
+///       Card(CardRank.nine, Suit.clubs),
+///       Card(CardRank.ten, Suit.spades),
+///       Card(CardRank.jack, Suit.hearts),
+///     ],
+///   );
+///   // result would be 1 since hand1 (pair of aces) beats hand2 (pair of kings)
+int comparePokerHands({
+  required List<Card> hand1, 
+  required List<Card> hand2,
+  required List<Card> communityCards,
+}) {
+  // validate inputs
+  if (hand1.length != 2 || hand2.length != 2) {
+    throw ArgumentError('Each hand must contain exactly 2 cards');
+  }
+  
+  if (communityCards.length > 5) {
+    throw ArgumentError('Community cards cannot exceed 5');
+  }
+  
+  // evaluate both hands
+  final handResult1 = evaluateHand(
+    playerHand: hand1,
+    communityCards: communityCards,
+  );
+  
+  final handResult2 = evaluateHand(
+    playerHand: hand2,
+    communityCards: communityCards,
+  );
+  
+  // compare hand types first (e.g., flush vs straight)
+  if (handResult1.type.index > handResult2.type.index) {
+    return 1; // hand1 wins
+  } else if (handResult1.type.index < handResult2.type.index) {
+    return -1; // hand2 wins
+  }
+  
+  // same hand type (e.g., both have pairs), compare the relevant cards
+  // first check if hand1 is better than hand2
+  bool hand1Better = _compareRelevantCards(
+    handResult1.relevantCards, 
+    handResult2.relevantCards
+  );
+  
+  if (hand1Better) {
+    return 1; // hand1 wins
+  }
+  
+  // then check if hand2 is better than hand1
+  bool hand2Better = _compareRelevantCards(
+    handResult2.relevantCards, 
+    handResult1.relevantCards
+  );
+  
+  if (hand2Better) {
+    return -1; // hand2 wins
+  }
+  
+  // if neither hand is better than the other, it's a tie
+  return 0;
+}
+
 /// helper method to group cards by suit
 /// takes a list of cards and creates a map where
 /// keys are suits and values are lists of cards of that suit

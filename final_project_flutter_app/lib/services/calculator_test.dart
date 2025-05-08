@@ -19,6 +19,7 @@ class CalculatorTest {
     testPair();
     testHighCard();
     testHandComparison();
+    testComparePokerHands();
 
     print('\nStarting probability calculation tests...\n');
 
@@ -28,6 +29,160 @@ class CalculatorTest {
 
     print('\nAll tests completed!');
   }
+
+/// tests the comparepokerHands function
+void testComparePokerHands() {
+  print('Testing comparePokerHands function...');
+
+  // test case 1: pair vs high card
+  {
+    final hand1 = <Card>[Card.fromString('AH'), Card.fromString('AD')]; // pair of aces
+    final hand2 = <Card>[Card.fromString('KS'), Card.fromString('QH')]; // king-queen high
+    final communityCards = <Card>[
+      Card.fromString('2C'),
+      Card.fromString('7S'),
+      Card.fromString('TC'),
+      Card.fromString('4D'),
+      Card.fromString('9H')
+    ];
+    
+    final result = comparePokerHands(
+      hand1: hand1,
+      hand2: hand2,
+      communityCards: communityCards
+    );
+    
+    assert(result == 1, 'pair should beat high card');
+  }
+  
+  // test case 2: same pair, different kickers
+  {
+    final hand1 = <Card>[Card.fromString('AH'), Card.fromString('KD')]; // ace-king
+    final hand2 = <Card>[Card.fromString('AC'), Card.fromString('QH')]; // ace-queen
+    final communityCards = <Card>[
+      Card.fromString('AS'),
+      Card.fromString('7C'),
+      Card.fromString('2D'),
+      Card.fromString('4H'),
+      Card.fromString('9S')
+    ];
+    
+    final result = comparePokerHands(
+      hand1: hand1,
+      hand2: hand2,
+      communityCards: communityCards
+    );
+    
+    assert(result == 1, 'higher kicker should win with same pair');
+  }
+  
+  // test case 3: two pair vs three of a kind
+  {
+    final hand1 = <Card>[Card.fromString('JH'), Card.fromString('JD')]; // pair of jacks
+    final hand2 = <Card>[Card.fromString('KS'), Card.fromString('KH')]; // pair of kings
+    final communityCards = <Card>[
+      Card.fromString('KC'),
+      Card.fromString('QS'),
+      Card.fromString('QH'),
+      Card.fromString('2D'),
+      Card.fromString('3C')
+    ];
+    
+    final result = comparePokerHands(
+      hand1: hand1,
+      hand2: hand2,
+      communityCards: communityCards
+    );
+    
+    assert(result == -1, 'three of a kind should beat two pair');
+  }
+  
+  // test case 4: same hand type with different high cards
+  {
+    final hand1 = <Card>[Card.fromString('AS'), Card.fromString('KS')]; // a♠ k♠
+    final hand2 = <Card>[Card.fromString('AH'), Card.fromString('QH')]; // a♥ q♥
+    final communityCards = <Card>[
+      Card.fromString('2S'),
+      Card.fromString('4S'),
+      Card.fromString('7S'),
+      Card.fromString('9H'),
+      Card.fromString('JH')
+    ];
+    
+    final result = comparePokerHands(
+      hand1: hand1,
+      hand2: hand2,
+      communityCards: communityCards
+    );
+    
+    assert(result == 1, 'higher second card should win with same flush');
+  }
+  
+  // test case 5: identical hands (tie)
+  {
+    final hand1 = <Card>[Card.fromString('AH'), Card.fromString('KD')]; // a♥ k♦
+    final hand2 = <Card>[Card.fromString('AC'), Card.fromString('KS')]; // a♣ k♠
+    final communityCards = <Card>[
+      Card.fromString('QC'),
+      Card.fromString('JD'),
+      Card.fromString('TD'),
+      Card.fromString('3H'),
+      Card.fromString('2S')
+    ];
+    
+    final result = comparePokerHands(
+      hand1: hand1,
+      hand2: hand2,
+      communityCards: communityCards
+    );
+    
+    assert(result == 0, 'identical straights should tie');
+  }
+  
+  // test case 6: straight flush vs four of a kind
+  {
+    final hand1 = <Card>[Card.fromString('7H'), Card.fromString('8H')]; // part of straight flush
+    final hand2 = <Card>[Card.fromString('AC'), Card.fromString('AS')]; // two aces
+    final communityCards = <Card>[
+      Card.fromString('9H'),
+      Card.fromString('TH'),
+      Card.fromString('JH'),
+      Card.fromString('AD'),
+      Card.fromString('AH')
+    ];
+    
+    final result = comparePokerHands(
+      hand1: hand1,
+      hand2: hand2,
+      communityCards: communityCards
+    );
+    
+    assert(result == 1, 'straight flush should beat four of a kind');
+  }
+  
+  // test case 7: royal flush vs straight flush
+  {
+    final hand1 = <Card>[Card.fromString('AH'), Card.fromString('KH')]; // part of royal flush
+    final hand2 = <Card>[Card.fromString('9D'), Card.fromString('8D')]; // part of straight flush
+    final communityCards = <Card>[
+      Card.fromString('QH'),
+      Card.fromString('JH'),
+      Card.fromString('TH'),
+      Card.fromString('7D'),
+      Card.fromString('6D')
+    ];
+    
+    final result = comparePokerHands(
+      hand1: hand1,
+      hand2: hand2,
+      communityCards: communityCards
+    );
+    
+    assert(result == 1, 'royal flush should beat straight flush');
+  }
+
+  print('✓ comparePokerHands test passed');
+}
 
 /// tests the probability calculation for pocket aces pre-flop vs 1 opponent
 void testProbabilityPocketAces() {
