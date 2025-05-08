@@ -14,3 +14,5 @@ class AssetPaths {
   static const String playerGUI = 'art/Base Player UI.png';
   static const String chatMenu = 'art/Chat Menu.png';
 }
+
+const bool isOffline = true;

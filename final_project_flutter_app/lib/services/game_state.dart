@@ -127,13 +127,21 @@ class GameState {
     return true;
   }
 
-  // void initializeAI() {
-  //   int i = 0;
-  //   while (i != table.totalCapacity - players.length) {
-  //     initializePlayer("AI_player_$i+1", isAI);
-  //     i++;
-  //   }
-  // }
+  void initializePlayers() {
+    for (int i = 0; i < table.totalCapacity; i++) {
+      bool isAI = i > 0;
+      String playerName = isAI ? "AI_Player_${i + 1}" : "Player_${i + 1}";
+
+      Player player = Player(
+        id: "player_${i + 1}",
+        name: playerName,
+        balance: 1000,
+        isAI: isAI,
+      );
+
+      players.add(player);
+    }
+  }
 
   void resetGame() {
     print("Resetting game state...");

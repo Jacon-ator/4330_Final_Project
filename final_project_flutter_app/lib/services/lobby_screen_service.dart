@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:final_project_flutter_app/config.dart';
 import 'package:final_project_flutter_app/models/player.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:final_project_flutter_app/services/game_state.dart';
@@ -51,6 +52,9 @@ class LobbyScreenService {
   }
 
   Future<bool> addToLobby(PokerParty pokerGameRef) async {
+    if (isOffline) {
+      return true;
+    }
     try {
       final user = _auth.currentUser;
 
@@ -124,6 +128,9 @@ class LobbyScreenService {
   }
 
   Future<int> removeFromLobby(PokerParty pokerGameRef) async {
+    if (isOffline) {
+      return 0;
+    }
     try {
       final user = _auth.currentUser;
 
@@ -152,6 +159,9 @@ class LobbyScreenService {
   }
 
   Future<void> startLobby(PokerParty pokerGameRef) async {
+    if (isOffline) {
+      return;
+    }
     try {
       final gameRef =
           await _firestore.collection("games").doc("primary_game").get();
