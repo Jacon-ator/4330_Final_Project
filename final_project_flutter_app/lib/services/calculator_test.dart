@@ -30,174 +30,364 @@ class CalculatorTest {
     print('\nAll tests completed!');
   }
 
-/// tests the comparepokerHands function
-void testComparePokerHands() {
-  print('Testing comparePokerHands function...');
+  /// tests the comparepokerHands function
+  void testComparePokerHands() {
+    print('Testing comparePokerHands function...');
 
-  // test case 1: pair vs high card
-  {
-    final hand1 = <Card>[Card.fromString('AH'), Card.fromString('AD')]; // pair of aces
-    final hand2 = <Card>[Card.fromString('KS'), Card.fromString('QH')]; // king-queen high
-    final communityCards = <Card>[
-      Card.fromString('2C'),
-      Card.fromString('7S'),
-      Card.fromString('TC'),
-      Card.fromString('4D'),
-      Card.fromString('9H')
-    ];
-    
-    final result = comparePokerHands(
-      hand1: hand1,
-      hand2: hand2,
-      communityCards: communityCards
-    );
-    
-    assert(result == 1, 'pair should beat high card');
+    // test case 1: pair vs high card
+    {
+      final hand1 = <Card>[
+        Card.fromString('AH'),
+        Card.fromString('AD')
+      ]; // pair of aces
+      final hand2 = <Card>[
+        Card.fromString('KS'),
+        Card.fromString('QH')
+      ]; // king-queen high
+      final communityCards = <Card>[
+        Card.fromString('2C'),
+        Card.fromString('7S'),
+        Card.fromString('TC'),
+        Card.fromString('4D'),
+        Card.fromString('9H')
+      ];
+
+      final result = comparePokerHands(
+          hand1: hand1, hand2: hand2, communityCards: communityCards);
+
+      assert(result == 1, 'pair should beat high card');
+    }
+
+    // test case 2: same pair, different kickers
+    {
+      final hand1 = <Card>[
+        Card.fromString('AH'),
+        Card.fromString('KD')
+      ]; // ace-king
+      final hand2 = <Card>[
+        Card.fromString('AC'),
+        Card.fromString('QH')
+      ]; // ace-queen
+      final communityCards = <Card>[
+        Card.fromString('AS'),
+        Card.fromString('7C'),
+        Card.fromString('2D'),
+        Card.fromString('4H'),
+        Card.fromString('9S')
+      ];
+
+      final result = comparePokerHands(
+          hand1: hand1, hand2: hand2, communityCards: communityCards);
+
+      assert(result == 1, 'higher kicker should win with same pair');
+    }
+
+    // test case 3: two pair vs three of a kind
+    {
+      final hand1 = <Card>[
+        Card.fromString('JH'),
+        Card.fromString('JD')
+      ]; // pair of jacks
+      final hand2 = <Card>[
+        Card.fromString('KS'),
+        Card.fromString('KH')
+      ]; // pair of kings
+      final communityCards = <Card>[
+        Card.fromString('KC'),
+        Card.fromString('QS'),
+        Card.fromString('QH'),
+        Card.fromString('2D'),
+        Card.fromString('3C')
+      ];
+
+      final result = comparePokerHands(
+          hand1: hand1, hand2: hand2, communityCards: communityCards);
+
+      assert(result == -1, 'three of a kind should beat two pair');
+    }
+
+    // test case 4: same hand type with different high cards
+    {
+      final hand1 = <Card>[
+        Card.fromString('AS'),
+        Card.fromString('KS')
+      ]; // a♠ k♠
+      final hand2 = <Card>[
+        Card.fromString('AH'),
+        Card.fromString('QH')
+      ]; // a♥ q♥
+      final communityCards = <Card>[
+        Card.fromString('2S'),
+        Card.fromString('4S'),
+        Card.fromString('7S'),
+        Card.fromString('9H'),
+        Card.fromString('JH')
+      ];
+
+      final result = comparePokerHands(
+          hand1: hand1, hand2: hand2, communityCards: communityCards);
+
+      assert(result == 1, 'higher second card should win with same flush');
+    }
+
+    // test case 5: identical hands (tie)
+    {
+      final hand1 = <Card>[
+        Card.fromString('AH'),
+        Card.fromString('KD')
+      ]; // a♥ k♦
+      final hand2 = <Card>[
+        Card.fromString('AC'),
+        Card.fromString('KS')
+      ]; // a♣ k♠
+      final communityCards = <Card>[
+        Card.fromString('QC'),
+        Card.fromString('JD'),
+        Card.fromString('TD'),
+        Card.fromString('3H'),
+        Card.fromString('2S')
+      ];
+
+      final result = comparePokerHands(
+          hand1: hand1, hand2: hand2, communityCards: communityCards);
+
+      assert(result == 0, 'identical straights should tie');
+    }
+
+    // test case 6: straight flush vs four of a kind
+    {
+      final hand1 = <Card>[
+        Card.fromString('7H'),
+        Card.fromString('8H')
+      ]; // part of straight flush
+      final hand2 = <Card>[
+        Card.fromString('AC'),
+        Card.fromString('AS')
+      ]; // two aces
+      final communityCards = <Card>[
+        Card.fromString('9H'),
+        Card.fromString('TH'),
+        Card.fromString('JH'),
+        Card.fromString('AD'),
+        Card.fromString('AH')
+      ];
+
+      final result = comparePokerHands(
+          hand1: hand1, hand2: hand2, communityCards: communityCards);
+
+      assert(result == 1, 'straight flush should beat four of a kind');
+    }
+
+    // test case 7: royal flush vs straight flush
+    {
+      final hand1 = <Card>[
+        Card.fromString('AH'),
+        Card.fromString('KH')
+      ]; // part of royal flush
+      final hand2 = <Card>[
+        Card.fromString('9D'),
+        Card.fromString('8D')
+      ]; // part of straight flush
+      final communityCards = <Card>[
+        Card.fromString('QH'),
+        Card.fromString('JH'),
+        Card.fromString('TH'),
+        Card.fromString('7D'),
+        Card.fromString('6D')
+      ];
+
+      final result = comparePokerHands(
+          hand1: hand1, hand2: hand2, communityCards: communityCards);
+
+      assert(result == 1, 'royal flush should beat straight flush');
+    }
+
+    print('✓ comparePokerHands test passed');
   }
-  
-  // test case 2: same pair, different kickers
-  {
-    final hand1 = <Card>[Card.fromString('AH'), Card.fromString('KD')]; // ace-king
-    final hand2 = <Card>[Card.fromString('AC'), Card.fromString('QH')]; // ace-queen
+
+  /// tests the probability calculation for pocket aces pre-flop vs 1 opponent
+  void testProbabilityPocketAces() {
+    print('--------------------------------------------------------------');
+    print('TESTING: Pocket Aces (AA) pre-flop vs 1 opponent');
+    print('--------------------------------------------------------------');
+    print('Player hand: Ace of Spades, Ace of Clubs');
+    print('Community cards: None (pre-flop)');
+    print(
+        'Scenario: Player has the strongest possible starting hand in Hold\'em');
+    print('Expected outcome: Strong favorite against a random hand');
+    print('--------------------------------------------------------------');
+
+    // standard scenario: pocket pair of aces pre-flop vs 1 opponent
+    final playerHand = <Card>[Card.fromString('AS'), Card.fromString('AC')];
+    final communityCards = <Card>[];
+
+    print('Running simulation against 1 opponent...');
+    final stopwatch = Stopwatch()..start();
+
+    final probability = calculateWinProbability(
+        playerHand: playerHand,
+        communityCards: communityCards,
+        numberOfOpponents: 1);
+
+    stopwatch.stop();
+    final executionTime = stopwatch.elapsedMilliseconds;
+
+    print('Calculation completed in $executionTime ms');
+    print(
+        'RESULT: Win probability against 1 opponent: ${(probability * 100).toStringAsFixed(2)}%');
+    print('Interpretation: Pocket aces are a significant favorite pre-flop');
+
+    // Pocket aces should have ~85% win rate vs random hand
+    assert(probability > 0.75 && probability < 0.95,
+        'Pocket aces should win 75-95% of the time against one opponent');
+
+    print('--------------------------------------------------------------');
+    print('✓ Pocket aces probability test passed');
+  }
+
+  /// tests probability calculation for top pair top kicker on the flop
+  void testProbabilityTopPairTopKicker() {
+    print('--------------------------------------------------------------');
+    print('TESTING: AK suited with top pair top kicker on A-7-2 rainbow flop');
+    print('--------------------------------------------------------------');
+    print('Player hand: Ace of Hearts, King of Hearts');
+    print('Community cards: Ace of Spades, Seven of Clubs, Two of Diamonds');
+    print(
+        'Scenario: Player has flopped top pair with the best kicker on a dry board');
+    print('Expected outcome: Strong favorite against a single opponent');
+    print('--------------------------------------------------------------');
+
+    // player has AK suited and flop comes A-7-2 rainbow
+    final playerHand = <Card>[Card.fromString('AH'), Card.fromString('KH')];
+
     final communityCards = <Card>[
-      Card.fromString('AS'),
+      Card.fromString('AS'), // Top pair
       Card.fromString('7C'),
-      Card.fromString('2D'),
-      Card.fromString('4H'),
-      Card.fromString('9S')
+      Card.fromString('2D') // Rainbow flop (different suits)
     ];
-    
-    final result = comparePokerHands(
-      hand1: hand1,
-      hand2: hand2,
-      communityCards: communityCards
-    );
-    
-    assert(result == 1, 'higher kicker should win with same pair');
-  }
-  
-  // test case 3: two pair vs three of a kind
-  {
-    final hand1 = <Card>[Card.fromString('JH'), Card.fromString('JD')]; // pair of jacks
-    final hand2 = <Card>[Card.fromString('KS'), Card.fromString('KH')]; // pair of kings
-    final communityCards = <Card>[
-      Card.fromString('KC'),
-      Card.fromString('QS'),
-      Card.fromString('QH'),
-      Card.fromString('2D'),
-      Card.fromString('3C')
-    ];
-    
-    final result = comparePokerHands(
-      hand1: hand1,
-      hand2: hand2,
-      communityCards: communityCards
-    );
-    
-    assert(result == -1, 'three of a kind should beat two pair');
-  }
-  
-  // test case 4: same hand type with different high cards
-  {
-    final hand1 = <Card>[Card.fromString('AS'), Card.fromString('KS')]; // a♠ k♠
-    final hand2 = <Card>[Card.fromString('AH'), Card.fromString('QH')]; // a♥ q♥
-    final communityCards = <Card>[
-      Card.fromString('2S'),
-      Card.fromString('4S'),
-      Card.fromString('7S'),
-      Card.fromString('9H'),
-      Card.fromString('JH')
-    ];
-    
-    final result = comparePokerHands(
-      hand1: hand1,
-      hand2: hand2,
-      communityCards: communityCards
-    );
-    
-    assert(result == 1, 'higher second card should win with same flush');
-  }
-  
-  // test case 5: identical hands (tie)
-  {
-    final hand1 = <Card>[Card.fromString('AH'), Card.fromString('KD')]; // a♥ k♦
-    final hand2 = <Card>[Card.fromString('AC'), Card.fromString('KS')]; // a♣ k♠
-    final communityCards = <Card>[
-      Card.fromString('QC'),
-      Card.fromString('JD'),
-      Card.fromString('TD'),
-      Card.fromString('3H'),
-      Card.fromString('2S')
-    ];
-    
-    final result = comparePokerHands(
-      hand1: hand1,
-      hand2: hand2,
-      communityCards: communityCards
-    );
-    
-    assert(result == 0, 'identical straights should tie');
-  }
-  
-  // test case 6: straight flush vs four of a kind
-  {
-    final hand1 = <Card>[Card.fromString('7H'), Card.fromString('8H')]; // part of straight flush
-    final hand2 = <Card>[Card.fromString('AC'), Card.fromString('AS')]; // two aces
-    final communityCards = <Card>[
-      Card.fromString('9H'),
-      Card.fromString('TH'),
-      Card.fromString('JH'),
-      Card.fromString('AD'),
-      Card.fromString('AH')
-    ];
-    
-    final result = comparePokerHands(
-      hand1: hand1,
-      hand2: hand2,
-      communityCards: communityCards
-    );
-    
-    assert(result == 1, 'straight flush should beat four of a kind');
-  }
-  
-  // test case 7: royal flush vs straight flush
-  {
-    final hand1 = <Card>[Card.fromString('AH'), Card.fromString('KH')]; // part of royal flush
-    final hand2 = <Card>[Card.fromString('9D'), Card.fromString('8D')]; // part of straight flush
-    final communityCards = <Card>[
-      Card.fromString('QH'),
-      Card.fromString('JH'),
-      Card.fromString('TH'),
-      Card.fromString('7D'),
-      Card.fromString('6D')
-    ];
-    
-    final result = comparePokerHands(
-      hand1: hand1,
-      hand2: hand2,
-      communityCards: communityCards
-    );
-    
-    assert(result == 1, 'royal flush should beat straight flush');
+
+    // test against 1 opponent
+    print('Running simulation against 1 opponent...');
+    final stopwatch = Stopwatch()..start();
+
+    final probability = calculateWinProbability(
+        playerHand: playerHand,
+        communityCards: communityCards,
+        numberOfOpponents: 1);
+
+    stopwatch.stop();
+    final executionTime = stopwatch.elapsedMilliseconds;
+
+    print('Calculation completed in $executionTime ms');
+    print(
+        'RESULT: Win probability against 1 opponent: ${(probability * 100).toStringAsFixed(2)}%');
+    print(
+        'Interpretation: Top pair top kicker is very strong on this dry board');
+
+    // TPTK against one opponent on this flop should win around 80-90% of the time
+    assert(probability > 0.75 && probability < 0.95,
+        'Top pair top kicker should win 75-95% of the time against one opponent on dry flop');
+
+    print('--------------------------------------------------------------');
+    print('✓ Top pair top kicker probability test passed');
   }
 
-  print('✓ comparePokerHands test passed');
-}
+  /// tests probability calculation for an unfavorable scenario with a weak hand against multiple opponents
+  void testProbabilityOvercard() {
+    print('--------------------------------------------------------------');
+    print('TESTING: KQ offsuit vs multiple opponents on a J-7-2 rainbow flop');
+    print('--------------------------------------------------------------');
+    print('Player hand: King of Spades, Queen of Diamonds');
+    print('Community cards: Jack of Hearts, Seven of Clubs, Two of Diamonds');
+    print(
+        'Scenario: Player has completely missed the flop with only overcards');
+    print(
+        'Expected outcome: Significant underdog, especially vs multiple opponents');
+    print('--------------------------------------------------------------');
 
-/// tests the probability calculation for pocket aces pre-flop vs 1 opponent
-void testProbabilityPocketAces() {
+    // player has KQ offsuit, missed the flop completely
+    final playerHand = <Card>[Card.fromString('KS'), Card.fromString('QD')];
+
+    final communityCards = <Card>[
+      Card.fromString('JH'),
+      Card.fromString('7C'),
+      Card.fromString('2D')
+    ];
+
+    // test against 3 opponents (multiplayer pot)
+    print('Running simulation against 3 opponents...');
+    final stopwatch = Stopwatch()..start();
+
+    final probability = calculateWinProbability(
+        playerHand: playerHand,
+        communityCards: communityCards,
+        numberOfOpponents: 3);
+
+    stopwatch.stop();
+    final executionTime = stopwatch.elapsedMilliseconds;
+
+    print('Calculation completed in $executionTime ms');
+    print(
+        'RESULT: Win probability against 3 opponents: ${(probability * 100).toStringAsFixed(2)}%');
+    print(
+        'Interpretation: Player needs to hit a King or Queen on turn/river or is drawing nearly dead');
+
+    // KQ offsuit with overcards against 3 opponents should be a significant underdog
+    assert(probability < 0.40,
+        'Missed flop with just overcards should win less than 40% of the time against multiple opponents');
+
+    // also test the scenario against 1 opponent for comparison
+    print('\nRunning the same simulation against 1 opponent for comparison...');
+    final stopwatchSingle = Stopwatch()..start();
+
+    final probabilityOneOpponent = calculateWinProbability(
+        playerHand: playerHand,
+        communityCards: communityCards,
+        numberOfOpponents: 1);
+
+    stopwatchSingle.stop();
+    final executionTimeSingle = stopwatchSingle.elapsedMilliseconds;
+
+    print('Calculation completed in $executionTimeSingle ms');
+    print(
+        'RESULT: Win probability against 1 opponent: ${(probabilityOneOpponent * 100).toStringAsFixed(2)}%');
+    print(
+        'Interpretation: Significantly better chances vs a single opponent (more than doubled)');
+    print(
+        'This demonstrates why poker pros play tighter against multiple opponents');
+
+    // the probability should be higher against 1 opponent than against 3
+    assert(probabilityOneOpponent > probability,
+        'Win probability should be higher against 1 opponent than against 3');
+
+    // calculate the ratio to show how much worse multiple opponents makes the situation
+    final ratio = probabilityOneOpponent / probability;
+    print(
+        '\nKey finding: Win probability is ${ratio.toStringAsFixed(2)}x higher against 1 opponent');
+    print('--------------------------------------------------------------');
+
+    print('✓ Weak overcard hand probability test passed');
+  }
+
+/// tests probability with a flush draw on the flop
+void testProbabilityFlushDraw() {
   print('--------------------------------------------------------------');
-  print('TESTING: Pocket Aces (AA) pre-flop vs 1 opponent');
+  print('TESTING: Flush draw on the flop vs 1 opponent');
   print('--------------------------------------------------------------');
-  print('Player hand: Ace of Spades, Ace of Clubs');
-  print('Community cards: None (pre-flop)');
-  print('Scenario: Player has the strongest possible starting hand in Hold\'em');
-  print('Expected outcome: Strong favorite against a random hand');
+  print('Player hand: King of Hearts, Jack of Hearts');
+  print('Community cards: 7 of Hearts, 3 of Hearts, 9 of Clubs');
+  print('Scenario: Player has 4 hearts and needs one more for a flush');
+  print('Expected outcome: Around 35-40% chance to win by the river');
   print('--------------------------------------------------------------');
   
-  // standard scenario: pocket pair of aces pre-flop vs 1 opponent
-  final playerHand = <Card>[Card.fromString('AS'), Card.fromString('AC')];
-  final communityCards = <Card>[];
+  // player has KJ suited with two hearts on the flop
+  final playerHand = <Card>[Card.fromString('KH'), Card.fromString('JH')];
+  
+  final communityCards = <Card>[
+    Card.fromString('7H'),
+    Card.fromString('3H'), 
+    Card.fromString('9C') 
+  ];
   
   print('Running simulation against 1 opponent...');
   final stopwatch = Stopwatch()..start();
@@ -213,130 +403,15 @@ void testProbabilityPocketAces() {
   
   print('Calculation completed in $executionTime ms');
   print('RESULT: Win probability against 1 opponent: ${(probability * 100).toStringAsFixed(2)}%');
-  print('Interpretation: Pocket aces are a significant favorite pre-flop');
+  print('Interpretation: With a flush draw on the flop, player has about a 35-40% chance');
+  print('There are 9 hearts remaining in the deck out of 47 unseen cards');
   
-  // Pocket aces should have ~85% win rate vs random hand
-  assert(probability > 0.75 && probability < 0.95,
-      'Pocket aces should win 75-95% of the time against one opponent');
-  
-  print('--------------------------------------------------------------');
-  print('✓ Pocket aces probability test passed');
-}
-
-/// tests probability calculation for top pair top kicker on the flop
-void testProbabilityTopPairTopKicker() {
-  print('--------------------------------------------------------------');
-  print('TESTING: AK suited with top pair top kicker on A-7-2 rainbow flop');
-  print('--------------------------------------------------------------');
-  print('Player hand: Ace of Hearts, King of Hearts');
-  print('Community cards: Ace of Spades, Seven of Clubs, Two of Diamonds');
-  print('Scenario: Player has flopped top pair with the best kicker on a dry board');
-  print('Expected outcome: Strong favorite against a single opponent');
-  print('--------------------------------------------------------------');
-  
-  // player has AK suited and flop comes A-7-2 rainbow
-  final playerHand = <Card>[Card.fromString('AH'), Card.fromString('KH')];
-  
-  final communityCards = <Card>[
-    Card.fromString('AS'), // Top pair
-    Card.fromString('7C'),
-    Card.fromString('2D') // Rainbow flop (different suits)
-  ];
-  
-  // test against 1 opponent
-  print('Running simulation against 1 opponent...');
-  final stopwatch = Stopwatch()..start();
-  
-  final probability = calculateWinProbability(
-    playerHand: playerHand,
-    communityCards: communityCards,
-    numberOfOpponents: 1
-  );
-  
-  stopwatch.stop();
-  final executionTime = stopwatch.elapsedMilliseconds;
-  
-  print('Calculation completed in $executionTime ms');
-  print('RESULT: Win probability against 1 opponent: ${(probability * 100).toStringAsFixed(2)}%');
-  print('Interpretation: Top pair top kicker is very strong on this dry board');
-  
-  // TPTK against one opponent on this flop should win around 80-90% of the time
-  assert(probability > 0.75 && probability < 0.95,
-      'Top pair top kicker should win 75-95% of the time against one opponent on dry flop');
+  // Flush draw against one opponent should win around 35-40% of the time
+  assert(probability > 0.30 && probability < 0.45,
+      'Flush draw should win 30-45% of the time against one opponent');
   
   print('--------------------------------------------------------------');
-  print('✓ Top pair top kicker probability test passed');
-}
-
-/// tests probability calculation for an unfavorable scenario with a weak hand against multiple opponents
-void testProbabilityOvercard() {
-  print('--------------------------------------------------------------');
-  print('TESTING: KQ offsuit vs multiple opponents on a J-7-2 rainbow flop');
-  print('--------------------------------------------------------------');
-  print('Player hand: King of Spades, Queen of Diamonds');
-  print('Community cards: Jack of Hearts, Seven of Clubs, Two of Diamonds');
-  print('Scenario: Player has completely missed the flop with only overcards');
-  print('Expected outcome: Significant underdog, especially vs multiple opponents');
-  print('--------------------------------------------------------------');
-  
-  // player has KQ offsuit, missed the flop completely
-  final playerHand = <Card>[Card.fromString('KS'), Card.fromString('QD')];
-  
-  final communityCards = <Card>[
-    Card.fromString('JH'),
-    Card.fromString('7C'), 
-    Card.fromString('2D')  
-  ];
-  
-  // test against 3 opponents (multiplayer pot)
-  print('Running simulation against 3 opponents...');
-  final stopwatch = Stopwatch()..start();
-  
-  final probability = calculateWinProbability(
-    playerHand: playerHand,
-    communityCards: communityCards,
-    numberOfOpponents: 3
-  );
-  
-  stopwatch.stop();
-  final executionTime = stopwatch.elapsedMilliseconds;
-  
-  print('Calculation completed in $executionTime ms');
-  print('RESULT: Win probability against 3 opponents: ${(probability * 100).toStringAsFixed(2)}%');
-  print('Interpretation: Player needs to hit a King or Queen on turn/river or is drawing nearly dead');
-  
-  // KQ offsuit with overcards against 3 opponents should be a significant underdog
-  assert(probability < 0.40,
-      'Missed flop with just overcards should win less than 40% of the time against multiple opponents');
-  
-  // also test the scenario against 1 opponent for comparison
-  print('\nRunning the same simulation against 1 opponent for comparison...');
-  final stopwatchSingle = Stopwatch()..start();
-  
-  final probabilityOneOpponent = calculateWinProbability(
-    playerHand: playerHand,
-    communityCards: communityCards,
-    numberOfOpponents: 1
-  );
-  
-  stopwatchSingle.stop();
-  final executionTimeSingle = stopwatchSingle.elapsedMilliseconds;
-  
-  print('Calculation completed in $executionTimeSingle ms');
-  print('RESULT: Win probability against 1 opponent: ${(probabilityOneOpponent * 100).toStringAsFixed(2)}%');
-  print('Interpretation: Significantly better chances vs a single opponent (more than doubled)');
-  print('This demonstrates why poker pros play tighter against multiple opponents');
-  
-  // the probability should be higher against 1 opponent than against 3
-  assert(probabilityOneOpponent > probability,
-      'Win probability should be higher against 1 opponent than against 3');
-  
-  // calculate the ratio to show how much worse multiple opponents makes the situation
-  final ratio = probabilityOneOpponent / probability;
-  print('\nKey finding: Win probability is ${ratio.toStringAsFixed(2)}x higher against 1 opponent');
-  print('--------------------------------------------------------------');
-  
-  print('✓ Weak overcard hand probability test passed');
+  print('✓ Flush draw probability test passed');
 }
 
   /// tests royal flush detection

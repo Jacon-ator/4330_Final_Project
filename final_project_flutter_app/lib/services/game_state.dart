@@ -43,6 +43,7 @@ class GameState {
   }) {
     this.players = players ?? [];
     this.communityCards = communityCards ?? [];
+    this.deck = deck ?? Deck(name: "Standard Deck", cards: []);
   }
 
   // Add this to your GameState class
