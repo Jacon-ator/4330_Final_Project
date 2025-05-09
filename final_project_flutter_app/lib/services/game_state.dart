@@ -3,6 +3,7 @@ import 'package:final_project_flutter_app/models/card.dart';
 import 'package:final_project_flutter_app/models/deck.dart';
 import 'package:final_project_flutter_app/models/player.dart';
 import 'package:final_project_flutter_app/models/table.dart';
+import 'package:final_project_flutter_app/services/calculator.dart';
 
 class GameState {
   List<Player> players = [];
@@ -235,6 +236,38 @@ class GameState {
     potIsRight = gameState.potIsRight;
     isLobbyActive = gameState.isLobbyActive;
     isGameOver = gameState.isGameOver;
+  }
+
+  List<Card> convertHandToEvaluate(List<PlayingCard> communityCards) {
+    Map<String, Suit> suitMap = {
+      'Hearts': Suit.hearts,
+      'Diamonds': Suit.diamonds,
+      'Spades': Suit.spades,
+      'Clubs': Suit.clubs,
+    };
+
+    Map<int, CardRank> rankMap = {
+      2: CardRank.two,
+      3: CardRank.three,
+      4: CardRank.four,
+      5: CardRank.five,
+      6: CardRank.six,
+      7: CardRank.seven,
+      8: CardRank.eight,
+      9: CardRank.nine,
+      10: CardRank.ten,
+      11: CardRank.jack,
+      12: CardRank.queen,
+      13: CardRank.king,
+      14: CardRank.ace,
+    };
+    List<Card> cards = communityCards.map((card) {
+      return Card(
+        rankMap[card.rank] ?? CardRank.ace,
+        suitMap[card.suit] ?? Suit.hearts,
+      );
+    }).toList();
+    return cards;
   }
 
   void reset() {

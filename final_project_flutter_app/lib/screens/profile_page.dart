@@ -8,7 +8,6 @@ import 'package:final_project_flutter_app/services/database_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-
 class PokerProfilePage extends StatefulWidget {
   final String name;
 
@@ -90,9 +89,12 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
     print("flutter: Coins: ${currentUserData?.coins}");
     print("flutter: Games Won: ${currentUserData?.games_won}");
     print("flutter: Games Lost: ${currentUserData?.games_lost}");
-    print("flutter: Owns Magic Card Skin: ${currentUserData?.ownMagicCardSkin}");
-    print("flutter: Owns Pokemon Card Skin: ${currentUserData?.ownPokemonCardSkin}");
-    print("flutter: Owns Purple Table Skin: ${currentUserData?.ownPurpleTableSkin}");
+    print(
+        "flutter: Owns Magic Card Skin: ${currentUserData?.ownMagicCardSkin}");
+    print(
+        "flutter: Owns Pokemon Card Skin: ${currentUserData?.ownPokemonCardSkin}");
+    print(
+        "flutter: Owns Purple Table Skin: ${currentUserData?.ownPurpleTableSkin}");
     print("flutter: Owns Red Table Skin: ${currentUserData?.ownRedTableSkin}");
     print("flutter: --------------------------");
 
@@ -104,8 +106,10 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
       currentChips = currentUserData?.chips ?? 0;
       ShopScreen.coinBalance = currentUserData?.coins ?? 0;
       ShopScreen.ownsMagicCardSkin = currentUserData?.ownMagicCardSkin ?? false;
-      ShopScreen.ownsPokemonCardSkin = currentUserData?.ownPokemonCardSkin ?? false;
-      ShopScreen.ownsPurpleTableSkin = currentUserData?.ownPurpleTableSkin ?? false;
+      ShopScreen.ownsPokemonCardSkin =
+          currentUserData?.ownPokemonCardSkin ?? false;
+      ShopScreen.ownsPurpleTableSkin =
+          currentUserData?.ownPurpleTableSkin ?? false;
       ShopScreen.ownsRedTableSkin = currentUserData?.ownRedTableSkin ?? false;
     });
   }
@@ -228,71 +232,51 @@ class _PokerProfilePageState extends State<PokerProfilePage> {
                     ],
                   ),
                   const SizedBox(height: 30),
-                  Row(
-                    //temp
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          recordWin(500); // Simulate winning 500 chips
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green[600],
-                        ),
-                        child: const Text("+500 Chips",
-                            style: TextStyle(color: Colors.white)),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          recordLoss(300); // Simulate losing 300 chips
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red[600],
-                        ),
-                        child: const Text("-300 Chips",
-                            style: TextStyle(color: Colors.white)),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20), //temp
 
                   if (FirebaseAuth.instance.currentUser == null) ...[
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green[600],
-                        ),
-                        onPressed: () {
-                          _sfxManager.playButtonSelect();
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (_) => const LoginPage(name: "Player")),
-                          );
-                        },
-                        child: const Text("Back to Login", style: TextStyle(color: Colors.white)),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green[600],
                       ),
-                      const SizedBox(height: 12),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green[600],
-                        ),
-                        onPressed: () {
-                          _sfxManager.playButtonSelect();
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (_) => const SignUpPage(name: "Player")),
-                          );
-                        },
-                        child: const Text("Create an Account", style: TextStyle(color: Colors.white)),
+                      onPressed: () {
+                        _sfxManager.playButtonSelect();
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                              builder: (_) => const LoginPage(name: "Player")),
+                        );
+                      },
+                      child: const Text("Back to Login",
+                          style: TextStyle(color: Colors.white)),
+                    ),
+                    const SizedBox(height: 12),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green[600],
                       ),
-                    ],
+                      onPressed: () {
+                        _sfxManager.playButtonSelect();
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                              builder: (_) => const SignUpPage(name: "Player")),
+                        );
+                      },
+                      child: const Text("Create an Account",
+                          style: TextStyle(color: Colors.white)),
+                    ),
+                  ],
 
-                  const SizedBox(height: 12), // Adding consistent spacing before the Sign Out button
-                  
+                  const SizedBox(
+                      height:
+                          12), // Adding consistent spacing before the Sign Out button
+
                   ElevatedButton.icon(
                     onPressed: () async {
                       await _authService.signout();
                       if (context.mounted) {
                         Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (_) => const LoginPage(name: "Player")),
+                          MaterialPageRoute(
+                              builder: (_) => const LoginPage(name: "Player")),
                           (Route<dynamic> route) => false,
                         );
                       }
