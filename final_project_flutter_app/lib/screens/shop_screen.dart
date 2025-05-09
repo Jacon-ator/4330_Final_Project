@@ -7,8 +7,10 @@ import 'package:flutter/material.dart';
 
 class ShopScreen extends Component with HasGameRef<PokerParty> {
   late Vector2 size;
-  static bool ownsCardSkin = false;
-  static bool ownsTableSkin = false;
+  static bool ownsMagicCardSkin = false;
+  static bool ownsPokemonCardSkin = false;
+  static bool ownsPurpleTableSkin = false;
+  static bool ownsRedTableSkin = false;
   static int coinBalance = 0;
   static late TextComponent coinTextOutline,
       coinTextFill; //use static for testing add_coins_button (can remove if app is done testing? or just use for demo)
@@ -32,12 +34,16 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
     final db = DatabaseService();
     currentUser = await db.getUserData();
     coinBalance = currentUser?.coins ?? 0;
-    ownsCardSkin = currentUser?.ownCardSkin ?? false;
-    ShopScreen.ownsTableSkin = currentUser?.ownTableSkin ?? false;
+    ownsMagicCardSkin = currentUser?.ownMagicCardSkin ?? false;
+    ownsPokemonCardSkin = currentUser?.ownPokemonCardSkin ?? false;
+    ownsPurpleTableSkin = currentUser?.ownPurpleTableSkin ?? false;
+    ownsPurpleTableSkin = currentUser?.ownRedTableSkin ?? false;
 
     print("User coins: ${ShopScreen.coinBalance}");
-    print("Owns Card Skin: ${ShopScreen.ownsCardSkin}");
-    print("Owns Table Skin: ${ShopScreen.ownsTableSkin}");
+    print("Owns Magic Card Skin: ${ShopScreen.ownsMagicCardSkin}");
+    print("Owns Pokemon Card Skin: ${ShopScreen.ownsPokemonCardSkin}");
+    print("Owns Purple Table Skin: ${ShopScreen.ownsPurpleTableSkin}");
+    print("Owns Red Table Skin: ${ShopScreen.ownsRedTableSkin}");
 
     final MainMenuButton mainMenuButton = MainMenuButton()
       ..size = Vector2(size.x / 6, size.y / 6)
@@ -105,17 +111,17 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
   }
 
   void buyRedTableSkin() {
-    if (!ownsTableSkin && coinBalance >= 1000) {
+    if (!ownsRedTableSkin && coinBalance >= 1000) {
       coinBalance -= 1000;
       coinTextOutline.text = 'Coins: $coinBalance';
       coinTextFill.text = 'Coins: $coinBalance';
-      ownsTableSkin = true;
+      ownsRedTableSkin = true;
 
       // Update Firestore
       FirebaseFirestore.instance
           .collection('users')
           .doc(currentUser?.email) // use the email from currentUser
-          .update({"Coins": coinBalance, "ownTableSkin": true});
+          .update({"Coins": coinBalance, "ownRedTableSkin": true});
 
       print("Table skin purchased!");
     } else {
@@ -124,17 +130,17 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
   }
 
   void buyPurpleTableSkin() {
-    if (!ownsTableSkin && coinBalance >= 1000) {
+    if (!ownsPurpleTableSkin && coinBalance >= 1000) {
       coinBalance -= 1000;
       coinTextOutline.text = 'Coins: $coinBalance';
       coinTextFill.text = 'Coins: $coinBalance';
-      ownsTableSkin = true;
+      ownsPurpleTableSkin = true;
 
       // Update Firestore
       FirebaseFirestore.instance
           .collection('users')
           .doc(currentUser?.email) // use the email from currentUser
-          .update({"Coins": coinBalance, "ownTableSkin": true});
+          .update({"Coins": coinBalance, "ownPurpleTableSkin": true});
 
       print("Table skin purchased!");
     } else {
@@ -143,17 +149,17 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
   }
 
   void buyPokemonCardSkin() {
-    if (!ownsCardSkin && coinBalance >= 200) {
+    if (!ownsPokemonCardSkin && coinBalance >= 200) {
       coinBalance -= 200;
       coinTextOutline.text = 'Coins: $coinBalance';
       coinTextFill.text = 'Coins: $coinBalance';
-      ownsCardSkin = true;
+      ownsPokemonCardSkin = true;
 
       // Update Firestore
       FirebaseFirestore.instance
           .collection('users')
           .doc(currentUser?.email)
-          .update({"Coins": coinBalance, "ownCardSkin": true});
+          .update({"Coins": coinBalance, "ownPokemonCardSkin": true});
 
       print("Card skin purchased!");
     } else {
@@ -162,17 +168,17 @@ class ShopScreen extends Component with HasGameRef<PokerParty> {
   }
 
   void buyMagicCardSkin() {
-    if (!ownsCardSkin && coinBalance >= 500) {
+    if (!ownsMagicCardSkin && coinBalance >= 500) {
       coinBalance -= 500;
       coinTextOutline.text = 'Coins: $coinBalance';
       coinTextFill.text = 'Coins: $coinBalance';
-      ownsCardSkin = true;
+      ownsMagicCardSkin = true;
 
       // Update Firestore
       FirebaseFirestore.instance
           .collection('users')
           .doc(currentUser?.email)
-          .update({"Coins": coinBalance, "ownCardSkin": true});
+          .update({"Coins": coinBalance, "ownMagicCardSkin": true});
 
       print("Card skin purchased!");
     } else {

@@ -42,6 +42,6 @@ class BuyMagicCardButton extends PositionComponent
     super.onTapDown(event);
     _sfxManager.playButtonSelect();
     final shop = parent as ShopScreen;
-    shop.buyPokemonCardSkin();
+    shop.buyMagicCardSkin();
   }
 }

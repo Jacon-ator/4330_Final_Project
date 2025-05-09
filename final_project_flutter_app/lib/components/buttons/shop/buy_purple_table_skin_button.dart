@@ -42,6 +42,6 @@ class BuyPurpleTableSkinButton extends PositionComponent
     super.onTapDown(event);
     _sfxManager.playButtonSelect();
     final shop = parent as ShopScreen;
-    shop.buyRedTableSkin();
+    shop.buyPurpleTableSkin();
   }
 }

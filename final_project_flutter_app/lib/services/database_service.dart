@@ -168,8 +168,10 @@ class userData {
   final int? coins; // Coins for shop
   final int? games_won;
   final int? games_lost;
-  final bool? ownTableSkin;
-  final bool? ownCardSkin;
+  final bool? ownPurpleTableSkin;
+  final bool? ownRedTableSkin;
+  final bool? ownMagicCardSkin;
+  final bool? ownPokemonCardSkin;
 
   userData({
     this.email,
@@ -177,8 +179,11 @@ class userData {
     this.coins,
     this.games_won,
     this.games_lost,
-    this.ownTableSkin,
-    this.ownCardSkin,
+    this.ownPurpleTableSkin,
+    this.ownRedTableSkin,
+    this.ownMagicCardSkin,
+    this.ownPokemonCardSkin,
+
   });
 
   factory userData.fromFirestore(
@@ -192,8 +197,11 @@ class userData {
         coins: data?['Coins'],
         games_won: data?['Games Won'],
         games_lost: data?['Games Lost'],
-        ownTableSkin: data?['ownTableSkin'] ?? false,
-        ownCardSkin: data?['ownCardSkin'] ?? false);
+        ownPurpleTableSkin: data?['ownPurpleTableSkin'] ?? false,
+        ownRedTableSkin: data?['ownRedTableSkin'] ?? false,
+        ownMagicCardSkin: data?['ownMagicCardSkin'] ?? false,
+        ownPokemonCardSkin: data?['ownPokemonCardSkin'] ?? false,
+    );
   }
 
   Map<String, dynamic> toFirestore() {
@@ -203,8 +211,10 @@ class userData {
       if (coins != null) "Coins": coins,
       if (games_won != null) "Games Won": games_won,
       if (games_lost != null) "Games Lost": games_lost,
-      if (ownTableSkin != null) "ownTableSkin": ownTableSkin,
-      if (ownCardSkin != null) "ownCardSkin": ownCardSkin
+      if (ownPurpleTableSkin != null) "ownPurpleTableSkin": ownPurpleTableSkin,
+      if (ownRedTableSkin != null) "ownRedTableSkin": ownRedTableSkin,
+      if (ownMagicCardSkin != null) "ownCardSkin": ownMagicCardSkin,
+      if (ownPokemonCardSkin != null) "ownCardSkin": ownPokemonCardSkin,
     };
   }
 }
