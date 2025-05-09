@@ -58,7 +58,7 @@ class StartGameButton extends PositionComponent
       super.onTapDown(event);
       _sfxManager.playButtonSelect();
       // Navigate to the lobby screen when the button is tapped
-      bool success = await lobbyScreenService.addToLobby(gameRef);
+      bool success = await lobbyScreenService.addToLobby();
       if (success) {
         gameRef.router.pushNamed('lobby');
       } else {

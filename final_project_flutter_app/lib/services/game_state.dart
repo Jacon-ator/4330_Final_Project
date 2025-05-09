@@ -186,6 +186,7 @@ class GameState {
       isGameOver: json['isGameOver'] ?? false,
       playerIndex: json['playerIndex'] ?? 0,
       dealerIndex: json['dealerIndex'] ?? -1,
+      isLobbyActive: json['isLobbyActive'] ?? false,
     );
   }
 
@@ -202,6 +203,7 @@ class GameState {
       'isGameOver': isGameOver,
       'playerIndex': playerIndex,
       'dealerIndex': dealerIndex,
+      'isLobbyActive': isLobbyActive,
     };
   }
 
@@ -233,5 +235,26 @@ class GameState {
     potIsRight = gameState.potIsRight;
     isLobbyActive = gameState.isLobbyActive;
     isGameOver = gameState.isGameOver;
+  }
+
+  void reset() {
+    players.clear();
+    playerIndex = 0;
+    dealerIndex = -1;
+    communityCards.clear();
+    deck.resetDeck();
+    table = Table(
+      id: "table1",
+      name: "Main Table",
+      totalCapacity: 4,
+      isAvailable: true,
+    );
+    round = 0;
+    pot = 0;
+    bigBlind = 25;
+    smallBlind = 10;
+    potIsRight = false;
+    isLobbyActive = false;
+    isGameOver = false;
   }
 }

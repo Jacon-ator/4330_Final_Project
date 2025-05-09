@@ -1,13 +1,32 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project_flutter_app/config.dart';
 import 'package:final_project_flutter_app/models/player.dart';
-import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:final_project_flutter_app/services/game_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class LobbyScreenService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  // Add to LobbyScreenService class
+  Stream<GameState> streamGameState() {
+    return _firestore
+        .collection("games")
+        .doc("primary_game")
+        .snapshots()
+        .map((snapshot) {
+      if (snapshot.exists) {
+        try {
+          return GameState.fromJson(snapshot.data()!);
+        } catch (e) {
+          print("Error parsing game state: $e");
+          return GameState(); // Return empty state on error
+        }
+      } else {
+        return GameState();
+      }
+    });
+  }
 
   // Add a stream to listen for player count changes
   Stream<int> streamPlayerCount() {
@@ -51,7 +70,7 @@ class LobbyScreenService {
     });
   }
 
-  Future<bool> addToLobby(PokerParty pokerGameRef) async {
+  Future<bool> addToLobby() async {
     if (isOffline) {
       return true;
     }
@@ -92,7 +111,6 @@ class LobbyScreenService {
             .collection("games")
             .doc("primary_game")
             .set(gameState.toJson());
-        // pokerGameRef.gameState.copy(gameState);
         return true;
       } else {
         GameState currentGameState = GameState.fromJson(gameRef.data()!);
@@ -107,7 +125,7 @@ class LobbyScreenService {
           return true;
         }
 
-        if (currentGameState.isLobbyActive) {
+        if (currentGameState.isLobbyActive && !currentGameState.isGameOver) {
           print("The game is currently playing. Please wait.");
           return false;
         }
@@ -127,7 +145,7 @@ class LobbyScreenService {
     }
   }
 
-  Future<int> removeFromLobby(PokerParty pokerGameRef) async {
+  Future<int> removeFromLobby() async {
     if (isOffline) {
       return 0;
     }
@@ -148,7 +166,6 @@ class LobbyScreenService {
               .collection("games")
               .doc("primary_game")
               .set(currentGameState.toJson());
-          // pokerGameRef.gameState.copy(currentGameState);
           return currentGameState.players.length;
         }
       }
@@ -158,7 +175,7 @@ class LobbyScreenService {
     return -1;
   }
 
-  Future<void> startLobby(PokerParty pokerGameRef) async {
+  Future<void> startLobby() async {
     if (isOffline) {
       return;
     }
@@ -177,8 +194,6 @@ class LobbyScreenService {
             .collection("games")
             .doc("primary_game")
             .set(currentGameState.toJson());
-
-        // pokerGameRef.gameState.copy(currentGameState);
       } else {
         print("Game does not exist.");
       }

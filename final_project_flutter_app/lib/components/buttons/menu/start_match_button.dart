@@ -1,4 +1,6 @@
+import 'package:final_project_flutter_app/config.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
+import 'package:final_project_flutter_app/services/lobby_screen_service.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
@@ -40,9 +42,17 @@ class StartMatchButton extends PositionComponent
     add(textComponent);
   }
 
+  // In StartMatchButton class
   @override
-  Future<void> onTapDown(TapDownEvent event) async {
-    super.onTapDown(event);
-    gameRef.router.pushNamed('game');
+  Future<void> onTapUp(TapUpEvent event) async {
+    super.onTapUp(event);
+    if (isOffline) {
+      gameRef.router.pushNamed("game");
+    } else {
+      final lobbyService = LobbyScreenService();
+
+      // Start the lobby which will set isLobbyActive=true
+      await lobbyService.startLobby();
+    }
   }
 }

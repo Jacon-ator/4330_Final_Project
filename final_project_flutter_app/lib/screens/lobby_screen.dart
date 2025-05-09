@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:final_project_flutter_app/components/buttons/menu/start_match_button.dart';
 import 'package:final_project_flutter_app/components/components.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
+import 'package:final_project_flutter_app/services/game_state.dart';
 import 'package:final_project_flutter_app/services/lobby_screen_service.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,8 @@ class LobbyScreen extends Component with HasGameRef<PokerParty> {
 
   final LobbyScreenService _lobbyService = LobbyScreenService();
   StreamSubscription<int>? _playerCountSubscription;
+  StreamSubscription<GameState>? _gameStateSubscription;
+  bool _navigatingToGame = false;
 
   @override
   Future<void> onLoad() async {
@@ -24,6 +27,16 @@ class LobbyScreen extends Component with HasGameRef<PokerParty> {
         _lobbyService.streamPlayerCount().listen((count) {
       playerCount = count;
       updatePlayerCount();
+    });
+
+    // Setup stream subscription for game state to watch isLobbyActive
+    _gameStateSubscription =
+        _lobbyService.streamGameState().listen((gameState) {
+      if (gameState.isLobbyActive && !_navigatingToGame) {
+        _navigatingToGame = true; // Prevent multiple navigations
+        print("Game is now active! Navigating to game screen...");
+        _navigateToGameScreen();
+      }
     });
 
     // Load background
@@ -79,17 +92,24 @@ class LobbyScreen extends Component with HasGameRef<PokerParty> {
     add(mainMenuButton);
   }
 
+  // Method to navigate to game screen
+  void _navigateToGameScreen() {
+    Future.delayed(const Duration(milliseconds: 500), () {
+      gameRef.router.pushNamed('game');
+    });
+  }
+
   @override
   void onRemove() {
-    // Clean up the subscription when the component is removed
     super.onRemove();
     updatePlayerCount();
   }
 
   // Also add a method to unsubscribe when leaving the lobby
   Future<void> leaveLobby() async {
-    await _lobbyService.removeFromLobby(gameRef);
+    await _lobbyService.removeFromLobby();
     _playerCountSubscription?.cancel();
+    _gameStateSubscription?.cancel();
   }
 
   void updatePlayerCount() {

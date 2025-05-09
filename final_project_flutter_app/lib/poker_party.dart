@@ -20,7 +20,7 @@ class PokerParty extends FlameGame {
   final AudioManager audioManager = AudioManager();
   bool _audioInitialized = false;
 
-  final GameState gameState = GameState();
+  late GameState gameState = GameState();
 
   final double _gameTimer = 0.0;
   final double _turnTimer = 0.0;
