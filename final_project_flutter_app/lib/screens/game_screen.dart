@@ -27,6 +27,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
   bool showPlayAgainButton = false;
   final SFXManager _sfxManager = SFXManager();
   StreamSubscription<DocumentSnapshot>? _gameStateSubscription;
+  String tableSkinImage = '';
 
   @override
   Future<void> onLoad() async {
@@ -45,13 +46,15 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
 
     gameState = gameRef.gameState; // Get the game state from the game reference
 
+    await loadUserTableSkin();  // Load the table skin based on the user's preferences
+
     await gameRef.images.loadAll([
       AssetPaths.cardFronts,
       AssetPaths.cardBacks,
     ]);
 
     // Load sprites
-    final tableSprite = await gameRef.loadSprite('art/Base Poker Table.png');
+    final tableSprite = await gameRef.loadSprite(tableSkinImage);
     final uiSprite = await gameRef.loadSprite('art/Base Player UI.png');
     final chatMenuSprite = await gameRef.loadSprite('art/Chat Menu.png');
 
@@ -143,6 +146,42 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       _updateGameStateInFirebase();
     }
   }
+
+Future<void> loadUserTableSkin() async {
+  // Get the current user's email
+  final currentPlayerEmail = FirebaseAuth.instance.currentUser?.email;
+  
+  if (currentPlayerEmail == null) {
+    print('No current user email available');
+    return;
+  }
+
+  // Fetch the user's data from Firestore using the email as the document ID
+  DocumentSnapshot userDoc = await FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentPlayerEmail) // Use the email as the document ID
+      .get();
+
+  if (userDoc.exists) {
+    // Retrieve the 'ownPurpleTableSkin' and 'ownRedTableSkin' values from the user's data
+    bool ownPurpleTableSkin = userDoc['ownPurpleTableSkin'] ?? false;
+    bool ownRedTableSkin = userDoc['ownRedTableSkin'] ?? false;
+        
+    // Choose the correct table image based on the user's purchases
+    if (ownPurpleTableSkin) {
+      tableSkinImage = 'art/Purple Poker Table.png';  // Purple table skin image
+    } else if (ownRedTableSkin) {
+      tableSkinImage = 'art/Red Poker Table.png';  // Red table skin image
+    } else {
+      tableSkinImage = 'art/Base Poker Table.png';  // Default table image
+    }
+
+    print("flutter: Table skin loaded: $tableSkinImage");
+  } else {
+    print('flutter: User document not found.');
+    tableSkinImage = 'art/Base Poker Table.png';  // Default table skin if not found
+  }  
+}
 
   @override
   Future<void> onMount() async {
