@@ -1,78 +1,46 @@
-import 'package:final_project_flutter_app/audio/sfx_manager.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 
-class AddBotButton extends PositionComponent with TapCallbacks, HasGameRef<PokerParty> {
-  final Function onTap;
-  late TextComponent textComponent;
-  late RectangleComponent background;
-  late RectangleComponent border;
+class AddBotButton extends PositionComponent
+    with TapCallbacks, HasGameRef<PokerParty> {
+  final VoidCallback onTap;
 
   AddBotButton({
     required Vector2 position,
     required this.onTap,
-  }) : super(position: position, size: Vector2(200, 60));
+  }) : super(position: position);
 
   @override
   Future<void> onLoad() async {
-    // Create button background
-    background = RectangleComponent(
-      size: size,
-      paint: Paint()..color = const Color(0xFF1A5C32),
-    );
-    add(background);
+    await super.onLoad();
+    Sprite? loadedSprite;
+    double exportScale = 5; // Adjust this value based on your export scale
 
-    // Create button border
-    border = RectangleComponent(
-      size: size,
-      paint: Paint()
-        ..color = Colors.white
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2,
+    final image =
+        await gameRef.images.load("art/buttons/Master Button Sheet.png");
+    loadedSprite = Sprite(
+      image,
+      srcPosition: Vector2(147 * exportScale,
+          20 * exportScale), // multiplied original coordinates
+      srcSize: Vector2(46 * exportScale,
+          13 * exportScale), // change width and height as needed
     );
-    add(border);
 
-    // Add text
-    textComponent = TextComponent(
-      text: 'Add Bot',
-      textRenderer: TextPaint(
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-    textComponent.position = Vector2(
-      size.x / 2 - textComponent.width / 2,
-      size.y / 2 - textComponent.height / 2,
-    );
-    add(textComponent);
-  }
+    size = loadedSprite.srcSize; // Set the size of the AddBotButton
 
-  @override
-  void onTapDown(TapDownEvent event) {
-    // Play button click sound
-    SFXManager().playButtonSelect();
-    
-    // Darken button to show it's pressed
-    background.paint.color = const Color(0xFF0F3C1F);
+    // Create a SpriteComponent and add it as a child
+    final spriteComponent = SpriteComponent(
+      sprite: loadedSprite,
+      size: size, // Make the SpriteComponent the same size as the button
+    );
+    add(spriteComponent);
   }
 
   @override
   void onTapUp(TapUpEvent event) {
-    // Return to original color
-    background.paint.color = const Color(0xFF1A5C32);
-    
-    // Call the onTap callback
-    onTap();
-  }
-
-  @override
-  void onTapCancel(TapCancelEvent event) {
-    // Return to original color if tap is canceled
-    background.paint.color = const Color(0xFF1A5C32);
+    super.onTapUp(event);
+    onTap(); // Call the provided onTap callback
   }
 }

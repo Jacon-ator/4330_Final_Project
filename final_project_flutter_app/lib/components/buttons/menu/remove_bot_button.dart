@@ -1,93 +1,57 @@
-import 'package:final_project_flutter_app/audio/sfx_manager.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 
-class RemoveBotButton extends PositionComponent with TapCallbacks, HasGameRef<PokerParty> {
-  final Function onTap;
-  late TextComponent textComponent;
-  late RectangleComponent background;
-  late RectangleComponent border;
-  bool isEnabled = false;
+class RemoveBotButton extends PositionComponent
+    with TapCallbacks, HasGameRef<PokerParty> {
+  final VoidCallback onTap;
+  bool isEnabled; // To control if the button is active
 
   RemoveBotButton({
     required Vector2 position,
     required this.onTap,
-    this.isEnabled = false,
-  }) : super(position: position, size: Vector2(200, 60));
+    this.isEnabled = true, // Default to enabled
+  }) : super(position: position);
 
   @override
   Future<void> onLoad() async {
-    // Create button background
-    background = RectangleComponent(
-      size: size,
-      paint: Paint()..color = isEnabled ? const Color(0xFF8B0000) : const Color(0xFF555555),
-    );
-    add(background);
+    await super.onLoad();
+    Sprite? loadedSprite;
+    double exportScale = 5; // Adjust this value based on your export scale
 
-    // Create button border
-    border = RectangleComponent(
-      size: size,
-      paint: Paint()
-        ..color = Colors.white
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2,
+    final image =
+        await gameRef.images.load("art/buttons/Master Button Sheet.png");
+    loadedSprite = Sprite(
+      image,
+      srcPosition: Vector2(147 * exportScale,
+          34 * exportScale), // multiplied original coordinates
+      srcSize: Vector2(46 * exportScale,
+          13 * exportScale), // change width and height as needed
     );
-    add(border);
 
-    // Add text
-    textComponent = TextComponent(
-      text: 'Remove Bot',
-      textRenderer: TextPaint(
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+    size = loadedSprite.srcSize; // Set the size of the RemoveBotButton
+
+    // Create a SpriteComponent and add it as a child
+    final spriteComponent = SpriteComponent(
+      sprite: loadedSprite,
+      size: size, // Make the SpriteComponent the same size as the button
     );
-    textComponent.position = Vector2(
-      size.x / 2 - textComponent.width / 2,
-      size.y / 2 - textComponent.height / 2,
-    );
-    add(textComponent);
-  }
-
-  void setEnabled(bool enabled) {
-    isEnabled = enabled;
-    background.paint.color = isEnabled ? const Color(0xFF8B0000) : const Color(0xFF555555);
-  }
-
-  @override
-  void onTapDown(TapDownEvent event) {
-    if (!isEnabled) return;
-    
-    // Play button click sound
-    SFXManager().playButtonSelect();
-    
-    // Darken button to show it's pressed
-    if (isEnabled) {
-      background.paint.color = const Color(0xFF5A0000);
-    }
+    add(spriteComponent);
   }
 
   @override
   void onTapUp(TapUpEvent event) {
-    if (!isEnabled) return;
-    
-    // Return to original color
-    background.paint.color = const Color(0xFF8B0000);
-    
-    // Call the onTap callback
-    onTap();
+    if (isEnabled) {
+      super.onTapUp(event);
+      onTap(); // Call the provided onTap callback
+    }
   }
 
-  @override
-  void onTapCancel(TapCancelEvent event) {
-    if (!isEnabled) return;
-    
-    // Return to original color if tap is canceled
-    background.paint.color = const Color(0xFF8B0000);
+  // Method to update the enabled state and visual feedback
+  void setEnabled(bool enabled) {
+    isEnabled = enabled;
+    final spriteChild = children.whereType<SpriteComponent>().firstOrNull;
+    final textChild = children.whereType<TextComponent>().firstOrNull;
   }
 }

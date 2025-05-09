@@ -32,11 +32,11 @@ class LobbyScreen extends Component with HasGameRef<PokerParty> {
 
     // Ensure we start with a clean state
     resetLobby();
-    
+
     // Set the initial player count based on the actual number of players
     playerCount = gameRef.gameState.players.length;
     print("Initial player count: $playerCount");
-    
+
     // Force an update of the player count display after a short delay to ensure it's rendered
     Future.delayed(const Duration(milliseconds: 100), () {
       updatePlayerCount();
@@ -125,20 +125,20 @@ class LobbyScreen extends Component with HasGameRef<PokerParty> {
       gameRef.size.y * 0.3,
     );
     add(playersComponent);
-    
+
     // Force a position update after adding to ensure correct positioning
     playersComponent.position = Vector2(
       gameRef.size.x / 2 - playersComponent.width / 2,
       gameRef.size.y * 0.3,
     );
-    
+
     // Add Bot button
     final addBotButton = AddBotButton(
       position: Vector2(gameRef.size.x / 2 - 210, gameRef.size.y * 0.45),
       onTap: addBot,
     );
     add(addBotButton);
-    
+
     // Remove Bot button
     removeBotButton = RemoveBotButton(
       position: Vector2(gameRef.size.x / 2 + 10, gameRef.size.y * 0.45),
@@ -148,7 +148,7 @@ class LobbyScreen extends Component with HasGameRef<PokerParty> {
     add(removeBotButton);
 
     playersComponentFill = TextComponent(
-      text: 'Players: 4/4',
+      text: playerCountText,
       textRenderer: TextPaint(
         style: const TextStyle(
           fontFamily: 'RedAlert', // pixel font
@@ -205,7 +205,7 @@ class LobbyScreen extends Component with HasGameRef<PokerParty> {
     _gameStateSubscription?.cancel();
     resetLobby();
   }
-  
+
   // Reset the lobby state
   void resetLobby() {
     // Clear all players except the human player
@@ -218,10 +218,10 @@ class LobbyScreen extends Component with HasGameRef<PokerParty> {
           break;
         }
       }
-      
+
       // Clear all players
       gameRef.gameState.players.clear();
-      
+
       // Add back just the human player if found
       if (humanPlayer != null) {
         gameRef.gameState.players.add(humanPlayer);
@@ -240,15 +240,16 @@ class LobbyScreen extends Component with HasGameRef<PokerParty> {
         );
         gameRef.gameState.players.add(newHumanPlayer);
       }
-      
+
       // Reset game state
       gameRef.gameState.isLobbyActive = false;
       gameRef.gameState.isGameOver = false;
-      
+
       // Update the player count to match the actual number of players (should be 1)
       playerCount = gameRef.gameState.players.length;
-      
-      print("Lobby reset: All bots removed, only human player remains. Player count: $playerCount");
+
+      print(
+          "Lobby reset: All bots removed, only human player remains. Player count: $playerCount");
     } else {
       // If no players exist, create a human player
       Player newHumanPlayer = Player(
@@ -263,10 +264,10 @@ class LobbyScreen extends Component with HasGameRef<PokerParty> {
         isAllIn: false,
       );
       gameRef.gameState.players.add(newHumanPlayer);
-      
+
       // Set player count to 1
       playerCount = 1;
-      
+
       print("Created new human player. Player count: $playerCount");
     }
   }
@@ -274,29 +275,32 @@ class LobbyScreen extends Component with HasGameRef<PokerParty> {
   void updatePlayerCount() {
     // Ensure player count matches the actual number of players in the game state
     playerCount = gameRef.gameState.players.length;
-    
+
     // Update the display
-    playersComponent.text = 'Players: $playerCount/4';
-    
+    String playerCountText = 'Players: $playerCount/4';
+    playersComponent.text = playerCountText;
+    playersComponentFill.text = playerCountText;
+
     // Update start match button
     children.whereType<StartMatchButton>().forEach((button) {
       button.playerCount = playerCount;
     });
-    
+
     // Update remove bot button state
     removeBotButton.setEnabled(playerCount > 1);
-    
+
     print("Updated player count: $playerCount");
   }
-  
+
   void addBot() {
     // Check if we can add more bots (max 4 players total)
-    if (gameRef.gameState.players.length < gameRef.gameState.table.totalCapacity) {
+    if (gameRef.gameState.players.length <
+        gameRef.gameState.table.totalCapacity) {
       // Create a new AI player
       int botIndex = gameRef.gameState.players.length;
       Player botPlayer = Player(
-        id: "ai_${botIndex}",
-        name: "AI_Player_${botIndex}",
+        id: "ai_$botIndex",
+        name: "AI_Player_$botIndex",
         balance: 1000,
         isAI: true,
         isCurrentTurn: false,
@@ -305,20 +309,20 @@ class LobbyScreen extends Component with HasGameRef<PokerParty> {
         handRank: null,
         isAllIn: false,
       );
-      
+
       // Add the bot to the game state
       gameRef.gameState.players.add(botPlayer);
-      
+
       // Update player count
       playerCount = gameRef.gameState.players.length;
       updatePlayerCount();
-      
+
       print("Added bot: ${botPlayer.name}");
     } else {
       print("Cannot add more bots. Table is full.");
     }
   }
-  
+
   void removeBot() {
     // Check if there are any bots to remove (keep at least 1 player - the human)
     if (gameRef.gameState.players.length > 1) {
@@ -331,7 +335,7 @@ class LobbyScreen extends Component with HasGameRef<PokerParty> {
           break;
         }
       }
-      
+
       // Update player count
       playerCount = gameRef.gameState.players.length;
       updatePlayerCount();
