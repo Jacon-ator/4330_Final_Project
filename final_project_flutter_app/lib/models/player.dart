@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:final_project_flutter_app/models/card.dart';
 import 'package:final_project_flutter_app/models/card_evaluator.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
+import 'package:final_project_flutter_app/services/calculator.dart';
 
 class Player {
   final String id;
@@ -50,7 +51,8 @@ class Player {
 
   int placeBet(int amount) {
     if (amount > balance) {
-      throw Exception("Insufficient balance to place bet.");
+      isAllIn = true; // Set all-in flag if going all-in
+      amount = balance; // Go all-in
     }
     bet = (bet ?? 0) + amount;
     balance -= amount;
@@ -96,7 +98,7 @@ class Player {
     // This could be expanded with actual AI strategies
     Random random = Random();
     int decision = random
-        .nextInt(2); // Randomly choose between 0 (fold), 1 (call), or 2 (raise)
+        .nextInt(3); // Randomly choose between 0 (fold), 1 (call), or 2 (raise)
     hasPlayedThisRound = true; // Mark that the player has played this round
     switch (decision) {
       case 0:
@@ -107,19 +109,17 @@ class Player {
         print("$name calls.");
         return call(gameRef); // Call
       case 2:
-        int raiseAmount = 50;
-        int betAmount = getCallAmount(gameRef) + raiseAmount;
-
-        if (betAmount > balance) {
-          betAmount = balance; // Go all-in if the raise amount exceeds balance
+        int raiseAmount = random.nextInt(balance ~/ 2);
+        if (raiseAmount > balance) {
+          raiseAmount =
+              balance; // Go all-in if the raise amount exceeds balance
           isAllIn = true; // Set all-in flag if going all-in
         }
-        //     random.nextInt(balance ~/ 2) + 1; // Random raise amount
-        // print("$name raises by $raiseAmount.");
-        print("$name raises 50.");
-        placeBet(betAmount);
+        print("$name raises by $raiseAmount.");
+        print("$name raises $raiseAmount.");
+        placeBet(raiseAmount);
 
-        return betAmount; // Raise
+        return raiseAmount; // Raise
       default:
         return 0; // Default to fold if something goes wrong
     }
@@ -169,5 +169,37 @@ class Player {
       'handRank': handRank?.toString() ?? 'none',
       'isAllIn': isAllIn,
     };
+  }
+
+  List<Card> convertHandToEvaluate(List<PlayingCard> hand) {
+    Map<String, Suit> suitMap = {
+      'Hearts': Suit.hearts,
+      'Diamonds': Suit.diamonds,
+      'Spades': Suit.spades,
+      'Clubs': Suit.clubs,
+    };
+
+    Map<int, CardRank> rankMap = {
+      2: CardRank.two,
+      3: CardRank.three,
+      4: CardRank.four,
+      5: CardRank.five,
+      6: CardRank.six,
+      7: CardRank.seven,
+      8: CardRank.eight,
+      9: CardRank.nine,
+      10: CardRank.ten,
+      11: CardRank.jack,
+      12: CardRank.queen,
+      13: CardRank.king,
+      14: CardRank.ace,
+    };
+    List<Card> cards = hand.map((card) {
+      return Card(
+        rankMap[card.rank] ?? CardRank.ace,
+        suitMap[card.suit] ?? Suit.hearts,
+      );
+    }).toList();
+    return cards;
   }
 }
