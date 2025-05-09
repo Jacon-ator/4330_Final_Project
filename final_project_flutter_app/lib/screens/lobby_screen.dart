@@ -163,17 +163,21 @@ class LobbyScreen extends Component with HasGameRef<PokerParty> {
     );
     add(playersComponentFill);
 
-    // Add start match button
+    // Add start match button - positioned halfway between bot buttons and bottom
     final startMatchButton = StartMatchButton(
       playerCount: playerCount,
-      position: Vector2(gameRef.size.x / 2 - 100, gameRef.size.y * 0.7),
+      position: Vector2(gameRef.size.x / 2, gameRef.size.y * 0.65),
     );
     add(startMatchButton);
+    
+    // Force button to respect its position after adding
+    startMatchButton.position = Vector2(gameRef.size.x / 2, gameRef.size.y * 0.65);
 
+    // Adjusted main menu button position to be at the bottom of the screen
     final MainMenuButton mainMenuButton = MainMenuButton()
       ..size = Vector2(gameRef.size.x / 6, gameRef.size.y / 6)
       ..position = Vector2(
-          gameRef.size.x / 2 - gameRef.size.x / 12, gameRef.size.y * 0.65);
+          gameRef.size.x / 2 - gameRef.size.x / 12, gameRef.size.y * 0.8);
 
     add(mainMenuButton);
   }

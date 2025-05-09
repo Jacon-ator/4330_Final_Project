@@ -32,7 +32,7 @@ class StartMatchButton extends PositionComponent
 
     size = loadedSprite.srcSize; // Set the size of the StartMatchButton
     anchor = Anchor.center;
-    position = gameRef.size / 2;
+    // Don't override the position that was set in the constructor
 
     // Create a SpriteComponent and add it as a child
     final spriteComponent = SpriteComponent(
