@@ -212,7 +212,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       maxNotifications: 3,
     );
     await add(notificationManager);
-    
+
     // Initialize HandArea and CommunityCardArea as class members to avoid race conditions
     handArea = HandArea();
     communityCardArea = CommunityCardArea();
@@ -287,7 +287,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     // Use the class member variables directly instead of searching for them
     handArea.clearCards();
     communityCardArea.clearCards();
-
+    notificationManager.showNotification('Game started!');
     await dealCards();
     await blinds(); // Place the blinds for the game
 
@@ -299,9 +299,20 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
 
   Future<void> dealCards() async {
     // gameState.deck.shuffleDeck();
+    notificationManager.showNotification('Dealing cards...',
+        backgroundColor: const Color(0xFF1A5C32), duration: 2.0);
+    Future.delayed(const Duration(milliseconds: 500));
 
     for (Player player in gameState.players) {
+      // Add delay between dealing cards to each player
+
+      // Deal first card with animation sound
       player.receiveCard(gameState.deck.dealCard());
+
+      // Short delay between first and second card
+      await Future.delayed(const Duration(milliseconds: 1000));
+
+      // Deal second card with animation sound
       player.receiveCard(gameState.deck.dealCard());
 
       print("Community cards dealt: ${gameState.communityCards.toString()}");
@@ -313,8 +324,10 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
   }
 
   Future<void> nextPlayer() async {
-    // move to next player
+    // Add a short delay before moving to the next player for smoother gameplay
+    await Future.delayed(const Duration(milliseconds: 800));
 
+    // move to next player
     bool potRight = checkPotIsRight(gameState.players);
 
     if (potRight) {
@@ -339,6 +352,10 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       duration: 2.0,
     );
     await updateGameStateInFirebase();
+
+    // Add a short delay after displaying the notification
+    await Future.delayed(const Duration(milliseconds: 500));
+
     await playerTurn();
   }
 
@@ -351,6 +368,11 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     if (currentPlayer.isFolded! || currentPlayer.isAllIn!) {
       print(
           '${currentPlayer.name} has folded or cannot bet any more money. Skipping turn.');
+      notificationManager.showNotification(
+        '${currentPlayer.name} has folded or cannot bet any more money. Skipping turn.',
+        backgroundColor: const Color(0xFF8B0000),
+        duration: 2.5,
+      );
       currentPlayer.isCurrentTurn = false; // End the current player's turn
       await updateGameStateInFirebase();
       await nextPlayer(); // Skip to the next player if current player has folded
@@ -365,12 +387,32 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     if (currentPlayer.isAI!) {
       // If it's an AI player's turn, handle AI logic here
       print('AI Player ${currentPlayer.name}\'s turn.');
+      notificationManager
+          .showNotification('AI Player ${currentPlayer.name}\'s turn.');
+      Future.delayed(const Duration(milliseconds: 500));
       if (!await endRoundIfFolded(currentPlayer)) {
         int amountToCall = currentPlayer.getCallAmount(gameRef);
         int amount = await currentPlayer.makeAIDecision(gameRef);
         currentPlayer.hasPlayedThisRound = true; // Mark as played this round
         if (amount > amountToCall) {
+          notificationManager.showNotification(
+            '${currentPlayer.name} raised to $amount!',
+            backgroundColor: const Color(0xFF1A5C32),
+            duration: 2.5,
+          );
           await resetTurnsOnRaise(currentPlayer);
+        } else if (amount == 0) {
+          notificationManager.showNotification(
+            '${currentPlayer.name} checked!',
+            backgroundColor: const Color(0xFF1A5C32),
+            duration: 2.5,
+          );
+        } else {
+          notificationManager.showNotification(
+            '${currentPlayer.name} called!',
+            backgroundColor: const Color(0xFF1A5C32),
+            duration: 2.5,
+          );
         }
         gameRef.gameState.pot += amount; // Add the bet to the pot
         currentPlayer.isCurrentTurn = false; // End AI turn after decision
@@ -393,9 +435,19 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     }
 
     print('Showing player actions...');
+
     print(
         'Current player: ${gameState.players[gameState.playerIndex].name}, amount to call: ${player.getCallAmount(gameRef)}');
-
+    notificationManager.showNotification(
+      'Current player: ${gameState.players[gameState.playerIndex].name}',
+      backgroundColor: const Color(0xFF1A5C32),
+      duration: 2.5,
+    );
+    notificationManager.showNotification(
+      'Amount to call: ${player.getCallAmount(gameRef)}',
+      backgroundColor: const Color(0xFF1A5C32),
+      duration: 2.5,
+    );
     // Set the base position for the first button
     children.whereType<ActionButton>().forEach((button) {
       remove(button); // Remove any existing action buttons
@@ -413,6 +465,9 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
           duration: 2.5,
         );
         player.hasPlayedThisRound = true; // Mark as played this round
+
+        // Add a short delay for visual feedback after checking
+        await Future.delayed(const Duration(milliseconds: 500));
 
         player.isCurrentTurn = false;
         await updateGameStateInFirebase();
@@ -569,7 +624,17 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
 
     print(
         '${smallBlindPlayer.name} placed small blind of ${gameState.smallBlind}');
+    notificationManager.showNotification(
+      '${smallBlindPlayer.name} placed small blind of ${gameState.smallBlind}',
+      backgroundColor: const Color(0xFF1A5C32),
+      duration: 2.5,
+    );
     print('${bigBlindPlayer.name} placed big blind of ${gameState.bigBlind}');
+    notificationManager.showNotification(
+      '${bigBlindPlayer.name} placed big blind of ${gameState.bigBlind}',
+      backgroundColor: const Color(0xFF1A5C32),
+      duration: 2.5,
+    );
     await updateGameStateInFirebase();
   }
 
@@ -639,6 +704,10 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       gameState.isGameOver = true; // Set the game state to over
       if (checkFolds() == gameState.players.length - 1) {
         print('${winner.name} wins by default!');
+        notificationManager.showNotification('All other players folded!',
+            backgroundColor: const Color(0xFF8B0000), // Red color for fold
+            duration: 2.5);
+        Future.delayed(const Duration(milliseconds: 500));
         notificationManager.showNotification(
           '${winner.name} wins by default!',
           backgroundColor: const Color(0xFFD4AF37), // Gold color for winner
@@ -753,9 +822,11 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
             print('${winner.name} wins by default!');
             winner.balance +=
                 gameState.pot; // Add the pot to the winner's balance
+            updateWinsInProfilePage(winner);
           } else {
             print(
                 '${winner.name} wins the game with a ${winner.hand.toString()}!');
+            updateWinsInProfilePage(winner);
           }
 
           // Show the play again button
@@ -1012,6 +1083,38 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       print('flutter: User document not found.');
       tableSkinImage =
           'art/Base Poker Table.png'; // Default table skin if not found
+    }
+  }
+
+  Future<void> updateWinsInProfilePage(Player winner) async {
+    final currentPlayerEmail = FirebaseAuth.instance.currentUser?.email;
+
+    if (currentPlayerEmail == null) {
+      print('No current user email available');
+      return;
+    }
+
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentPlayerEmail) // Use the email as the document ID
+        .get();
+
+    if (userDoc.exists) {
+      if (winner.isAI! == true) {
+        int losses = userDoc['Games Lost'] ?? 0;
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentPlayerEmail)
+            .update({'Game Lost': losses - 1});
+        return;
+      }
+      int wins = userDoc['Games Wons'] ?? 0;
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentPlayerEmail)
+          .update({'Games Won': wins + 1});
+    } else {
+      print('User document not found.');
     }
   }
 }
