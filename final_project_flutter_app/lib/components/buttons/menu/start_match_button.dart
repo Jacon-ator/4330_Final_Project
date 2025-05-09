@@ -3,7 +3,6 @@ import 'package:final_project_flutter_app/poker_party.dart';
 import 'package:final_project_flutter_app/services/lobby_screen_service.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:flutter/material.dart';
 
 class StartMatchButton extends PositionComponent
     with TapCallbacks, HasGameRef<PokerParty> {
@@ -17,29 +16,30 @@ class StartMatchButton extends PositionComponent
 
   @override
   Future<void> onLoad() async {
-    // Add a background for the button
-    final buttonBackground = RectangleComponent(
-      size: size,
-      paint: Paint()..color = Color(0xFF104810),
-    );
-    add(buttonBackground);
+    await super.onLoad(); // It's good practice to call super.onLoad()
+    Sprite?
+        loadedSprite; // Renamed to avoid confusion with the SpriteComponent's sprite property
+    double exportScale = 5; // Adjust this value based on your export scale
 
-    // Add text to the button
-    textComponent = TextComponent(
-      text: 'Start Match',
-      textRenderer: TextPaint(
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 28,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+    final image =
+        await gameRef.images.load("art/buttons/Master Button Sheet.png");
+    loadedSprite = Sprite(
+      image,
+      srcPosition: Vector2(69 * exportScale,
+          62 * exportScale), // multiplied original coordinates
+      srcSize: Vector2(335, 65), // change width and height as needed
     );
-    textComponent.position = Vector2(
-      size.x / 2 - textComponent.width / 2,
-      size.y / 2 - textComponent.height / 2,
+
+    size = loadedSprite.srcSize; // Set the size of the StartMatchButton
+    anchor = Anchor.center;
+    position = gameRef.size / 2;
+
+    // Create a SpriteComponent and add it as a child
+    final spriteComponent = SpriteComponent(
+      sprite: loadedSprite,
+      size: size, // Make the SpriteComponent the same size as the button
     );
-    add(textComponent);
+    add(spriteComponent);
   }
 
   // In StartMatchButton class

@@ -26,8 +26,8 @@ class StartGameButton extends PositionComponent
         await gameRef.images.load("art/buttons/Master Button Sheet.png");
     sprite = Sprite(
       image,
-      srcPosition: Vector2(69 * exportScale,
-          62 * exportScale), // multiplied original coordinates
+      srcPosition: Vector2(137 * exportScale,
+          76 * exportScale), // multiplied original coordinates
       srcSize: Vector2(335, 65), // change width and height as needed
     );
 

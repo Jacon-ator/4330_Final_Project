@@ -13,7 +13,9 @@ import 'package:flutter/material.dart';
 
 class LobbyScreen extends Component with HasGameRef<PokerParty> {
   late TextComponent titleComponent;
-  late TextComponent playersComponent;
+  late TextComponent titleComponentFill;
+  late TextComponent playersComponent, playersComponentFill;
+  late Vector2 size;
   int playerCount = 0;
 
   late RemoveBotButton removeBotButton;
@@ -26,6 +28,7 @@ class LobbyScreen extends Component with HasGameRef<PokerParty> {
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+    size = gameRef.size;
 
     // Ensure we start with a clean state
     resetLobby();
@@ -57,18 +60,25 @@ class LobbyScreen extends Component with HasGameRef<PokerParty> {
     });
 
     // Load background
-    final background = RectangleComponent(
-        size: gameRef.size, paint: Paint()..color = const Color(0xFF1E6C3C));
-    add(background);
+    final rulesBackground = await Sprite.load('art/Lobby Screen.png');
+    add(SpriteComponent(
+      sprite: rulesBackground,
+      size: size, // Make the image fill the screen
+      position: Vector2(0, 0),
+    ));
 
     // Add title
     titleComponent = TextComponent(
       text: 'Game Lobby',
       textRenderer: TextPaint(
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 48,
+        style: TextStyle(
+          fontFamily: 'RedAlert',
+          fontSize: 104,
           fontWeight: FontWeight.bold,
+          foreground: Paint()
+            ..style = PaintingStyle.stroke // Set to stroke
+            ..strokeWidth = 7 // Adjust outline thickness as needed
+            ..color = const Color.fromARGB(230, 118, 161, 93),
         ),
       ),
     );
@@ -76,15 +86,37 @@ class LobbyScreen extends Component with HasGameRef<PokerParty> {
       gameRef.size.x / 2 - titleComponent.width / 2,
       gameRef.size.y * 0.15,
     );
-    add(titleComponent);
 
-    // Add player counter
-    playersComponent = TextComponent(
-      text: 'Players: $playerCount/4',
+    titleComponentFill = TextComponent(
+      text: 'Game Lobby',
       textRenderer: TextPaint(
         style: const TextStyle(
-          color: Colors.white,
-          fontSize: 36,
+          fontFamily: 'RedAlert',
+          color: Color.fromARGB(255, 70, 130, 50),
+          fontSize: 104,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+    titleComponentFill.position = Vector2(
+      gameRef.size.x / 2 - titleComponentFill.width / 2,
+      gameRef.size.y * 0.15,
+    );
+    add(titleComponent);
+    add(titleComponentFill);
+
+    String playerCountText = 'Players: $playerCount/4';
+    // Add player counter
+    playersComponent = TextComponent(
+      text: playerCountText,
+      textRenderer: TextPaint(
+        style: TextStyle(
+          fontFamily: 'RedAlert',
+          fontSize: 64,
+          foreground: Paint()
+            ..style = PaintingStyle.stroke // Set to stroke
+            ..strokeWidth = 7 // Adjust outline thickness as needed
+            ..color = const Color.fromARGB(230, 118, 161, 93),
         ),
       ),
     );
@@ -114,6 +146,22 @@ class LobbyScreen extends Component with HasGameRef<PokerParty> {
       isEnabled: playerCount > 1, // Only enable if there are bots to remove
     );
     add(removeBotButton);
+
+    playersComponentFill = TextComponent(
+      text: 'Players: 4/4',
+      textRenderer: TextPaint(
+        style: const TextStyle(
+          fontFamily: 'RedAlert', // pixel font
+          fontSize: 64,
+          color: Color.fromARGB(255, 70, 130, 50), // Fill color
+        ),
+      ),
+    );
+    playersComponentFill.position = Vector2(
+      gameRef.size.x / 2 - playersComponent.width / 2,
+      gameRef.size.y * 0.3,
+    );
+    add(playersComponentFill);
 
     // Add start match button
     final startMatchButton = StartMatchButton(
