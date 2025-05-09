@@ -72,7 +72,7 @@ class LoginScreen extends Component with HasGameRef<PokerParty> {
     //text field for the password
     final passwordfield = TextField(
       obscureText: true,
-      decoration: const InputDecoration(label: Text('Password')),
+      decoration: const InputDecoration(label: Text('CHANGE FOR EXAM')),
       onChanged: (value) {
         password = value;
       },
