@@ -6,6 +6,7 @@ import 'package:final_project_flutter_app/components/buttons/gameplay/end_lobby_
 import 'package:final_project_flutter_app/components/buttons/gameplay/play_next_round_button.dart';
 import 'package:final_project_flutter_app/components/buttons/gameplay/raise_slider.dart';
 import 'package:final_project_flutter_app/components/components.dart';
+import 'package:final_project_flutter_app/components/game_notification.dart';
 import 'package:final_project_flutter_app/config.dart';
 import 'package:final_project_flutter_app/models/card.dart';
 import 'package:final_project_flutter_app/models/card_evaluator.dart';
@@ -30,6 +31,9 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
   StreamSubscription<DocumentSnapshot>? _gameStateSubscription;
   String tableSkinImage = 'art/Base Poker Table.png';
   String cardSkinImage = 'art/cards/Black Card Back.png';
+
+  // Notification manager for displaying game messages
+  late NotificationManager notificationManager;
 
   // Store direct references to frequently accessed components to avoid race conditions
   late HandArea handArea;
@@ -200,6 +204,15 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     add(bottomCardSprite1);
     add(bottomCardSprite2);
 
+    // Initialize the notification manager with a box in the top right of the screen
+    notificationManager = NotificationManager(
+      boxPosition: Vector2(gameRef.size.x - 300, 30),
+      boxSize: Vector2(280, 200),
+      spacing: 50,
+      maxNotifications: 3,
+    );
+    await add(notificationManager);
+    
     // Initialize HandArea and CommunityCardArea as class members to avoid race conditions
     handArea = HandArea();
     communityCardArea = CommunityCardArea();
@@ -320,6 +333,11 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       return;
     }
     print('Next player is ${gameState.players[gameState.playerIndex].name}');
+    notificationManager.showNotification(
+      'Next player is ${gameState.players[gameState.playerIndex].name}',
+      backgroundColor: const Color(0xFF1A5C32),
+      duration: 2.0,
+    );
     await updateGameStateInFirebase();
     await playerTurn();
   }
@@ -389,6 +407,11 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     final checkButton = ActionButton('Check', () async {
       if (!gameState.isGameOver && player.isCurrentTurn!) {
         print('${player.name} checked!');
+        notificationManager.showNotification(
+          '${player.name} checked!',
+          backgroundColor: const Color(0xFF1A5C32),
+          duration: 2.5,
+        );
         player.hasPlayedThisRound = true; // Mark as played this round
 
         player.isCurrentTurn = false;
@@ -396,6 +419,11 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
         await nextPlayer();
       } else {
         print('It is not your turn!');
+        notificationManager.showNotification(
+          'It is not your turn!',
+          backgroundColor: const Color(0xFF8B0000),
+          duration: 2.5,
+        );
       }
     },
         // Using exported coordinates for Check button:
@@ -408,6 +436,11 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       () async {
         if (!gameState.isGameOver && player.isCurrentTurn!) {
           print('${player.name} called!');
+          notificationManager.showNotification(
+            '${player.name} called!',
+            backgroundColor: const Color(0xFF1A5C32),
+            duration: 2.5,
+          );
           int bet = player.call(gameRef);
           gameState.pot += bet; // Add the bet to the pot
           player.hasPlayedThisRound = true; // Mark as played this round
@@ -417,6 +450,11 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
           await nextPlayer();
         } else {
           print('It is not your turn!');
+          notificationManager.showNotification(
+            'It is not your turn!',
+            backgroundColor: const Color(0xFF8B0000),
+            duration: 2.5,
+          );
         }
       },
       // Using exported coordinates for Call button:
@@ -437,6 +475,11 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       () async {
         if (!gameState.isGameOver && player.isCurrentTurn!) {
           print('${player.name} folded!');
+          notificationManager.showNotification(
+            '${player.name} folded!',
+            backgroundColor: const Color(0xFF8B0000),
+            duration: 2.5,
+          );
           player.fold();
           player.hasPlayedThisRound = true; // Mark as played this round
 
@@ -445,6 +488,11 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
           await nextPlayer();
         } else {
           print('It is not your turn!');
+          notificationManager.showNotification(
+            'It is not your turn!',
+            backgroundColor: const Color(0xFF8B0000),
+            duration: 2.5,
+          );
         }
       },
       // Using exported coordinates for Call button:
@@ -464,6 +512,11 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
         if (!gameState.isGameOver && player.isCurrentTurn!) {
           int bet = await showSlider();
           print('${player.name} raised to $bet!');
+          notificationManager.showNotification(
+            '${player.name} raised to $bet!',
+            backgroundColor: const Color(0xFF1A5C32),
+            duration: 2.5,
+          );
           gameState.pot += bet; // Add the bet to the pot
           await resetTurnsOnRaise(player);
           hideRaiseSlider();
@@ -472,6 +525,11 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
           await nextPlayer();
         } else {
           print('It is not your turn!');
+          notificationManager.showNotification(
+            'It is not your turn!',
+            backgroundColor: const Color(0xFF8B0000),
+            duration: 2.5,
+          );
         }
       },
       // For example:
@@ -581,9 +639,19 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       gameState.isGameOver = true; // Set the game state to over
       if (checkFolds() == gameState.players.length - 1) {
         print('${winner.name} wins by default!');
+        notificationManager.showNotification(
+          '${winner.name} wins by default!',
+          backgroundColor: const Color(0xFFD4AF37), // Gold color for winner
+          duration: 4.0,
+        );
         winner.balance += gameState.pot; // Add the pot to the winner's balance
       } else {
         print('${winner.name} wins the game with a ${winner.hand.toString()}!');
+        notificationManager.showNotification(
+          '${winner.name} wins the game with a ${winner.hand.toString()}!',
+          backgroundColor: const Color(0xFFD4AF37), // Gold color for winner
+          duration: 4.0,
+        );
       }
 
       // Show the play again button
