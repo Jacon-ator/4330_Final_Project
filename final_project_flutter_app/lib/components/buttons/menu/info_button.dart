@@ -1,34 +1,22 @@
-import 'package:final_project_flutter_app/screens/poker_hands_page.dart';
-import 'package:flutter/material.dart';
+import 'package:final_project_flutter_app/poker_party.dart';
+import 'package:flame/components.dart';
 
-class InfoButton extends StatelessWidget {
-  final String name;
-
-  const InfoButton({super.key, required this.name});
+class InfoButton extends SpriteComponent with HasGameRef<PokerParty> {
+  InfoButton() : super(priority: 1);
 
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const PokerHandsPage(),
-          ),
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: const BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.white,
-        ),
-        child: const Icon(
-          Icons.info_outline,
-          size: 32,
-          color: Colors.black,
-        ),
-      ),
+  Future<void> onLoad() async {
+    sprite = Sprite(
+      game.images.fromCache('Master Button Sheet.png'),
+      srcPosition: Vector2(170, 0),
+      srcSize: Vector2(13, 12),
     );
   }
+
+  void handleTap(Vector2 tapPosition) {
+    if (toRect().contains(tapPosition.toOffset())) {
+      gameRef.router.pushNamed('rules');
+    }
+  }
 }
+
