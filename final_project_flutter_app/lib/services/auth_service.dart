@@ -27,8 +27,10 @@ class AuthService {
         "Coins" : 150, //Start with 150 Coins
         "Games Won" : 0,
         "Games Lost" : 0,
-        "ownTableSkin": false,
-        "ownCardSkin": false
+        "ownPurpleTableSkin": false,
+        "ownRedTableSkin": false,
+        "ownMagicCardSkin": false,
+        "ownPokemonCardSkin": false
         }
       );
 
