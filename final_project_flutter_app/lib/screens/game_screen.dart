@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_project_flutter_app/audio/sfx_manager.dart';
+import 'package:final_project_flutter_app/components/buttons/gameplay/end_lobby_button.dart';
 import 'package:final_project_flutter_app/components/buttons/gameplay/play_next_round_button.dart';
 import 'package:final_project_flutter_app/components/buttons/gameplay/raise_slider.dart';
 import 'package:final_project_flutter_app/components/components.dart';
@@ -10,6 +11,7 @@ import 'package:final_project_flutter_app/models/card.dart';
 import 'package:final_project_flutter_app/models/card_evaluator.dart';
 import 'package:final_project_flutter_app/models/player.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
+import 'package:final_project_flutter_app/services/calculator.dart';
 import 'package:final_project_flutter_app/services/game_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flame/components.dart';
@@ -26,7 +28,12 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
   CardEvaluator cardEvaluator = CardEvaluator();
   final SFXManager _sfxManager = SFXManager();
   StreamSubscription<DocumentSnapshot>? _gameStateSubscription;
-  String tableSkinImage = '';
+  String tableSkinImage = 'art/Base Poker Table.png';
+  String cardSkinImage = 'art/cards/Black Card Back.png';
+
+  // Store direct references to frequently accessed components to avoid race conditions
+  late HandArea handArea;
+  late CommunityCardArea communityCardArea;
 
   @override
   Future<void> onLoad() async {
@@ -45,7 +52,8 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
 
     gameState = gameRef.gameState; // Get the game state from the game reference
 
-    await loadUserTableSkin();  // Load the table skin based on the user's preferences
+    await loadUserTableSkin(); // Load the table skin based on the user's preferences
+    await loadUserCardSkin(); // Load card skins
 
     await gameRef.images.loadAll([
       AssetPaths.cardFronts,
@@ -53,6 +61,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     ]);
 
     // Load sprites
+    final cardSprite = await gameRef.loadSprite(cardSkinImage);
     final tableSprite = await gameRef.loadSprite(tableSkinImage);
     final uiSprite = await gameRef.loadSprite('art/Base Player UI.png');
     final chatMenuSprite = await gameRef.loadSprite('art/Chat Menu.png');
@@ -94,8 +103,70 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       ..size = Vector2(20 * 5.2, 27 * 5.76)
       ..position = Vector2(1150, 523);
 
-    late final PlayNextRoundButton endLobbyButton;
-    endLobbyButton = PlayNextRoundButton(
+    // Create left card sprites (left side of the table)
+    final leftCardSprite1 = SpriteComponent()
+      ..sprite = cardSprite
+      ..size = Vector2(50, 80)
+      ..position = Vector2(150, tableHeight / 2 - 50)
+      ..angle = 0.75
+      ..priority = 1;
+
+    final leftCardSprite2 = SpriteComponent()
+      ..sprite = cardSprite
+      ..size = Vector2(50, 80)
+      ..position = Vector2(150, tableHeight / 2 + 10)
+      ..angle = 1.35
+      ..priority = 1;
+
+    // Create top card sprites (top side of the table)
+    final topCardSprite1 = SpriteComponent()
+      ..sprite = cardSprite
+      ..size = Vector2(50, 80)
+      ..position = Vector2(tableWidth / 2 - 30, 30)
+      ..angle = 0.5
+      ..priority = 1;
+
+    final topCardSprite2 = SpriteComponent()
+      ..sprite = cardSprite
+      ..size = Vector2(50, 80)
+      ..position = Vector2(tableWidth / 2 + 20, 30)
+      ..angle = -0.5
+      ..priority = 1;
+
+    // Create right card sprites (right side of the table)
+    final rightCardSprite1 = SpriteComponent()
+      ..sprite = cardSprite
+      ..size = Vector2(50, 80)
+      ..position = Vector2(tableWidth - 120, tableHeight / 2 - 40)
+      ..angle = 1.2
+      ..priority = 1;
+
+    final rightCardSprite2 = SpriteComponent()
+      ..sprite = cardSprite
+      ..size = Vector2(50, 80)
+      ..position = Vector2(tableWidth - 120, tableHeight / 2 + 15)
+      ..angle = 0.75
+      ..priority = 1;
+
+    // Create bottom card sprites (bottom side of the table)
+    final bottomCardSprite1 = SpriteComponent()
+      ..sprite = cardSprite
+      ..size = Vector2(50, 80)
+      ..position = Vector2(tableWidth / 2 - 60,
+          tableHeight - 100) // Position at the bottom center
+      ..angle = -0.75 // Adjust the angle to make it appear flipped
+      ..priority = 1;
+
+    final bottomCardSprite2 = SpriteComponent()
+      ..sprite = cardSprite
+      ..size = Vector2(50, 80)
+      ..position = Vector2(tableWidth / 2 + 30,
+          tableHeight - 100) // Position next to the first card
+      ..angle = 0.2 // Adjust the angle to make it appear flipped
+      ..priority = 1;
+
+    late final EndLobbyButton endLobbyButton;
+    endLobbyButton = EndLobbyButton(
       spriteSrcPosition:
           Vector2(137 * 5, 62 * 5), // Replace with appropriate values
       spriteSrcSize: Vector2(80 * 5, 13 * 5), // Replace with appropriate values
@@ -103,172 +174,107 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       spriteScale: 0.70,
       () async {
         gameState.isLobbyActive = false; // Set the lobby state to inactive
-        await _updateGameStateInFirebase();
+        await updateGameStateInFirebase();
         gameRef.gameState.reset();
         gameRef.router.popUntilNamed("menu"); // Navigate to the lobby screen
-        await startGame();
       },
-    );
-
-    // Add the components
+    ); // Add the components
     add(pokerTable);
     add(chatMenu);
     add(endLobbyButton); // Add the button to the screen
     add(playerUI);
     add(profilePicture);
+    add(topCardSprite1);
+    add(topCardSprite2);
+    add(leftCardSprite1);
+    add(leftCardSprite2);
+    add(rightCardSprite1);
+    add(rightCardSprite2);
+    add(bottomCardSprite1);
+    add(bottomCardSprite2);
 
-    add(HandArea());
-    add(CommunityCardArea());
+    // Initialize HandArea and CommunityCardArea as class members to avoid race conditions
+    handArea = HandArea();
+    communityCardArea = CommunityCardArea();
 
-    print("Starting game...");
+    // Add them to the component tree
+    await add(handArea);
+    await add(communityCardArea);
 
-    if (isOffline) {
-      gameState.initializePlayers();
-    } else {
-      await gameState.initializePlayersFromLobby(FirebaseFirestore.instance);
-    }
-
-    await startGame();
-
-    if (!isOffline) {
-      // Listen for game state changes from other players
-      _gameStateSubscription = FirebaseFirestore.instance
-          .collection('games')
-          .doc('primary_game')
-          .snapshots()
-          .listen((snapshot) {
-        if (snapshot.exists && snapshot.data() != null) {
-          // Only update if it's not this player's turn
-          final currentPlayerId = FirebaseAuth.instance.currentUser?.uid;
-          final remoteGameState = GameState.fromJson(snapshot.data()!);
-
-          if (remoteGameState.isGameOver) {
-            gameState.removePlayer(currentPlayerId!);
-            gameRef.router.pushNamed("menu");
-          }
-
-          // Find current player in the remote game state
-          final currentPlayer = remoteGameState.players.firstWhere(
-            (p) => p.id == currentPlayerId,
-          );
-
-          // If it's not this player's turn, update the local game state
-          if (!currentPlayer.isCurrentTurn!) {
-            gameState = remoteGameState;
-            // updateUI();
-          }
-        }
-      });
-      _updateGameStateInFirebase();
-    }
+    // Initial game setup
   }
-
-Future<void> loadUserTableSkin() async {
-  // Get the current user's email
-  final currentPlayerEmail = FirebaseAuth.instance.currentUser?.email;
-  
-  if (currentPlayerEmail == null) {
-    print('No current user email available');
-    return;
-  }
-
-  // Fetch the user's data from Firestore using the email as the document ID
-  DocumentSnapshot userDoc = await FirebaseFirestore.instance
-      .collection('users')
-      .doc(currentPlayerEmail) // Use the email as the document ID
-      .get();
-
-  if (userDoc.exists) {
-    // Retrieve the 'ownPurpleTableSkin' and 'ownRedTableSkin' values from the user's data
-    bool ownPurpleTableSkin = userDoc['ownPurpleTableSkin'] ?? false;
-    bool ownRedTableSkin = userDoc['ownRedTableSkin'] ?? false;
-        
-    // Choose the correct table image based on the user's purchases
-    if (ownPurpleTableSkin) {
-      tableSkinImage = 'art/Purple Poker Table.png';  // Purple table skin image
-    } else if (ownRedTableSkin) {
-      tableSkinImage = 'art/Red Poker Table.png';  // Red table skin image
-    } else {
-      tableSkinImage = 'art/Base Poker Table.png';  // Default table image
-    }
-
-    print("flutter: Table skin loaded: $tableSkinImage");
-  } else {
-    print('flutter: User document not found.');
-    tableSkinImage = 'art/Base Poker Table.png';  // Default table skin if not found
-  }  
-}
 
   @override
   Future<void> onMount() async {
     super.onMount();
-    print("Starting game...");
+    await initializePlayers();
+    await startGame();
+    setupFirebaseListener();
+  }
 
+  Future<void> initializePlayers() async {
+    print("Initializing players...");
     if (isOffline) {
       gameState.initializePlayers();
     } else {
       await gameState.initializePlayersFromLobby(FirebaseFirestore.instance);
     }
+    await updateGameStateInFirebase();
+  }
 
-    await startGame();
+  void setupFirebaseListener() {
+    if (isOffline) return;
 
-    if (!isOffline) {
-      // Listen for game state changes from other players
-      _gameStateSubscription = FirebaseFirestore.instance
-          .collection('games')
-          .doc('primary_game')
-          .snapshots()
-          .listen((snapshot) {
-        if (snapshot.exists && snapshot.data() != null) {
-          // Only update if it's not this player's turn
-          final currentPlayerId = FirebaseAuth.instance.currentUser?.uid;
-          final remoteGameState = GameState.fromJson(snapshot.data()!);
+    // Clear any existing subscription to avoid duplicates
+    _gameStateSubscription?.cancel();
 
-          if (remoteGameState.isGameOver) {
-            gameState.removePlayer(currentPlayerId!);
-            gameRef.router.pushNamed("menu");
-          }
+    // Listen for game state changes from other players
+    _gameStateSubscription = FirebaseFirestore.instance
+        .collection('games')
+        .doc('primary_game')
+        .snapshots()
+        .listen((snapshot) {
+      if (snapshot.exists && snapshot.data() != null) {
+        // Only update if it's not this player's turn
+        final currentPlayerId = FirebaseAuth.instance.currentUser?.uid;
+        final remoteGameState = GameState.fromJson(snapshot.data()!);
 
-          // Find current player in the remote game state
-          final currentPlayer = remoteGameState.players.firstWhere(
-            (p) => p.id == currentPlayerId,
-          );
-
-          // If it's not this player's turn, update the local game state
-          if (!currentPlayer.isCurrentTurn!) {
-            gameState = remoteGameState;
-            // updateUI();
-          }
+        if (remoteGameState.isGameOver) {
+          gameState.removePlayer(currentPlayerId!);
+          gameRef.router.pushNamed("menu");
         }
-      });
 
-      _updateGameStateInFirebase();
-    }
+        // Find current player in the remote game state
+        final currentPlayer = remoteGameState.players.firstWhere(
+          (p) => p.id == currentPlayerId,
+        );
+
+        // If it's not this player's turn, update the local game state
+        if (!currentPlayer.isCurrentTurn!) {
+          gameState = remoteGameState;
+          // updateUI();
+        }
+      }
+    });
   }
 
   Future<void> startGame() async {
     gameState.resetGame();
-    await _updateGameStateInFirebase();
+    await updateGameStateInFirebase();
     gameState.dealerIndex = (gameState.dealerIndex + 1) %
         gameState.players.length; // Move to the next dealer
 
-    HandArea? handArea = children.whereType<HandArea>().firstOrNull;
-    CommunityCardArea? ccardArea =
-        children.whereType<CommunityCardArea>().firstOrNull;
+    // Use the class member variables directly instead of searching for them
+    handArea.clearCards();
+    communityCardArea.clearCards();
 
-    if (handArea != null) {
-      handArea.clearCards();
-    }
-    if (ccardArea != null) {
-      ccardArea.clearCards();
-    }
     await dealCards();
     await blinds(); // Place the blinds for the game
 
     gameState.playerIndex = gameState.dealerIndex;
 
-    await _updateGameStateInFirebase();
-    await playerTurn(gameState.players[gameState.playerIndex]);
+    await updateGameStateInFirebase();
+    await playerTurn();
   }
 
   Future<void> dealCards() async {
@@ -283,7 +289,7 @@ Future<void> loadUserTableSkin() async {
           '${player.name} received cards: ${player.hand![0].toString()} and ${player.hand![1].toString()}');
     }
 
-    await _updateGameStateInFirebase();
+    await updateGameStateInFirebase();
   }
 
   Future<void> nextPlayer() async {
@@ -303,15 +309,16 @@ Future<void> loadUserTableSkin() async {
       gameState.players[gameState.playerIndex].isCurrentTurn = true;
     }
     if (gameState.isGameOver) {
-      await _updateGameStateInFirebase();
+      await updateGameStateInFirebase();
       return;
     }
     print('Next player is ${gameState.players[gameState.playerIndex].name}');
-    await _updateGameStateInFirebase();
-    await playerTurn(gameState.players[gameState.playerIndex]);
+    await updateGameStateInFirebase();
+    await playerTurn();
   }
 
-  Future<void> playerTurn(Player currentPlayer) async {
+  Future<void> playerTurn() async {
+    Player currentPlayer = gameState.players[gameState.playerIndex];
     // Set the first player as current turn
 
     // This method will be called to start the player's turn.
@@ -320,7 +327,7 @@ Future<void> loadUserTableSkin() async {
       print(
           '${currentPlayer.name} has folded or cannot bet any more money. Skipping turn.');
       currentPlayer.isCurrentTurn = false; // End the current player's turn
-      await _updateGameStateInFirebase();
+      await updateGameStateInFirebase();
       await nextPlayer(); // Skip to the next player if current player has folded
       return;
     }
@@ -333,28 +340,33 @@ Future<void> loadUserTableSkin() async {
     if (currentPlayer.isAI!) {
       // If it's an AI player's turn, handle AI logic here
       print('AI Player ${currentPlayer.name}\'s turn.');
-      await endRoundIfFolded(currentPlayer);
-      int amountToCall = currentPlayer.getCallAmount(gameRef);
-      int amount = await currentPlayer.makeAIDecision(gameRef);
-      currentPlayer.hasPlayedThisRound = true; // Mark as played this round
-      if (amount > amountToCall) {
-        await resetTurnsOnRaise(currentPlayer);
-      }
-      gameRef.gameState.pot += amount; // Add the bet to the pot
-      currentPlayer.isCurrentTurn = false; // End AI turn after decision
-      await _updateGameStateInFirebase();
-      await endRoundIfFolded(currentPlayer);
+      if (!await endRoundIfFolded(currentPlayer)) {
+        int amountToCall = currentPlayer.getCallAmount(gameRef);
+        int amount = await currentPlayer.makeAIDecision(gameRef);
+        currentPlayer.hasPlayedThisRound = true; // Mark as played this round
+        if (amount > amountToCall) {
+          await resetTurnsOnRaise(currentPlayer);
+        }
+        gameRef.gameState.pot += amount; // Add the bet to the pot
+        currentPlayer.isCurrentTurn = false; // End AI turn after decision
+        await updateGameStateInFirebase();
+        await endRoundIfFolded(currentPlayer);
 
-      await nextPlayer(); // Move to the next player
+        await nextPlayer(); // Move to the next player
+      }
     } else {
-      await _updateGameStateInFirebase();
+      await updateGameStateInFirebase();
       showPlayerActions(currentPlayer);
     }
   }
 
   void showPlayerActions(Player player) {
-    updateHandUI(player, 0); // Update the hand UI for the current player
-    updateHandUI(player, 1); // Update the hand UI for the second card
+    // Only update hand UI if the player has cards
+    if (player.hand != null && player.hand!.length >= 2) {
+      updateHandUI(player, 0); // Update the hand UI for the current player
+      updateHandUI(player, 1); // Update the hand UI for the second card
+    }
+
     print('Showing player actions...');
     print(
         'Current player: ${gameState.players[gameState.playerIndex].name}, amount to call: ${player.getCallAmount(gameRef)}');
@@ -373,7 +385,7 @@ Future<void> loadUserTableSkin() async {
         player.hasPlayedThisRound = true; // Mark as played this round
 
         player.isCurrentTurn = false;
-        await _updateGameStateInFirebase();
+        await updateGameStateInFirebase();
         await nextPlayer();
       } else {
         print('It is not your turn!');
@@ -394,7 +406,7 @@ Future<void> loadUserTableSkin() async {
           player.hasPlayedThisRound = true; // Mark as played this round
 
           player.isCurrentTurn = false;
-          await _updateGameStateInFirebase();
+          await updateGameStateInFirebase();
           await nextPlayer();
         } else {
           print('It is not your turn!');
@@ -422,7 +434,7 @@ Future<void> loadUserTableSkin() async {
           player.hasPlayedThisRound = true; // Mark as played this round
 
           player.isCurrentTurn = false;
-          await _updateGameStateInFirebase();
+          await updateGameStateInFirebase();
           await nextPlayer();
         } else {
           print('It is not your turn!');
@@ -449,7 +461,7 @@ Future<void> loadUserTableSkin() async {
           await resetTurnsOnRaise(player);
           hideRaiseSlider();
           player.isCurrentTurn = false;
-          await _updateGameStateInFirebase();
+          await updateGameStateInFirebase();
           await nextPlayer();
         } else {
           print('It is not your turn!');
@@ -471,7 +483,7 @@ Future<void> loadUserTableSkin() async {
       p.hasPlayedThisRound =
           false; // reset for all other players since the raise allows them to decide to raise again or
     }
-    await _updateGameStateInFirebase();
+    await updateGameStateInFirebase();
   }
 
   Future<void> blinds() async {
@@ -493,7 +505,7 @@ Future<void> loadUserTableSkin() async {
     print(
         '${smallBlindPlayer.name} placed small blind of ${gameState.smallBlind}');
     print('${bigBlindPlayer.name} placed big blind of ${gameState.bigBlind}');
-    await _updateGameStateInFirebase();
+    await updateGameStateInFirebase();
   }
 
   void updateUI() {
@@ -502,39 +514,30 @@ Future<void> loadUserTableSkin() async {
     children.whereType<ActionButton>().forEach(remove);
 
     // Update hand display
-    final handArea = children.whereType<HandArea>().firstOrNull;
-    if (handArea != null) {
-      handArea.clearCards();
-      // Display the current player's cards
-      final currentPlayerId = FirebaseAuth.instance.currentUser?.uid;
-      Player? currentPlayer = gameState.players.firstWhere(
-        (p) => p.id == currentPlayerId,
-      );
+    handArea.clearCards();
 
-      if (currentPlayer.hand != null) {
-        updateHandUI(currentPlayer, 0);
-        updateHandUI(currentPlayer, 1);
-      }
+    // Display the current player's cards
+    final currentPlayerId = FirebaseAuth.instance.currentUser?.uid;
+    Player currentPlayer = gameState.players.firstWhere(
+      (p) => p.id == currentPlayerId,
+    );
+
+    if (currentPlayer.hand != null) {
+      updateHandUI(currentPlayer, 0);
+      updateHandUI(currentPlayer, 1);
     }
 
     // Update community cards
-    final communityCardArea =
-        children.whereType<CommunityCardArea>().firstOrNull;
-    if (communityCardArea != null) {
-      communityCardArea.clearCards();
+    communityCardArea.clearCards();
 
-      for (int i = 0; i < gameState.communityCards.length; i++) {
-        communityCardArea.addCard(gameState.communityCards[i], i, gameRef);
-      }
+    for (int i = 0; i < gameState.communityCards.length; i++) {
+      communityCardArea.addCard(gameState.communityCards[i], i, gameRef);
     }
 
     // If it's the current player's turn, show action buttons
-    final currentPlayerId = FirebaseAuth.instance.currentUser?.uid;
-    final currentPlayer = gameState.players.firstWhere(
-      (p) => p.id == currentPlayerId && p.isCurrentTurn!,
-    );
-
-    showPlayerActions(currentPlayer);
+    if (currentPlayer.isCurrentTurn!) {
+      showPlayerActions(currentPlayer);
+    }
   }
 
   void updateHandUI(Player player, int index) {
@@ -544,19 +547,12 @@ Future<void> loadUserTableSkin() async {
       return;
     }
 
-    // Find the HandArea component
-    final handArea = children.whereType<HandArea>().firstOrNull;
-    if (handArea == null) {
-      print('Error: HandArea not found');
-      return;
-    }
-
     // Create the card component
     final cardComponent = CardComponent(
       card: player.hand![index],
     );
 
-    // Add the card to the HandArea instead of directly to the screen
+    // Add the card to the HandArea using the class member reference
     handArea.addCard(player, cardComponent, index);
   }
 
@@ -570,14 +566,39 @@ Future<void> loadUserTableSkin() async {
     return foldCount;
   }
 
-  Future<void> endRoundIfFolded(Player currentPlayer) async {
+  Future<bool> endRoundIfFolded(Player currentPlayer) async {
     int foldCount = checkFolds();
     if (foldCount == gameState.players.length - 1) {
-      print('All other players folded. ${currentPlayer.name} wins by default!');
-      roundBasedDealing(4); // skips to the determining of the winner
-      await _updateGameStateInFirebase();
-      return; // Exit the turn
+      Player winner = determineWinner();
+      winner.balance += gameState.pot; // Add the pot to the winner's balance
+      gameState.isGameOver = true; // Set the game state to over
+      if (checkFolds() == gameState.players.length - 1) {
+        print('${winner.name} wins by default!');
+        winner.balance += gameState.pot; // Add the pot to the winner's balance
+      } else {
+        print('${winner.name} wins the game with a ${winner.hand.toString()}!');
+      }
+
+      // Show the play again button
+      late final PlayNextRoundButton playAgainButton;
+      playAgainButton = PlayNextRoundButton(
+        spriteSrcPosition:
+            Vector2(137 * 5, 48 * 5), // Replace with appropriate values
+        spriteSrcSize:
+            Vector2(80 * 5, 13 * 5), // Replace with appropriate values
+        position: Vector2(gameRef.size.x * 3 / 4 + 15, gameRef.size.y / 2),
+        spriteScale: 0.73,
+        () async {
+          remove(playAgainButton); // Remove the button from the screen
+          await startGame(); // Start a new game
+        },
+      );
+      cleanupEndGameButtons();
+      add(playAgainButton);
+      await updateGameStateInFirebase();
+      return true; // Exit the turn
     }
+    return false;
   }
 
   bool checkPotIsRight(List<Player> players) {
@@ -600,14 +621,12 @@ Future<void> loadUserTableSkin() async {
   }
 
   Future<void> roundBasedDealing(int round) async {
-    //find the community card area component
-    final communityCardArea =
-        children.whereType<CommunityCardArea>().firstOrNull;
+    // Use the class member directly instead of searching for it
     for (var player in gameState.players) {
       player.hasPlayedThisRound =
           false; // Reset the played status for all players
     }
-    await _updateGameStateInFirebase();
+    await updateGameStateInFirebase();
 
     switch (round) {
       case 0: // Pre-flop
@@ -620,10 +639,10 @@ Future<void> loadUserTableSkin() async {
           PlayingCard card = gameState.deck.dealCard();
           gameState.communityCards.add(card);
 
-          communityCardArea!
-              .addCard(card, i, gameRef); // Add the card to the community area
+          communityCardArea.addCard(
+              card, i, gameRef); // Add the card to the community area
         }
-        await _updateGameStateInFirebase();
+        await updateGameStateInFirebase();
         break;
       case 2: // Turn
         print('Turn round, showing 1 community card.');
@@ -632,10 +651,10 @@ Future<void> loadUserTableSkin() async {
           PlayingCard card = gameState.deck.dealCard();
           gameState.communityCards.add(card);
 
-          communityCardArea!
-              .addCard(card, i, gameRef); // Add the card to the community area
+          communityCardArea.addCard(
+              card, i, gameRef); // Add the card to the community area
         }
-        await _updateGameStateInFirebase();
+        await updateGameStateInFirebase();
         break;
       case 3: // River
         print('River round, showing 1 community card.');
@@ -644,58 +663,58 @@ Future<void> loadUserTableSkin() async {
           PlayingCard card = gameState.deck.dealCard();
           gameState.communityCards.add(card);
 
-          communityCardArea!
-              .addCard(card, i, gameRef); // Add the card to the community area
+          communityCardArea.addCard(
+              card, i, gameRef); // Add the card to the community area
         }
-        await _updateGameStateInFirebase();
+        await updateGameStateInFirebase();
         break;
-      default: // End of game
-        Player winner = determineWinner();
-        winner.balance += gameState.pot; // Add the pot to the winner's balance
-        gameState.isGameOver = true; // Set the game state to over
-        if (checkFolds() == gameState.players.length - 1) {
-          print('${winner.name} wins by default!');
-        } else {
-          print(
-              '${winner.name} wins the game with a ${winner.handRank.toString()}!');
+      case 4: // Showdown
+        if (!gameState.isGameOver) {
+          Player winner = determineWinner();
+          winner.balance +=
+              gameState.pot; // Add the pot to the winner's balance
+          gameState.isGameOver = true; // Set the game state to over
+          if (checkFolds() == gameState.players.length - 1) {
+            print('${winner.name} wins by default!');
+            winner.balance +=
+                gameState.pot; // Add the pot to the winner's balance
+          } else {
+            print(
+                '${winner.name} wins the game with a ${winner.hand.toString()}!');
+          }
+
+          // Show the play again button
+          late final PlayNextRoundButton playAgainButton;
+          playAgainButton = PlayNextRoundButton(
+            spriteSrcPosition:
+                Vector2(137 * 5, 48 * 5), // Replace with appropriate values
+            spriteSrcSize:
+                Vector2(80 * 5, 13 * 5), // Replace with appropriate values
+            position: Vector2(gameRef.size.x * 3 / 4 + 15, gameRef.size.y / 2),
+            spriteScale: 0.73,
+            () async {
+              remove(playAgainButton); // Remove the button from the screen
+              await startGame(); // Start a new game
+            },
+          );
+          cleanupEndGameButtons();
+          add(playAgainButton);
+          await updateGameStateInFirebase();
         }
-
-        // Show the play again button
-        late final PlayNextRoundButton playAgainButton;
-        playAgainButton = PlayNextRoundButton(
-          spriteSrcPosition:
-              Vector2(137 * 5, 48 * 5), // Replace with appropriate values
-          spriteSrcSize:
-              Vector2(80 * 5, 13 * 5), // Replace with appropriate values
-          position: Vector2(gameRef.size.x * 3 / 4 + 15, gameRef.size.y / 2),
-          spriteScale: 0.73,
-          () async {
-            remove(playAgainButton); // Remove the button from the screen
-            await startGame(); // Start a new game
-          },
-        );
-        add(playAgainButton);
-
-        await _updateGameStateInFirebase();
         break;
-      // default:
-      //   print('Invalid round number: $round');
-      //   break;
+      default:
+        break; // End of game
     }
   }
 
+  void cleanupEndGameButtons() {
+    // Remove all PlayNextRoundButton instances
+    children.whereType<PlayNextRoundButton>().toList().forEach((button) {
+      remove(button);
+    });
+  }
+
   Player determineWinner() {
-    Map<HandRank, int> handranksToInts = {
-      HandRank.highCard: 1,
-      HandRank.onePair: 2,
-      HandRank.twoPair: 3,
-      HandRank.threeOfAKind: 4,
-      HandRank.straight: 5,
-      HandRank.flush: 6,
-      HandRank.fullHouse: 7,
-      HandRank.fourOfAKind: 8,
-      HandRank.straightFlush: 9,
-    };
     List<Player> contenders =
         gameState.players.where((p) => !p.isFolded!).toList();
 
@@ -704,20 +723,30 @@ Future<void> loadUserTableSkin() async {
           '${contenders[0].name} is the only player left, they win by default!');
       return contenders[0]; // If only one player is left, they win by default
     }
+    Player bestcontender = contenders.first;
 
     for (Player contender in contenders) {
-      contender.handRank = cardEvaluator
-          .bestOfSeven([...contender.hand!, ...gameState.communityCards]);
-      print(
-          '${contender.name} has a ${contender.handRank.toString()} with hand: ${contender.hand}');
+      int result = comparePokerHands(
+          hand1: bestcontender.convertHandToEvaluate(bestcontender.hand!),
+          hand2: contender.convertHandToEvaluate(contender.hand!),
+          communityCards:
+              gameState.convertHandToEvaluate(gameState.communityCards));
+      if (result == 1) {
+        bestcontender = bestcontender;
+      }
+      if (result == -1) {
+        bestcontender = contender;
+      }
+      if (result == 0) {
+        // If hands are equal, compare balances
+        if (contender.balance > bestcontender.balance) {
+          bestcontender = contender;
+        } else {
+          bestcontender = bestcontender;
+        }
+      }
     }
-
-    contenders.sort((a, b) =>
-        handranksToInts[b.handRank]!.compareTo(handranksToInts[a.handRank]!));
-    Player winner =
-        contenders.first; // The first player in the sorted list is the winner
-    print('Winner is ${winner.name} with a ${winner.handRank.toString()}!');
-    return winner; // Return the winner
+    return bestcontender;
   }
 
   Future<int> showSlider() async {
@@ -821,7 +850,7 @@ Future<void> loadUserTableSkin() async {
 
 // FIREBASE FUNCTIONS
 
-  Future<void> _updateGameStateInFirebase() async {
+  Future<void> updateGameStateInFirebase() async {
     if (isOffline) {
       return; // Skip Firebase update if offline
     }
@@ -834,6 +863,80 @@ Future<void> loadUserTableSkin() async {
       print("Game state updated in Firebase");
     } catch (e) {
       print("Error updating game state: $e");
+    }
+  }
+
+  Future<void> loadUserCardSkin() async {
+    final currentPlayerEmail = FirebaseAuth.instance.currentUser?.email;
+
+    if (currentPlayerEmail == null) {
+      print('No current user email available');
+      return;
+    }
+
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentPlayerEmail) // Use the email as the document ID
+        .get();
+
+    if (userDoc.exists) {
+      bool ownMagicCardSkin = userDoc['ownMagicCardSkin'] ?? false;
+      bool ownPokemonCardSkin = userDoc['ownPokemonCardSkin'] ?? false;
+
+      if (ownMagicCardSkin) {
+        cardSkinImage =
+            'art/cards/Magic Card Back.png'; // Magic card skin image
+      } else if (ownPokemonCardSkin) {
+        cardSkinImage =
+            'art/cards/Pokemon Card Back.png'; // Pokemon card skin image
+      } else {
+        cardSkinImage =
+            'art/cards/Black Card Back.png'; // Default card skin image
+      }
+
+      print("flutter: Card skin loaded: $cardSkinImage");
+    } else {
+      print('flutter: User document not found.');
+      cardSkinImage =
+          'art/cards/Black Card Back.png'; // Default card skin if not found
+    }
+  }
+
+  Future<void> loadUserTableSkin() async {
+    // Get the current user's email
+    final currentPlayerEmail = FirebaseAuth.instance.currentUser?.email;
+
+    if (currentPlayerEmail == null) {
+      print('No current user email available');
+      return;
+    }
+
+    // Fetch the user's data from Firestore using the email as the document ID
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentPlayerEmail) // Use the email as the document ID
+        .get();
+
+    if (userDoc.exists) {
+      // Retrieve the 'ownPurpleTableSkin' and 'ownRedTableSkin' values from the user's data
+      bool ownPurpleTableSkin = userDoc['ownPurpleTableSkin'] ?? false;
+      bool ownRedTableSkin = userDoc['ownRedTableSkin'] ?? false;
+
+      // Choose the correct table image based on the user's purchases
+      if (ownPurpleTableSkin) {
+        tableSkinImage =
+            'art/Purple Poker Table.png'; // Purple table skin image
+      } else if (ownRedTableSkin) {
+        tableSkinImage = 'art/Red Poker Table.png'; // Red table skin image
+      } else {
+        tableSkinImage = 'art/Base Poker Table.png'; // Default table image
+      }
+
+      print("flutter: Table skin loaded: $tableSkinImage");
+    } else {
+      print('flutter: User document not found.');
+      tableSkinImage =
+          'art/Base Poker Table.png'; // Default table skin if not found
     }
   }
 }
