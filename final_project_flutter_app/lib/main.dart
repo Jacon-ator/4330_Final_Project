@@ -1,7 +1,7 @@
+import 'package:final_project_flutter_app/audio/audio_manager.dart';
 import 'package:final_project_flutter_app/components/buttons/auth/profile_button.dart';
 import 'package:final_project_flutter_app/components/buttons/menu/chat_button.dart';
 import 'package:final_project_flutter_app/poker_party.dart';
-import 'package:final_project_flutter_app/audio/audio_manager.dart';
 import 'package:final_project_flutter_app/screens/login_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -65,13 +65,13 @@ Widget buildGameScreen(String playerName) {
           ),
         ),
         Positioned(
-          top: 20,
-          left: 20,
+          top: 10,
+          left: 10,
           child: ProfileButton(name: playerName),
         ),
         Positioned(
-          top: 20,
-          right: 20,
+          top: 10,
+          right: 10,
           child: ChatButton(name: playerName),
         ),
         // Positioned(
