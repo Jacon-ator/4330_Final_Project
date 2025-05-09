@@ -24,7 +24,6 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
 
   late GameState gameState = gameRef.gameState; // Reference to the game state
   CardEvaluator cardEvaluator = CardEvaluator();
-  bool showPlayAgainButton = false;
   final SFXManager _sfxManager = SFXManager();
   StreamSubscription<DocumentSnapshot>? _gameStateSubscription;
 
@@ -92,9 +91,26 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       ..size = Vector2(20 * 5.2, 27 * 5.76)
       ..position = Vector2(1150, 523);
 
+    late final PlayNextRoundButton endLobbyButton;
+    endLobbyButton = PlayNextRoundButton(
+      spriteSrcPosition:
+          Vector2(137 * 5, 62 * 5), // Replace with appropriate values
+      spriteSrcSize: Vector2(80 * 5, 13 * 5), // Replace with appropriate values
+      position: Vector2(gameRef.size.x * 3 / 4 + 15, gameRef.size.y / 2 + 70),
+      spriteScale: 0.70,
+      () async {
+        gameState.isLobbyActive = false; // Set the lobby state to inactive
+        await _updateGameStateInFirebase();
+        gameRef.gameState.reset();
+        gameRef.router.popUntilNamed("menu"); // Navigate to the lobby screen
+        await startGame();
+      },
+    );
+
     // Add the components
     add(pokerTable);
     add(chatMenu);
+    add(endLobbyButton); // Add the button to the screen
     add(playerUI);
     add(profilePicture);
 
@@ -606,40 +622,20 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
         }
 
         // Show the play again button
-        showPlayAgainButton = true;
         late final PlayNextRoundButton playAgainButton;
         playAgainButton = PlayNextRoundButton(
-          spriteSrcPosition: Vector2(0, 0), // Replace with appropriate values
-          spriteSrcSize: Vector2(100, 50), // Replace with appropriate values
-          position: Vector2(gameRef.size.x / 2 - 50, gameRef.size.y / 2 - 25),
+          spriteSrcPosition:
+              Vector2(137 * 5, 48 * 5), // Replace with appropriate values
+          spriteSrcSize:
+              Vector2(80 * 5, 13 * 5), // Replace with appropriate values
+          position: Vector2(gameRef.size.x * 3 / 4 + 15, gameRef.size.y / 2),
+          spriteScale: 0.73,
           () async {
-            showPlayAgainButton = false; // Hide the button
             remove(playAgainButton); // Remove the button from the screen
             await startGame(); // Start a new game
           },
         );
         add(playAgainButton);
-
-        late final PlayNextRoundButton endLobbyButton;
-        endLobbyButton = PlayNextRoundButton(
-          spriteSrcPosition:
-              Vector2(100, 100), // Replace with appropriate values
-          spriteSrcSize: Vector2(100, 50), // Replace with appropriate values
-          position: Vector2(gameRef.size.x / 2 - 50, gameRef.size.y / 2 + 25),
-          () async {
-            showPlayAgainButton = false; // Hide the button
-            remove(endLobbyButton); // Remove the button from the screen
-            remove(playAgainButton); // Remove the button from the screen
-            gameState.isLobbyActive = false; // Set the lobby state to inactive
-            await _updateGameStateInFirebase();
-            gameRef.gameState.reset();
-            gameRef.router
-                .popUntilNamed("menu"); // Navigate to the lobby screen
-            await startGame();
-          },
-        );
-
-        add(endLobbyButton); // Add the button to the screen
 
         await _updateGameStateInFirebase();
         break;

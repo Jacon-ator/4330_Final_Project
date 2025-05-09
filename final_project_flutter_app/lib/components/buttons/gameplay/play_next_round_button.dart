@@ -14,6 +14,7 @@ class PlayNextRoundButton extends PositionComponent
   // These parameters tell the button where to extract its sprite from the spritesheet.
   final Vector2 spriteSrcPosition;
   final Vector2 spriteSrcSize;
+  late double spriteScale = 1;
 
   Sprite? sprite;
 
@@ -21,6 +22,7 @@ class PlayNextRoundButton extends PositionComponent
     this.onPressed, {
     required this.spriteSrcPosition,
     required this.spriteSrcSize,
+    required this.spriteScale,
     Vector2? position,
   }) {
     if (position != null) {
@@ -31,19 +33,29 @@ class PlayNextRoundButton extends PositionComponent
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    // Load the master button spritesheet.
+
     final image =
         await gameRef.images.load("art/buttons/Master Button Sheet.png");
-    sprite =
-        Sprite(image, srcPosition: spriteSrcPosition, srcSize: spriteSrcSize);
-    size = spriteSrcSize;
+    sprite = Sprite(
+      image,
+      srcPosition: spriteSrcPosition, // multiplied original coordinates
+      srcSize: spriteSrcSize, // change width and height as needed
+    );
+
+    // Optionally, adjust the size based on your asset's dimensions.
+    if (sprite != null) {
+      size = sprite!.srcSize * spriteScale;
+
+      position = position;
+    }
   }
 
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    // Render the sprite button background.
-    sprite?.renderRect(canvas, size.toRect());
+    if (sprite != null) {
+      sprite!.renderRect(canvas, size.toRect());
+    }
   }
 
   @override
