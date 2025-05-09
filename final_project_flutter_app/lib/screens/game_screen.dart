@@ -26,7 +26,8 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
   CardEvaluator cardEvaluator = CardEvaluator();
   final SFXManager _sfxManager = SFXManager();
   StreamSubscription<DocumentSnapshot>? _gameStateSubscription;
-  String tableSkinImage = '';
+  String tableSkinImage = 'art/Base Poker Table.png';
+  String cardSkinImage = 'art/cards/Black Card Back.png';
 
   @override
   Future<void> onLoad() async {
@@ -46,6 +47,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     gameState = gameRef.gameState; // Get the game state from the game reference
 
     await loadUserTableSkin();  // Load the table skin based on the user's preferences
+    await loadUserCardSkin(); // Load card skins
 
     await gameRef.images.loadAll([
       AssetPaths.cardFronts,
@@ -53,6 +55,7 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     ]);
 
     // Load sprites
+    final cardSprite = await gameRef.loadSprite(cardSkinImage);
     final tableSprite = await gameRef.loadSprite(tableSkinImage);
     final uiSprite = await gameRef.loadSprite('art/Base Player UI.png');
     final chatMenuSprite = await gameRef.loadSprite('art/Chat Menu.png');
@@ -94,6 +97,67 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       ..size = Vector2(20 * 5.2, 27 * 5.76)
       ..position = Vector2(1150, 523);
 
+
+    // Create left card sprites (left side of the table)
+    final leftCardSprite1 = SpriteComponent()
+      ..sprite = cardSprite
+      ..size = Vector2(50, 80)
+      ..position = Vector2(150, tableHeight / 2 - 50)
+      ..angle = 0.75 
+      ..priority = 1;
+
+    final leftCardSprite2 = SpriteComponent()
+      ..sprite = cardSprite
+      ..size = Vector2(50, 80)
+      ..position = Vector2(150, tableHeight / 2 + 10)
+      ..angle = 1.35  
+      ..priority = 1;
+
+    // Create top card sprites (top side of the table)
+    final topCardSprite1 = SpriteComponent()
+      ..sprite = cardSprite
+      ..size = Vector2(50, 80)
+      ..position = Vector2(tableWidth / 2 - 30, 30)
+      ..angle = 0.5  
+      ..priority = 1;
+
+    final topCardSprite2 = SpriteComponent()
+      ..sprite = cardSprite
+      ..size = Vector2(50, 80)
+      ..position = Vector2(tableWidth / 2 + 20, 30)
+      ..angle = -0.5  
+      ..priority = 1;
+
+    // Create right card sprites (right side of the table)
+    final rightCardSprite1 = SpriteComponent()
+      ..sprite = cardSprite
+      ..size = Vector2(50, 80)
+      ..position = Vector2(tableWidth - 120, tableHeight / 2 - 40)
+      ..angle = 1.2  
+      ..priority = 1;
+
+    final rightCardSprite2 = SpriteComponent()
+      ..sprite = cardSprite
+      ..size = Vector2(50, 80)
+      ..position = Vector2(tableWidth - 120, tableHeight / 2 + 15)
+      ..angle = 0.75 
+      ..priority = 1;
+
+    // Create bottom card sprites (bottom side of the table)
+    final bottomCardSprite1 = SpriteComponent()
+      ..sprite = cardSprite
+      ..size = Vector2(50, 80)
+      ..position = Vector2(tableWidth / 2 - 60, tableHeight - 100)  // Position at the bottom center
+      ..angle = -0.75  // Adjust the angle to make it appear flipped
+      ..priority = 1;
+
+    final bottomCardSprite2 = SpriteComponent()
+      ..sprite = cardSprite
+      ..size = Vector2(50, 80)
+      ..position = Vector2(tableWidth / 2 + 30, tableHeight - 100)  // Position next to the first card
+      ..angle = 0.2  // Adjust the angle to make it appear flipped
+      ..priority = 1;
+
     late final PlayNextRoundButton endLobbyButton;
     endLobbyButton = PlayNextRoundButton(
       spriteSrcPosition:
@@ -116,6 +180,14 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
     add(endLobbyButton); // Add the button to the screen
     add(playerUI);
     add(profilePicture);
+    add(topCardSprite1);
+    add(topCardSprite2);
+    add(leftCardSprite1);
+    add(leftCardSprite2);
+    add(rightCardSprite1);
+    add(rightCardSprite2);
+    add(bottomCardSprite1);
+    add(bottomCardSprite2);
 
     add(HandArea());
     add(CommunityCardArea());
@@ -197,6 +269,40 @@ Future<void> loadUserTableSkin() async {
     print('flutter: User document not found.');
     tableSkinImage = 'art/Base Poker Table.png';  // Default table skin if not found
   }  
+}
+
+Future<void> loadUserCardSkin() async {
+
+  final currentPlayerEmail = FirebaseAuth.instance.currentUser?.email;
+
+  if (currentPlayerEmail == null) {
+    print('No current user email available');
+    return;
+  }
+
+  DocumentSnapshot userDoc = await FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentPlayerEmail) // Use the email as the document ID
+      .get();
+
+  if (userDoc.exists) {
+
+    bool ownMagicCardSkin = userDoc['ownMagicCardSkin'] ?? false;
+    bool ownPokemonCardSkin = userDoc['ownPokemonCardSkin'] ?? false;
+
+    if (ownMagicCardSkin) {
+      cardSkinImage = 'art/cards/Magic Card Back.png';  // Magic card skin image
+    } else if (ownPokemonCardSkin) {
+      cardSkinImage = 'art/cards/Pokemon Card Back.png';  // Pokemon card skin image
+    } else {
+      cardSkinImage = 'art/cards/Black Card Back.png';  // Default card skin image
+    }
+
+    print("flutter: Card skin loaded: $cardSkinImage");
+  } else {
+    print('flutter: User document not found.');
+    cardSkinImage = 'art/cards/Black Card Back.png';  // Default card skin if not found
+  }
 }
 
   @override
