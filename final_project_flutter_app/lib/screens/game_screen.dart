@@ -175,6 +175,13 @@ class GameScreen extends Component with HasGameRef<PokerParty> {
       () async {
         gameState.isLobbyActive = false; // Set the lobby state to inactive
         await updateGameStateInFirebase();
+        //update the user's "Chips" in the database
+        await FirebaseFirestore.instance
+            .collection("users")
+            .doc(FirebaseAuth.instance.currentUser?.email)
+            .update({
+          "Chips": gameState.players[0].balance,
+        });
         gameRef.gameState.reset();
         gameRef.router.popUntilNamed("menu"); // Navigate to the lobby screen
       },
