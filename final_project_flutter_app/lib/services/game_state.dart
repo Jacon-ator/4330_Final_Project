@@ -128,16 +128,17 @@ class GameState {
     return true;
   }
 
+  // This method is now deprecated in favor of manual player/bot addition in the lobby
+  // It's kept for backward compatibility but not used in the main flow
   void initializePlayers() {
-    for (int i = 0; i < table.totalCapacity; i++) {
-      bool isAI = i > 0;
-      String playerName = isAI ? "AI_Player_${i + 1}" : "Player_${i + 1}";
-
+    // Only initialize if players list is empty
+    if (players.isEmpty) {
+      // Add just the human player by default
       Player player = Player(
-        id: "player_${i + 1}",
-        name: playerName,
+        id: "player_1",
+        name: "Player_1",
         balance: 1000,
-        isAI: isAI,
+        isAI: false,
       );
 
       players.add(player);

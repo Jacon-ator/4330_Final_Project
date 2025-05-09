@@ -45,7 +45,9 @@ class MainMenuButton extends PositionComponent
   @override
   void onTapDown(TapDownEvent event) {
     super.onTapDown(event);
+    // Reset the game state before navigating to the main menu
+    gameRef.resetGameState();
     // Navigate to the main menu screen when the button is tapped
-    gameRef.router.pushNamed('menu');
+    gameRef.goTo('menu');
   }
 }
