@@ -51,7 +51,7 @@ class MainMenuScreen extends Component with HasGameRef<PokerParty> {
 
     add(background);
     // add(supportButton);
-    add(rulesButton);
+    // add(rulesButton);
     add(startGameButton);
     add(shopButton);
     add(settingsButton);
