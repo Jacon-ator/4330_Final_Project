@@ -39,7 +39,3 @@ This is a Flutter-based Texas Hold'em poker game developed as part of the CSC 43
 - All UI components are initialized in `onLoad()` method
 - Game state is managed centrally and synchronized with Firebase
 - Direct references to frequently used components are stored as class members to avoid race conditions
-
-### Known Issues
-
-- [List any known issues here]
