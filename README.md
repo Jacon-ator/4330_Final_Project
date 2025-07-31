@@ -18,7 +18,7 @@ This is a Flutter-based Texas Hold'em poker game developed as part of the CSC 43
 | Austin Cao  | Shop implementation, Chat implementation, Backend|
 | Jacob Kinchen  | All the art, initial setup of the repository, skinning the UI elements|
 | Hoa Nguyen  | Game Logic, Firebase setup, CI/CD Pipline, General bug fixing|
-| Adian Elier  | Hand evaluation, card evaluator, unit testing |
+| Aidan Elier  | Hand evaluation, card evaluator, unit testing |
 | Anna Olinde  | Frontend implementation, general UI/UX flow |
 | Philemon Holmes  |Music creation, connecting the music to the game|
 | Troy Williams  | Firebase initial setup, assisting with chat implementation|
